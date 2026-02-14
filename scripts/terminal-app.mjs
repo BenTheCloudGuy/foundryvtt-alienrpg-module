@@ -38,11 +38,17 @@ export class WYTerminalApp extends Application {
     super(options);
     this.shipStatus = options.shipStatus;
 
+    /** @type {Array} Cached log entries loaded from muthur/logs.json */
+    this._fileLogCache = [];
+
     // Load persisted chat history
     try {
       const saved = game.settings.get('wy-terminal', 'chatHistory');
       if (Array.isArray(saved)) this.chatHistory = saved;
     } catch (e) { /* first load */ }
+
+    // Load log entries from JSON file (async, fills cache before first view)
+    this._loadFileLogEntries();
   }
 
   static get defaultOptions() {
@@ -273,7 +279,7 @@ export class WYTerminalApp extends Application {
         return { ...base, systems: this._getSystemsDetailData() };
 
       case 'logs':
-        return { ...base, logs: this._getLogData() };
+        return { ...base, logs: this._getLogData(), isGM: game.user.isGM };
 
       case 'muthur':
         return { ...base, chatHistory: this.chatHistory, muthurHeader: this._getMuthurHeader() };
@@ -375,14 +381,49 @@ export class WYTerminalApp extends Application {
 
   /* ── Log data ── */
   _getLogData() {
-    const logs = this._loadSetting('logEntries');
-    if (logs.length) return logs;
+    // Merge logs from the JSON file (loaded at init) and runtime setting
+    const fileLogs = this._fileLogCache || [];
+    const settingLogs = this._loadSetting('logEntries');
 
-    return [
-      { timestamp: '2183-06-12 06:00:00', source: 'SYSTEM', message: 'CREW REVIVED FROM CRYOSLEEP', level: '' },
-      { timestamp: '2183-06-12 06:05:00', source: 'MU/TH/UR', message: 'UNKNOWN SIGNAL DETECTED ON LONG-RANGE SENSORS', level: 'warning' },
-      { timestamp: '2183-06-12 06:10:00', source: 'NAV', message: 'COURSE CORRECTION CALCULATED FOR SIGNAL SOURCE', level: '' },
-    ];
+    // Merge: setting logs first (newest), then file logs
+    // Deduplicate by id if present
+    const seen = new Set();
+    const merged = [];
+    for (const log of [...settingLogs, ...fileLogs]) {
+      const key = log.id || `${log.timestamp}-${log.title || log.message}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        merged.push({
+          id: log.id || key,
+          timestamp: log.timestamp || '',
+          source: (log.source || 'SYSTEM').toUpperCase(),
+          title: (log.title || log.message || 'UNTITLED').toUpperCase(),
+          level: log.level || '',
+          detail: log.detail || log.message || '',
+        });
+      }
+    }
+
+    // Sort by timestamp descending (newest first)
+    merged.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+    return merged;
+  }
+
+  /**
+   * Load log entries from muthur/logs.json file.
+   * Called once during initialization; cached in _fileLogCache.
+   */
+  async _loadFileLogEntries() {
+    try {
+      const resp = await fetch('modules/wy-terminal/muthur/logs.json', { cache: 'no-store' });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+      this._fileLogCache = Array.isArray(data.logs) ? data.logs : [];
+      console.log(`WY-Terminal | Loaded ${this._fileLogCache.length} log entries from logs.json`);
+    } catch (err) {
+      console.warn('WY-Terminal | Could not load muthur/logs.json:', err.message);
+      this._fileLogCache = [];
+    }
   }
 
   /* ── Scenes data ── */
@@ -529,6 +570,9 @@ export class WYTerminalApp extends Application {
 
   _onViewRendered(viewName, contentEl) {
     switch (viewName) {
+      case 'logs':
+        this._setupLogsView(contentEl);
+        break;
       case 'muthur':
         this._setupMuthurView(contentEl);
         break;
@@ -545,6 +589,63 @@ export class WYTerminalApp extends Application {
         this._setupSettingsView(contentEl);
         break;
     }
+  }
+
+  /* ── Logs View Setup — Expandable entries + GM form ── */
+  _setupLogsView(contentEl) {
+    // Click-to-expand log entries
+    contentEl.querySelectorAll('.wy-log-entry').forEach(entry => {
+      const header = entry.querySelector('.wy-log-header');
+      const detail = entry.querySelector('.wy-log-detail');
+      if (!header || !detail) return;
+
+      header.addEventListener('click', () => {
+        const isOpen = entry.classList.contains('expanded');
+        // Close all others
+        contentEl.querySelectorAll('.wy-log-entry.expanded').forEach(other => {
+          if (other !== entry) {
+            other.classList.remove('expanded');
+            other.querySelector('.wy-log-detail')?.classList.add('wy-hidden');
+          }
+        });
+        // Toggle this one
+        entry.classList.toggle('expanded', !isOpen);
+        detail.classList.toggle('wy-hidden', isOpen);
+      });
+    });
+
+    // GM: show/hide new log form
+    const addBtn = contentEl.querySelector('[data-action="add-log"]');
+    const form = contentEl.querySelector('#wy-log-form');
+    if (addBtn && form) {
+      addBtn.addEventListener('click', () => {
+        form.classList.toggle('wy-hidden');
+      });
+    }
+
+    // GM: cancel log form
+    contentEl.querySelector('[data-action="cancel-log"]')?.addEventListener('click', () => {
+      form?.classList.add('wy-hidden');
+    });
+
+    // GM: submit log form
+    contentEl.querySelector('[data-action="submit-log"]')?.addEventListener('click', async () => {
+      const source = contentEl.querySelector('#wy-log-form-source')?.value || 'SYSTEM';
+      const title = contentEl.querySelector('#wy-log-form-title')?.value || 'UNTITLED';
+      const level = contentEl.querySelector('#wy-log-form-level')?.value || '';
+      const detail = contentEl.querySelector('#wy-log-form-detail')?.value || '';
+
+      if (!title.trim()) {
+        ui.notifications.warn('WY-Terminal: Log title is required.');
+        return;
+      }
+
+      await this._addLog(source, title, level, detail || title);
+      ui.notifications.info('WY-Terminal: Log entry created.');
+
+      // Re-render the logs view to show the new entry
+      this._renderView('logs');
+    });
   }
 
   /* ── MU/TH/UR Chat Setup ── */
@@ -930,16 +1031,19 @@ export class WYTerminalApp extends Application {
     }
   }
 
-  async _addLog(source, message, level = '') {
+  async _addLog(source, message, level = '', detail = '') {
     const logs = this._loadSetting('logEntries');
+    const id = `rt-${Date.now()}`;
     logs.unshift({
+      id,
       timestamp: this._getGameDate(),
       source: source.toUpperCase(),
-      message: message.toUpperCase(),
+      title: message.toUpperCase(),
       level,
+      detail: detail || message.toUpperCase(),
     });
-    // Keep last 100 entries
-    if (logs.length > 100) logs.length = 100;
+    // Keep last 200 entries
+    if (logs.length > 200) logs.length = 200;
     await game.settings.set('wy-terminal', 'logEntries', logs);
   }
 

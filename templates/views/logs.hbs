@@ -1,11 +1,54 @@
 <div class="wy-view-logs">
-  <div class="wy-section-title">SHIP LOG — {{shipName}}</div>
+  <div class="wy-section-title">
+    SHIP LOG — {{shipName}}
+    {{#if isGM}}
+    <button class="wy-log-add-btn" data-action="add-log" title="Create New Log Entry">+ NEW LOG</button>
+    {{/if}}
+  </div>
 
-  <div class="wy-border-box">
+  {{!-- GM: New log entry form (hidden by default) --}}
+  {{#if isGM}}
+  <div class="wy-log-form wy-hidden" id="wy-log-form">
+    <div class="wy-log-form-title">CREATE NEW LOG ENTRY</div>
+    <div class="wy-log-form-row">
+      <label class="wy-log-form-label">SOURCE</label>
+      <input type="text" class="wy-setting-input" id="wy-log-form-source" placeholder="SYSTEM" />
+    </div>
+    <div class="wy-log-form-row">
+      <label class="wy-log-form-label">TITLE</label>
+      <input type="text" class="wy-setting-input" id="wy-log-form-title" placeholder="LOG ENTRY TITLE" style="width: 100%;" />
+    </div>
+    <div class="wy-log-form-row">
+      <label class="wy-log-form-label">LEVEL</label>
+      <select class="wy-setting-input" id="wy-log-form-level">
+        <option value="">NORMAL</option>
+        <option value="warning">WARNING</option>
+        <option value="critical">CRITICAL</option>
+      </select>
+    </div>
+    <div class="wy-log-form-row">
+      <label class="wy-log-form-label">DETAIL</label>
+      <textarea class="wy-setting-input wy-log-form-detail" id="wy-log-form-detail" rows="6" placeholder="FULL LOG BODY TEXT..."></textarea>
+    </div>
+    <div class="wy-log-form-actions">
+      <button class="wy-scene-btn" data-action="submit-log">COMMIT LOG</button>
+      <button class="wy-scene-btn" data-action="cancel-log">CANCEL</button>
+    </div>
+  </div>
+  {{/if}}
+
+  <div class="wy-border-box wy-log-list">
     {{#each logs}}
-    <div class="wy-log-entry {{this.level}}">
-      <div class="wy-log-timestamp">[{{this.timestamp}}] — {{this.source}}</div>
-      <div class="wy-log-message">{{this.message}}</div>
+    <div class="wy-log-entry {{this.level}}" data-log-index="{{@index}}">
+      <div class="wy-log-header">
+        <span class="wy-log-expand-icon">▶</span>
+        <span class="wy-log-timestamp">[{{this.timestamp}}]</span>
+        <span class="wy-log-source">{{this.source}}</span>
+        <span class="wy-log-title">{{this.title}}</span>
+      </div>
+      <div class="wy-log-detail wy-hidden">
+        <pre class="wy-log-detail-text">{{this.detail}}</pre>
+      </div>
     </div>
     {{/each}}
 

@@ -852,19 +852,95 @@
 }
 
 /* ============================================================================
-   LOG ENTRIES
+   LOG ENTRIES — Expandable detail view
    ============================================================================ */
 
+.wy-log-list {
+  max-height: 100%;
+  overflow-y: auto;
+}
+
 .wy-log-entry {
-  padding: 8px 0;
+  padding: 0;
   border-bottom: 1px solid rgba(58, 122, 0, 0.15);
+  cursor: pointer;
+  transition: background var(--wy-transition);
+}
+
+.wy-log-entry:hover {
+  background: var(--wy-green-glow);
+}
+
+.wy-log-entry.expanded {
+  background: rgba(127, 255, 0, 0.04);
+}
+
+.wy-log-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 8px;
+}
+
+.wy-log-expand-icon {
+  font-size: 10px;
+  color: var(--wy-green-dim);
+  flex-shrink: 0;
+  width: 12px;
+  transition: transform 0.15s ease;
+}
+
+.wy-log-entry.expanded .wy-log-expand-icon {
+  transform: rotate(90deg);
+  color: var(--wy-green);
 }
 
 .wy-log-timestamp {
   font-size: 10px;
   color: var(--wy-green-dim);
   letter-spacing: 1px;
+  flex-shrink: 0;
 }
+
+.wy-log-source {
+  font-size: 10px;
+  color: var(--wy-green-dim);
+  letter-spacing: 2px;
+  flex-shrink: 0;
+  min-width: 60px;
+}
+
+.wy-log-title {
+  color: var(--wy-green);
+  font-size: var(--wy-font-size-sm);
+  letter-spacing: 1px;
+}
+
+.wy-log-entry.warning .wy-log-title { color: var(--wy-amber); }
+.wy-log-entry.warning .wy-log-source { color: var(--wy-amber-dim); }
+.wy-log-entry.critical .wy-log-title { color: var(--wy-red); }
+.wy-log-entry.critical .wy-log-source { color: var(--wy-red-dim); }
+
+.wy-log-detail {
+  padding: 0 8px 12px 30px;
+  border-top: 1px solid rgba(58, 122, 0, 0.1);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.wy-log-detail-text {
+  font-family: var(--wy-font);
+  font-size: var(--wy-font-size-sm);
+  color: var(--wy-green);
+  line-height: 1.7;
+  letter-spacing: 0.5px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+  padding: 10px 0;
+}
+
+.wy-log-entry.warning .wy-log-detail-text { color: var(--wy-amber); }
+.wy-log-entry.critical .wy-log-detail-text { color: var(--wy-red); }
 
 .wy-log-message {
   color: var(--wy-green);
@@ -877,6 +953,72 @@
 
 .wy-log-entry.critical .wy-log-message {
   color: var(--wy-red);
+}
+
+/* --- GM Log Add Button --- */
+.wy-log-add-btn {
+  float: right;
+  background: none;
+  border: 1px solid var(--wy-green-dim);
+  color: var(--wy-green);
+  font-family: var(--wy-font);
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: var(--wy-transition);
+}
+
+.wy-log-add-btn:hover {
+  background: var(--wy-green-glow);
+  border-color: var(--wy-green);
+  text-shadow: 0 0 6px var(--wy-green-glow);
+}
+
+/* --- GM Log Form --- */
+.wy-log-form {
+  border: 1px solid var(--wy-border);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.wy-log-form-title {
+  font-size: var(--wy-font-size-sm);
+  color: var(--wy-green);
+  letter-spacing: 3px;
+  margin-bottom: 10px;
+  text-shadow: 0 0 6px var(--wy-green-glow);
+}
+
+.wy-log-form-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 6px 0;
+}
+
+.wy-log-form-label {
+  font-size: 10px;
+  color: var(--wy-green-dim);
+  letter-spacing: 2px;
+  min-width: 60px;
+  padding-top: 5px;
+  flex-shrink: 0;
+}
+
+.wy-log-form-detail {
+  width: 100%;
+  resize: vertical;
+  min-height: 80px;
+  font-family: var(--wy-font) !important;
+}
+
+.wy-log-form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  justify-content: flex-end;
 }
 
 /* ============================================================================
