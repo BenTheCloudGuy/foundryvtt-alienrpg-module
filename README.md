@@ -1,6 +1,6 @@
 # Weyland-Yutani Ship Terminal
 
-A FoundryVTT module that provides an interactive green-screen CRT terminal interface for the **AlienRPG** game system. Designed for **Chariots of the Gods** and other Alien RPG scenarios.
+A FoundryVTT module that provides an interactive green-screen CRT terminal interface for the **AlienRPG** game system. Designed for **Chariots of the Gods** and other Alien RPG scenarios [future work].
 
 ![Terminal Interface](screenshots/terminal-preview.png)
 
@@ -158,6 +158,21 @@ The central display frame supports:
 
 The zoom only affects the display frame content — navigation buttons remain fixed.
 
+## Compendium Packs
+
+The module includes compendium packs migrated from the AlienRPG world data:
+
+| Pack | Type | Records | Contents |
+|------|------|---------|----------|
+| **AlienRPG Actors** | Actor | 158 | Characters, Creatures, Spacecraft, Vehicles, Synthetics |
+| **AlienRPG Items** | Item | 286 | Weapons, Armor, Talents, Agendas, Colony Initiatives, Skills |
+| **AlienRPG Scenes** | Scene | 6 | Montero, Cronus Decks A-D, CotG Cover |
+| **AlienRPG Macros** | Macro | 7 | Dice rollers, table rollers, utility macros |
+| **AlienRPG Journal** | JournalEntry | 80 | Scenario text, handouts, rules reference, artwork |
+| **AlienRPG Tables** | RollTable | 60+ | Attack tables, critical injuries, panic, colony generation |
+
+> **Note:** Scene backgrounds reference images from the `alienrpg-starterset` module. Make sure that module is also installed for scene maps to display correctly.
+
 ## Settings
 
 | Setting | Scope | Description |
@@ -182,6 +197,13 @@ The zoom only affects the display frame content — navigation buttons remain fi
 ```
 wy-terminal/
 ├── module.json              # FoundryVTT module manifest
+├── packs/                   # Compendium packs (LevelDB)
+│   ├── actors/              # Characters, creatures, vehicles, spacecraft
+│   ├── items/               # Weapons, armor, talents, agendas, etc.
+│   ├── scenes/              # Game scenes with tokens, walls, lights
+│   ├── macros/              # Dice roller and utility macros
+│   ├── journal/             # Scenario text, handouts, rules
+│   └── tables/              # Roll tables (attacks, injuries, panic, etc.)
 ├── scripts/
 │   ├── wy-terminal.mjs      # Entry point — hooks, settings, globals
 │   ├── terminal-app.mjs     # Main Application class

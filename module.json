@@ -38,6 +38,74 @@
     }
   ],
   "socket": true,
+  "packs": [
+    {
+      "name": "actors",
+      "label": "AlienRPG Actors",
+      "path": "packs/actors",
+      "type": "Actor",
+      "system": "alienrpg",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "items",
+      "label": "AlienRPG Items",
+      "path": "packs/items",
+      "type": "Item",
+      "system": "alienrpg",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "scenes",
+      "label": "AlienRPG Scenes",
+      "path": "packs/scenes",
+      "type": "Scene",
+      "system": "alienrpg",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "macros",
+      "label": "AlienRPG Macros",
+      "path": "packs/macros",
+      "type": "Macro",
+      "system": "alienrpg",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "journal",
+      "label": "AlienRPG Journal",
+      "path": "packs/journal",
+      "type": "JournalEntry",
+      "system": "alienrpg",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "tables",
+      "label": "AlienRPG Tables",
+      "path": "packs/tables",
+      "type": "RollTable",
+      "system": "alienrpg",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    }
+  ],
   "url": "https://github.com/BenTheCloudGuy/foundryvtt-alienrpg-module",
   "manifest": "https://raw.githubusercontent.com/BenTheCloudGuy/foundryvtt-alienrpg-module/main/module.json",
   "download": "https://github.com/BenTheCloudGuy/foundryvtt-alienrpg-module/archive/refs/heads/main.zip"
