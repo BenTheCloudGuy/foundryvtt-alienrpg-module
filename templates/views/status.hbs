@@ -1,0 +1,50 @@
+<div class="wy-view-status">
+  <div class="wy-section-title">SHIP STATUS — {{shipName}}</div>
+
+  <div class="wy-border-box">
+    <table class="wy-data-table">
+      <tr>
+        <td class="wy-text-dim">VESSEL:</td>
+        <td>{{shipName}}</td>
+        <td class="wy-text-dim">CLASS:</td>
+        <td>{{shipClass}}</td>
+      </tr>
+      <tr>
+        <td class="wy-text-dim">REGISTRY:</td>
+        <td>{{shipRegistry}}</td>
+        <td class="wy-text-dim">OWNER:</td>
+        <td>WEYLAND-YUTANI CORP.</td>
+      </tr>
+      <tr>
+        <td class="wy-text-dim">MISSION:</td>
+        <td colspan="3">{{missionName}}</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="wy-section-title" style="font-size: 13px; margin-top: 24px;">SYSTEM OVERVIEW</div>
+
+  <div class="wy-border-box">
+    <table class="wy-data-table">
+      <thead>
+        <tr>
+          <th>SYSTEM</th>
+          <th>STATUS</th>
+          <th>DETAIL</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each systems}}
+        <tr>
+          <td>{{this.name}}</td>
+          <td>
+            <span class="wy-indicator {{this.statusClass}}"></span>
+            {{this.status}}
+          </td>
+          <td class="wy-text-dim">{{this.detail}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+</div>

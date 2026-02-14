@@ -1,0 +1,114 @@
+{
+    "header_name": "MU/TH/UR 6500",
+    "game_time": "2183-03-15 07:30",
+    
+    "unknown_signal_detected": true,
+    "close_enough_to_scan": false,
+    "montero_hit_cronus": false,
+    "montero_sensors_online": true,
+    "docked_with_cronus": false,
+    "montero_self_destruct_active": false,
+    "montero_engines_offline": false,
+    "montero_main_power_offline": false,
+    
+    "distress_call_detected": false,
+    "distress_call_identified": false,
+    "inform_salvage": false,
+    "hull_breach": false,
+    "superficial_damage": false,
+    
+    "prompt_updates": {
+        "unknown_signal_detected": "An unknown emergency distress signal has been detected. Signal source shows MINIMAL POWER READINGS. Distance: APPROXIMATELY 9000 KM. Bearing: 231 BY 119 DEGREES. Signal is too weak and noisy to identify the source vessel. DETAILED SCANS NOT POSSIBLE AT THIS RANGE. Must close to approximately 1 kilometer for sensor resolution.",
+        "close_enough_to_scan": "SCAN RANGE ACHIEVED. Distance to signal source: ~1 KM. DISTRESS SIGNAL SOURCE IDENTIFIED: USCSS CRONUS, WEYLAND SEV M3 HELIADES-CLASS. Status: ADRIFT. Power: MINIMAL. Comms Array: OFFLINE. Beacon: 75 YEARS OUTDATED. Frequency: 8713.41. Salvage operation mandated under W-Y rules.",
+        "montero_hit_cronus": "COLLISION DAMAGE REPORT: The Montero has collided with the USCSS Cronus. Significant damage sustained. Hyperdrive engines are OFFLINE. Atmosphere venting from ladder to CLAM Chamber - emergency bulkheads sealed. CLAM and escape pods are OFFLINE. Sensors are OFFLINE but repairable (requires 8+ hours in damaged upper engine room).",
+        "montero_sensors_online": "Sensors are fully operational. Ship can perform internal and external scans, navigate safely, and dock with other vessels.",
+        "docked_with_cronus": "The Montero has successfully docked with the USCSS Cronus. Access to Cronus Deck A Main Airlock is now available via the docking umbilical.",
+        "montero_self_destruct_active": "SELF-DESTRUCT SEQUENCE INITIATED. The Montero will detonate in approximately 10 minutes. This sequence CANNOT be cancelled. Any vessel within close proximity will be severely damaged or destroyed.",
+        "montero_engines_offline": "Hyperdrive and main propulsion systems are OFFLINE. The ship can only maneuver using basic thrusters. FTL travel is impossible.",
+        "montero_main_power_offline": "MAIN POWER OFFLINE. All primary systems unavailable including engines and sensors. Emergency power only. MU/TH/UR functionality severely limited."
+    },
+    
+    "crew": [
+        {"id": "miller", "name": "Captain Miller", "role": "Captain", "location": "Bridge", "status": "Active", "task": null, "task_eta": null},
+        {"id": "rye", "name": "Rye", "role": "Pilot", "location": "Bridge", "status": "Active", "task": null, "task_eta": null},
+        {"id": "wilson", "name": "Wilson", "role": "Company Agent", "location": "Crew Quarters", "status": "Active", "task": null, "task_eta": null},
+        {"id": "cham", "name": "Cham", "role": "Roughneck", "location": "Cargo Bay", "status": "Active", "task": null, "task_eta": null},
+        {"id": "reid", "name": "Reid", "role": "Medic", "location": "Med Bay", "status": "Active", "task": null, "task_eta": null},
+        {"id": "davis", "name": "Davis", "role": "Engineer", "location": "Engineering", "status": "Active", "task": null, "task_eta": null}
+    ],
+    
+    "ship_systems": {
+        "life_support": "Online",
+        "main_power": "Online",
+        "emergency_power": "Standby",
+        "engines_ftl": "Online",
+        "engines_thrusters": "Online",
+        "sensors": "Online",
+        "communications": "Online",
+        "docking_clamps": "Standby",
+        "escape_pods": "Ready",
+        "clam_shuttle": "Ready",
+        "weapons": "None"
+    },
+    
+    "ship_locations": [
+        "Bridge",
+        "Crew Quarters",
+        "Med Bay",
+        "Galley",
+        "Engineering",
+        "Cargo Bay",
+        "Airlock",
+        "EVA Storage",
+        "CLAM Bay",
+        "Escape Pod Bay"
+    ],
+    
+    "travel_times": {
+        "default": 1,
+        "Bridge-Engineering": 3,
+        "Bridge-Cargo Bay": 2,
+        "Bridge-Med Bay": 1,
+        "Bridge-Crew Quarters": 1,
+        "Bridge-Airlock": 2,
+        "Engineering-Cargo Bay": 2,
+        "Engineering-CLAM Bay": 2,
+        "Cargo Bay-Airlock": 1,
+        "Med Bay-Crew Quarters": 1,
+        "Airlock-EVA Storage": 1
+    },
+    
+    "logs": [
+        {"timestamp": "2183-03-15 06:00", "type": "system", "author": "MU/TH/UR", "message": "Crew revived from hypersleep. All vitals nominal."},
+        {"timestamp": "2183-03-15 06:30", "type": "captain", "author": "Cpt. Miller", "message": "All crew accounted for. Preparing for final approach to Anchorpoint."},
+        {"timestamp": "2183-03-15 07:00", "type": "system", "author": "MU/TH/UR", "message": "Distress signal detected. Bearing 231 by 119. Source unknown."}
+    ],
+    
+    "restricted_logs": [
+        {
+            "id": "special_order_966",
+            "timestamp": "2183-03-15 05:45",
+            "type": "priority",
+            "author": "NETWORK COMCON",
+            "subject": "SPECIAL ORDER 966",
+            "requires_code": "wilson_command",
+            "message": "TO: USCSS MONTERO — AGENT WILSON\nJOHN J — 942/T2-009R — FROM\nNETWORK\nCOMCON 01500 — WEYLAND YUTANI\n\nMESSAGE RECEIVED\n\nNEW DIRECTIVE — SPECIAL ORDER 966\n\nQUARANTINE SCIENCE TEAM\nDIRECT CREW TO REPAIR AND RETURN\nUSCSS CRONUS\nUSE OF FORCE AUTHORIZED\nREMOVE MONTERO FROM EQUATION\nTRANSFER CREW TO SCIENCE VESSEL\n\nREPEAT — DO NOT ABANDON CRONUS\nBRING BACK ALL XENOMORPHIC\nMATERIALS\n\nPRIORITY ONE\nALL OTHER PRIORITIES RESCINDED\n\nAWAITING ACKNOWLEDGMENT\nAWAITING ACKNOWLEDGMENT\nAWAITING ACKNOWLEDGMENT"
+        }
+    ],
+    
+    "command_codes": {
+        "wilson_command": {
+            "code": "942T2009R",
+            "user": "John Wilson",
+            "clearance": "EYES ONLY"
+        }
+    },
+    
+    "menu_options": [
+        {"key": "1", "label": "CREW STATUS", "command": "crew_status"},
+        {"key": "2", "label": "SHIP SYSTEMS", "command": "ship_systems"},
+        {"key": "3", "label": "SHIP LOGS", "command": "ship_logs"},
+        {"key": "4", "label": "NAVIGATION", "command": "navigation"},
+        {"key": "5", "label": "QUERY MU/TH/UR", "command": "query"}
+    ]
+}

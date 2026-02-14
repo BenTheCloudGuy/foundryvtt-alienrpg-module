@@ -1,0 +1,43 @@
+<div class="wy-emergency-panel">
+  <div class="wy-section-title wy-text-red">⚠ EMERGENCY PROTOCOLS ⚠</div>
+
+  <div class="wy-border-box" style="border-color: var(--wy-red-dim);">
+    <div class="wy-text-dim" style="margin-bottom: 12px; letter-spacing: 2px;">
+      AUTHORIZED PERSONNEL ONLY — ALL ACTIONS LOGGED
+    </div>
+
+    <button class="wy-emergency-btn" data-emergency="self-destruct">
+      ⚠ SELF-DESTRUCT SEQUENCE ⚠
+    </button>
+
+    <button class="wy-emergency-btn" data-emergency="evacuate">
+      EVACUATION PROTOCOL
+    </button>
+
+    <button class="wy-emergency-btn" data-emergency="lockdown">
+      SHIP LOCKDOWN
+    </button>
+
+    <button class="wy-emergency-btn" data-emergency="distress">
+      BROADCAST DISTRESS SIGNAL
+    </button>
+
+    <button class="wy-emergency-btn" data-emergency="purge">
+      ATMOSPHERE PURGE — DECK SELECT
+    </button>
+  </div>
+
+  {{#if selfDestructActive}}
+  <div class="wy-border-box" style="border-color: var(--wy-red); margin-top: 16px; text-align: center;">
+    <div class="wy-text-red wy-text-blink" style="font-size: 18px; letter-spacing: 4px; margin: 12px 0;">
+      ⚠ SELF-DESTRUCT ACTIVE ⚠
+    </div>
+    <div class="wy-text-red" style="font-size: 24px; font-family: var(--wy-font-display); letter-spacing: 6px;">
+      T-{{selfDestructTimer}}
+    </div>
+    <button class="wy-emergency-btn" data-emergency="cancel-self-destruct" style="margin-top: 12px;">
+      ABORT SELF-DESTRUCT
+    </button>
+  </div>
+  {{/if}}
+</div>

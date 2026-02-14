@@ -1,0 +1,25 @@
+<div class="wy-view-muthur">
+  <div class="wy-muthur-output" id="wy-muthur-output">
+    <div class="wy-muthur-line system">╠█▓▒░ {{muthurHeader}} — INTERFACE ACTIVE ░▒▓█╣</div>
+    <div class="wy-muthur-line system">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+    {{#each chatHistory}}
+    <div class="wy-muthur-line {{this.type}}">
+      {{#if (eq this.type 'user')}}<span class="prefix">»</span>{{/if}}
+      {{#if (eq this.type 'muthur')}}<span class="prefix">MU/TH/UR:</span>{{/if}}
+      {{#if (eq this.type 'system')}}<span class="prefix">[SYS]</span>{{/if}}
+      {{this.text}}
+    </div>
+    {{/each}}
+  </div>
+  <div class="wy-muthur-input-bar">
+    <span class="wy-muthur-prompt">»</span>
+    <input class="wy-muthur-input"
+           id="wy-muthur-input"
+           type="text"
+           placeholder="ENTER QUERY..."
+           autocomplete="off"
+           spellcheck="false"
+           data-action="muthur-input" />
+    <button class="wy-muthur-send" data-action="muthur-send">SEND</button>
+  </div>
+</div>

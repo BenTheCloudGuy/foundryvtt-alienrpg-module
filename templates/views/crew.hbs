@@ -1,0 +1,52 @@
+<div class="wy-view-crew">
+  <div class="wy-section-title">CREW MANIFEST</div>
+
+  <div class="wy-border-box">
+    <table class="wy-data-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>NAME</th>
+          <th>ROLE</th>
+          <th>LOCATION</th>
+          <th>STATUS</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each crew}}
+        <tr>
+          <td><span class="wy-indicator {{this.statusClass}}"></span></td>
+          <td>{{this.name}}</td>
+          <td class="wy-text-dim">{{this.role}}</td>
+          <td>{{this.location}}</td>
+          <td class="{{this.statusTextClass}}">{{this.status}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+
+  {{#if activeTasks}}
+  <div class="wy-section-title" style="font-size: 13px; margin-top: 24px;">ACTIVE TASKS</div>
+  <div class="wy-border-box">
+    <table class="wy-data-table">
+      <thead>
+        <tr>
+          <th>CREW</th>
+          <th>TASK</th>
+          <th>ETA</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each activeTasks}}
+        <tr>
+          <td>{{this.crewName}}</td>
+          <td>{{this.task}}</td>
+          <td class="wy-text-amber">{{this.eta}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+  {{/if}}
+</div>

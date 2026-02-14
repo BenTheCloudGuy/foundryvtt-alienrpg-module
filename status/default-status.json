@@ -1,0 +1,42 @@
+{
+  "shipName": "USCSS MONTERO",
+  "shipClass": "M-CLASS STARFREIGHTER",
+  "shipRegistry": "REG# 220-8170421",
+  "missionName": "CHARIOTS OF THE GODS",
+  "timestamp": "2183-06-12T06:00:00.000Z",
+  "status": {
+    "selfDestructActive": false,
+    "selfDestructTimer": null,
+    "dockedWithCronus": false,
+    "signalDetected": false,
+    "enginesOffline": false,
+    "currentPosition": "SECTOR 87-C / ZETA RETICULI",
+    "destination": "LV-426 VICINITY",
+    "eta": "CALCULATING...",
+    "speed": "0.5C SUBLIGHT",
+    "fuelLevel": "87%"
+  },
+  "crew": [
+    { "name": "MILLER", "role": "CAPTAIN", "location": "BRIDGE", "status": "ACTIVE" },
+    { "name": "CHAM", "role": "PILOT", "location": "BRIDGE", "status": "ACTIVE" },
+    { "name": "RYLE", "role": "ROUGHNECK", "location": "CREW QUARTERS", "status": "ACTIVE" },
+    { "name": "WILSON", "role": "MEDIC", "location": "MEDBAY", "status": "ACTIVE" },
+    { "name": "REID", "role": "COMPANY AGENT", "location": "CARGO BAY", "status": "ACTIVE" },
+    { "name": "DAVIS", "role": "ROUGHNECK", "location": "ENGINE ROOM", "status": "ACTIVE" },
+    { "name": "LUCAS", "role": "COMPANY REP", "location": "LOUNGE", "status": "ACTIVE" }
+  ],
+  "systems": [
+    { "name": "REACTOR", "status": "ONLINE", "detail": "PWR OUTPUT NOMINAL" },
+    { "name": "LIFE SUPPORT", "status": "ONLINE", "detail": "O2/CO2 NOMINAL" },
+    { "name": "ENGINES", "status": "ONLINE", "detail": "FEL DRIVE STANDBY" },
+    { "name": "COMMS ARRAY", "status": "ONLINE", "detail": "FREQ: STANDARD" },
+    { "name": "SENSORS", "status": "ONLINE", "detail": "RANGE: 100 AU" },
+    { "name": "HULL INTEGRITY", "status": "NOMINAL", "detail": "100%" },
+    { "name": "WEAPONS", "status": "N/A", "detail": "NOT INSTALLED" },
+    { "name": "MU/TH/UR UPLINK", "status": "ONLINE", "detail": "6000 SERIES" }
+  ],
+  "recentLogs": [
+    { "timestamp": "2183-06-12 06:00:00", "source": "SYSTEM", "message": "CREW REVIVED FROM CRYOSLEEP", "level": "" },
+    { "timestamp": "2183-06-12 06:05:00", "source": "MU/TH/UR", "message": "UNKNOWN SIGNAL DETECTED ON LONG-RANGE SENSORS", "level": "warning" }
+  ]
+}

@@ -1,0 +1,149 @@
+<div class="wy-terminal {{#if scanlines}}scanlines{{/if}} {{#if crtFlicker}}crt-flicker{{/if}}">
+  
+  {{!-- Noise overlay for boot-up effect --}}
+  <div class="wy-noise-overlay"></div>
+
+  {{!-- ═══════════ HEADER BAR ═══════════ --}}
+  <div class="wy-header">
+    <div class="wy-header-logo">
+      <svg class="wy-logo-mark" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="32,4 4,56 24,56 32,40 40,56 60,56" />
+        <rect x="28" y="56" width="8" height="4" />
+      </svg>
+      <div>
+        <div class="wy-header-title">WEYLAND-YUTANI</div>
+        <div class="wy-header-subtitle">{{shipName}} — INTERFACE 2037</div>
+      </div>
+    </div>
+    <div class="wy-header-status">
+      <div class="wy-header-status-line">
+        SYSTEM: <span class="{{systemStatusClass}}">{{systemStatus}}</span>
+      </div>
+      <div class="wy-header-status-line">
+        {{currentDate}}
+      </div>
+    </div>
+    <button class="wy-header-close" data-action="close-terminal" title="Close Terminal">✕</button>
+  </div>
+
+  {{!-- ═══════════ ALERT BAR ═══════════ --}}
+  <div class="wy-alert-bar {{#if alertActive}}active{{/if}}">
+    ⚠ {{alertMessage}} ⚠
+  </div>
+
+  {{!-- ═══════════ MAIN BODY ═══════════ --}}
+  <div class="wy-body">
+
+    {{!-- ──── LEFT NAV COLUMN ──── --}}
+    <div class="wy-nav-column left">
+      <div class="wy-nav-label">SHIP</div>
+      <button class="wy-nav-btn {{#if (eq activeView 'status')}}active{{/if}}" data-view="status">
+        <span class="btn-icon">◈</span>
+        <span class="btn-label">STATUS</span>
+      </button>
+      <button class="wy-nav-btn {{#if (eq activeView 'crew')}}active{{/if}}" data-view="crew">
+        <span class="btn-icon">☺</span>
+        <span class="btn-label">CREW</span>
+      </button>
+      <button class="wy-nav-btn {{#if (eq activeView 'systems')}}active{{/if}}" data-view="systems">
+        <span class="btn-icon">⚙</span>
+        <span class="btn-label">SYSTEMS</span>
+      </button>
+      <button class="wy-nav-btn {{#if (eq activeView 'logs')}}active{{/if}}" data-view="logs">
+        <span class="btn-icon">▤</span>
+        <span class="btn-label">LOGS</span>
+      </button>
+
+      <div class="wy-nav-separator"></div>
+      <div class="wy-nav-label">NAV</div>
+
+      <button class="wy-nav-btn {{#if (eq activeView 'maps')}}active{{/if}}" data-view="maps">
+        <span class="btn-icon">◫</span>
+        <span class="btn-label">MAPS</span>
+      </button>
+      <button class="wy-nav-btn {{#if (eq activeView 'nav')}}active{{/if}}" data-view="nav">
+        <span class="btn-icon">⊕</span>
+        <span class="btn-label">NAV</span>
+      </button>
+
+      <div class="wy-nav-separator"></div>
+
+      <button class="wy-nav-btn emergency {{#if (eq activeView 'emergency')}}active{{/if}}" data-view="emergency">
+        <span class="btn-icon">⚠</span>
+        <span class="btn-label">EMRGCY</span>
+      </button>
+    </div>
+
+    {{!-- ──── DISPLAY FRAME ──── --}}
+    <div class="wy-display-container">
+      
+      {{!-- Display toolbar --}}
+      <div class="wy-display-toolbar">
+        <div class="wy-display-toolbar-title" id="wy-display-title">{{displayTitle}}</div>
+        <div class="wy-display-toolbar-actions">
+          <button class="wy-toolbar-btn" data-action="zoom-in" title="Zoom In">+</button>
+          <button class="wy-toolbar-btn" data-action="zoom-out" title="Zoom Out">−</button>
+          <button class="wy-toolbar-btn" data-action="zoom-reset" title="Reset Zoom">⊡</button>
+        </div>
+      </div>
+
+      {{!-- Display frame (main content area) --}}
+      <div class="wy-display-frame" id="wy-display-frame">
+        <div class="wy-display-content" id="wy-display-content">
+          {{!-- Dynamic content injected here --}}
+        </div>
+      </div>
+    </div>
+
+    {{!-- ──── RIGHT NAV COLUMN ──── --}}
+    <div class="wy-nav-column right">
+      <div class="wy-nav-label">COMMS</div>
+      <button class="wy-nav-btn {{#if (eq activeView 'muthur')}}active{{/if}}" data-view="muthur">
+        <span class="btn-icon">◉</span>
+        <span class="btn-label">MU/TH/UR</span>
+      </button>
+      <button class="wy-nav-btn {{#if (eq activeView 'comms')}}active{{/if}}" data-view="comms">
+        <span class="btn-icon">⊞</span>
+        <span class="btn-label">COMMS</span>
+      </button>
+
+      <div class="wy-nav-separator"></div>
+      <div class="wy-nav-label">CARGO</div>
+
+      <button class="wy-nav-btn {{#if (eq activeView 'cargo')}}active{{/if}}" data-view="cargo">
+        <span class="btn-icon">☰</span>
+        <span class="btn-label">CARGO</span>
+      </button>
+
+      <div class="wy-nav-separator"></div>
+      <div class="wy-nav-label">DISPLAY</div>
+
+      <button class="wy-nav-btn {{#if (eq activeView 'scenes')}}active{{/if}}" data-view="scenes">
+        <span class="btn-icon">⊞</span>
+        <span class="btn-label">SCENES</span>
+      </button>
+
+      <div class="wy-nav-separator"></div>
+
+      <button class="wy-nav-btn {{#if (eq activeView 'settings')}}active{{/if}}" data-view="settings">
+        <span class="btn-icon">⚙</span>
+        <span class="btn-label">CONFIG</span>
+      </button>
+    </div>
+  </div>
+
+  {{!-- ═══════════ FOOTER STATUS BAR ═══════════ --}}
+  <div class="wy-footer">
+    <div class="wy-footer-left">
+      <span>TERM://{{shipName}}/MAIN</span>
+      <span>|</span>
+      <span>USER: {{userName}}</span>
+    </div>
+    <div class="wy-footer-right">
+      <span>MEM: OK</span>
+      <span>|</span>
+      <span>NET: {{#if muthurOnline}}LINKED{{else}}STANDBY{{/if}}</span>
+      <span class="wy-blink-cursor"></span>
+    </div>
+  </div>
+</div>

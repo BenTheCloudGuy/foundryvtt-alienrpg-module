@@ -1,0 +1,1001 @@
+/* ============================================================================
+   WEYLAND-YUTANI SHIP TERMINAL — CSS
+   Authentic retro green-screen CRT interface for AlienRPG / FoundryVTT
+   ============================================================================ */
+
+/* ---------- Fonts ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+:root {
+  /* --- Terminal Color Palette --- */
+  --wy-green: #7fff00;
+  --wy-green-bright: #a0ff40;
+  --wy-green-dim: #3a7a00;
+  --wy-green-dark: #1a3a00;
+  --wy-green-glow: rgba(127, 255, 0, 0.15);
+  --wy-green-glow-strong: rgba(127, 255, 0, 0.35);
+  --wy-amber: #ffbf00;
+  --wy-amber-dim: #7a5c00;
+  --wy-red: #ff3333;
+  --wy-red-dim: #7a1a1a;
+  --wy-cyan: #00e5ff;
+  --wy-white: #d0ffd0;
+  --wy-bg: #0a0a0a;
+  --wy-bg-panel: #050505;
+  --wy-bg-display: #020a00;
+  --wy-border: #3a7a00;
+  --wy-border-bright: #7fff00;
+
+  /* --- Typography --- */
+  --wy-font: 'Share Tech Mono', 'OCR-A', 'Courier New', monospace;
+  --wy-font-display: 'Orbitron', 'Share Tech Mono', monospace;
+  --wy-font-size: 13px;
+  --wy-font-size-sm: 11px;
+  --wy-font-size-lg: 16px;
+  --wy-font-size-xl: 20px;
+  --wy-font-size-header: 28px;
+
+  /* --- Spacing --- */
+  --wy-gap: 8px;
+  --wy-padding: 12px;
+  --wy-radius: 2px;
+
+  /* --- Animation --- */
+  --wy-transition: 0.15s ease;
+  --wy-glow-pulse: wy-glow-pulse 3s ease-in-out infinite;
+}
+
+/* ============================================================================
+   TERMINAL APPLICATION WINDOW
+   ============================================================================ */
+
+.wy-terminal-app {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.wy-terminal-app .window-header {
+  display: none !important;
+}
+
+.wy-terminal-app .window-content {
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+/* ============================================================================
+   TERMINAL SHELL — The outer bezel / frame
+   ============================================================================ */
+
+.wy-terminal {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: var(--wy-bg);
+  border: 2px solid var(--wy-border);
+  border-radius: 4px;
+  box-shadow:
+    0 0 20px rgba(127, 255, 0, 0.08),
+    inset 0 0 60px rgba(0, 0, 0, 0.5);
+  font-family: var(--wy-font);
+  font-size: var(--wy-font-size);
+  color: var(--wy-green);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* --- CRT Scanline Overlay --- */
+.wy-terminal.scanlines::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 1px,
+    rgba(0, 0, 0, 0.15) 1px,
+    rgba(0, 0, 0, 0.15) 3px
+  );
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* --- CRT Flicker --- */
+.wy-terminal.crt-flicker::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: transparent;
+  pointer-events: none;
+  z-index: 101;
+  animation: wy-crt-flicker 0.08s infinite;
+  opacity: 0.02;
+}
+
+@keyframes wy-crt-flicker {
+  0%   { background: rgba(127, 255, 0, 0.03); }
+  50%  { background: transparent; }
+  100% { background: rgba(127, 255, 0, 0.02); }
+}
+
+/* ============================================================================
+   HEADER BAR — Weyland-Yutani branding
+   ============================================================================ */
+
+.wy-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: linear-gradient(180deg, #111 0%, #0a0a0a 100%);
+  border-bottom: 1px solid var(--wy-border);
+  flex-shrink: 0;
+  min-height: 48px;
+}
+
+.wy-header-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wy-header-logo svg {
+  width: 32px;
+  height: 32px;
+  fill: var(--wy-green);
+  filter: drop-shadow(0 0 4px var(--wy-green-glow));
+}
+
+.wy-header-title {
+  font-family: var(--wy-font-display);
+  font-size: var(--wy-font-size-header);
+  font-weight: 700;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: var(--wy-green);
+  text-shadow: 0 0 10px var(--wy-green-glow-strong), 0 0 30px var(--wy-green-glow);
+}
+
+.wy-header-subtitle {
+  font-size: var(--wy-font-size-sm);
+  color: var(--wy-green-dim);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.wy-header-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.wy-header-status-line {
+  font-size: var(--wy-font-size-sm);
+  color: var(--wy-green-dim);
+  letter-spacing: 1px;
+}
+
+.wy-header-status-line .online {
+  color: var(--wy-green);
+  text-shadow: 0 0 6px var(--wy-green-glow);
+}
+
+.wy-header-status-line .warning {
+  color: var(--wy-amber);
+  text-shadow: 0 0 6px rgba(255, 191, 0, 0.3);
+}
+
+.wy-header-status-line .critical {
+  color: var(--wy-red);
+  text-shadow: 0 0 6px rgba(255, 51, 51, 0.3);
+  animation: wy-blink 1s step-end infinite;
+}
+
+.wy-header-close {
+  background: none;
+  border: 1px solid var(--wy-border);
+  color: var(--wy-green-dim);
+  font-family: var(--wy-font);
+  font-size: 18px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--wy-transition);
+  margin-left: 16px;
+}
+
+.wy-header-close:hover {
+  color: var(--wy-red);
+  border-color: var(--wy-red);
+  background: var(--wy-red-dim);
+}
+
+/* ============================================================================
+   ALERT BAR — Status alerts / warnings
+   ============================================================================ */
+
+.wy-alert-bar {
+  display: none;
+  padding: 4px 16px;
+  background: rgba(255, 51, 51, 0.08);
+  border-bottom: 1px solid var(--wy-red-dim);
+  font-size: var(--wy-font-size-sm);
+  color: var(--wy-red);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+  animation: wy-blink 2s step-end infinite;
+  flex-shrink: 0;
+}
+
+.wy-alert-bar.active {
+  display: block;
+}
+
+/* ============================================================================
+   MAIN BODY — Button columns + Display frame
+   ============================================================================ */
+
+.wy-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* --- Navigation Button Columns --- */
+.wy-nav-column {
+  display: flex;
+  flex-direction: column;
+  width: 140px;
+  min-width: 120px;
+  padding: var(--wy-gap);
+  gap: 4px;
+  background: var(--wy-bg-panel);
+  border-right: 1px solid var(--wy-border);
+  flex-shrink: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.wy-nav-column.right {
+  border-right: none;
+  border-left: 1px solid var(--wy-border);
+}
+
+.wy-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px;
+  background: transparent;
+  border: 1px solid var(--wy-border);
+  color: var(--wy-green);
+  font-family: var(--wy-font);
+  font-size: var(--wy-font-size-sm);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: var(--wy-transition);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  min-height: 42px;
+}
+
+.wy-nav-btn .btn-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+.wy-nav-btn:hover {
+  background: var(--wy-green-glow);
+  border-color: var(--wy-green);
+  color: var(--wy-green-bright);
+  text-shadow: 0 0 8px var(--wy-green-glow);
+}
+
+.wy-nav-btn.active {
+  background: var(--wy-green-dark);
+  border-color: var(--wy-green-bright);
+  color: var(--wy-green-bright);
+  text-shadow: 0 0 10px var(--wy-green-glow-strong);
+  box-shadow: inset 0 0 10px var(--wy-green-glow);
+}
+
+.wy-nav-btn.active::before {
+  content: '▸';
+  position: absolute;
+  left: 2px;
+  color: var(--wy-green-bright);
+}
+
+.wy-nav-btn.emergency {
+  border-color: var(--wy-red-dim);
+  color: var(--wy-red);
+}
+
+.wy-nav-btn.emergency:hover {
+  background: rgba(255, 51, 51, 0.1);
+  border-color: var(--wy-red);
+  color: var(--wy-red);
+  text-shadow: 0 0 8px rgba(255, 51, 51, 0.3);
+}
+
+.wy-nav-btn.emergency.active {
+  background: var(--wy-red-dim);
+  border-color: var(--wy-red);
+  color: var(--wy-red);
+  box-shadow: inset 0 0 10px rgba(255, 51, 51, 0.2);
+}
+
+.wy-nav-separator {
+  height: 1px;
+  background: var(--wy-border);
+  margin: 6px 0;
+  opacity: 0.4;
+}
+
+.wy-nav-label {
+  font-size: 9px;
+  color: var(--wy-green-dim);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 4px 6px;
+  opacity: 0.6;
+}
+
+/* ============================================================================
+   DISPLAY FRAME — The central screen area
+   ============================================================================ */
+
+.wy-display-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  background: var(--wy-bg-display);
+}
+
+.wy-display-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 12px;
+  background: #080808;
+  border-bottom: 1px solid var(--wy-border);
+  flex-shrink: 0;
+  min-height: 28px;
+}
+
+.wy-display-toolbar-title {
+  font-size: var(--wy-font-size-sm);
+  letter-spacing: 2px;
+  color: var(--wy-green-dim);
+  text-transform: uppercase;
+}
+
+.wy-display-toolbar-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.wy-toolbar-btn {
+  background: none;
+  border: 1px solid var(--wy-border);
+  color: var(--wy-green-dim);
+  font-family: var(--wy-font);
+  font-size: 11px;
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: var(--wy-transition);
+}
+
+.wy-toolbar-btn:hover {
+  border-color: var(--wy-green);
+  color: var(--wy-green);
+  background: var(--wy-green-glow);
+}
+
+/* --- Display Frame (scrollable, zoomable center content) --- */
+.wy-display-frame {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  touch-action: pan-x pan-y;
+  min-height: 0;
+}
+
+.wy-display-frame::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.wy-display-frame::-webkit-scrollbar-track {
+  background: var(--wy-bg);
+}
+
+.wy-display-frame::-webkit-scrollbar-thumb {
+  background: var(--wy-green-dark);
+  border-radius: 3px;
+}
+
+.wy-display-frame::-webkit-scrollbar-thumb:hover {
+  background: var(--wy-green-dim);
+}
+
+/* Content wrapper for zoom transforms */
+.wy-display-content {
+  transform-origin: 0 0;
+  transition: transform 0.1s ease;
+  min-width: 100%;
+  min-height: 100%;
+  padding: var(--wy-padding);
+  box-sizing: border-box;
+}
+
+/* ============================================================================
+   DISPLAY VIEWS — Different content types
+   ============================================================================ */
+
+/* --- Boot / Welcome Screen --- */
+.wy-view-boot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 40px;
+}
+
+.wy-boot-logo {
+  font-family: var(--wy-font-display);
+  font-size: 36px;
+  font-weight: 900;
+  letter-spacing: 8px;
+  color: var(--wy-green);
+  text-shadow: 0 0 20px var(--wy-green-glow-strong), 0 0 60px var(--wy-green-glow);
+  margin-bottom: 16px;
+}
+
+.wy-boot-line {
+  font-size: var(--wy-font-size);
+  color: var(--wy-green-dim);
+  letter-spacing: 2px;
+  margin: 4px 0;
+  animation: wy-type-in 0.5s ease forwards;
+  opacity: 0;
+}
+
+.wy-boot-line:nth-child(2) { animation-delay: 0.3s; }
+.wy-boot-line:nth-child(3) { animation-delay: 0.6s; }
+.wy-boot-line:nth-child(4) { animation-delay: 0.9s; }
+.wy-boot-line:nth-child(5) { animation-delay: 1.2s; }
+.wy-boot-line:nth-child(6) { animation-delay: 1.5s; }
+.wy-boot-line:nth-child(7) { animation-delay: 1.8s; }
+.wy-boot-line:nth-child(8) { animation-delay: 2.1s; }
+
+@keyframes wy-type-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Status View --- */
+.wy-view-status,
+.wy-view-crew,
+.wy-view-systems,
+.wy-view-logs,
+.wy-view-nav,
+.wy-view-comms,
+.wy-view-cargo,
+.wy-view-emergency {
+  padding: 16px 20px;
+}
+
+.wy-section-title {
+  font-family: var(--wy-font-display);
+  font-size: var(--wy-font-size-lg);
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--wy-green);
+  text-shadow: 0 0 8px var(--wy-green-glow);
+  border-bottom: 1px solid var(--wy-border);
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+
+/* Table styles for crew, systems, etc. */
+.wy-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--wy-font);
+  font-size: var(--wy-font-size-sm);
+}
+
+.wy-data-table th {
+  text-align: left;
+  padding: 6px 10px;
+  color: var(--wy-green-dim);
+  border-bottom: 1px solid var(--wy-border);
+  font-weight: normal;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+.wy-data-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(58, 122, 0, 0.2);
+  color: var(--wy-green);
+}
+
+.wy-data-table tr:hover td {
+  background: var(--wy-green-glow);
+}
+
+/* Status indicators */
+.wy-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.wy-indicator.online  { background: var(--wy-green); box-shadow: 0 0 6px var(--wy-green-glow-strong); }
+.wy-indicator.warning  { background: var(--wy-amber); box-shadow: 0 0 6px rgba(255, 191, 0, 0.4); }
+.wy-indicator.offline  { background: #444; }
+.wy-indicator.critical { background: var(--wy-red); box-shadow: 0 0 6px rgba(255, 51, 51, 0.4); animation: wy-blink 1s step-end infinite; }
+
+/* --- Map / Image View --- */
+.wy-view-map {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  touch-action: none; /* Allow Hammer.js to handle touch */
+  overflow: hidden;
+}
+
+.wy-view-map img {
+  max-width: none;
+  max-height: none;
+  image-rendering: auto;
+  pointer-events: none;
+}
+
+/* --- MU/TH/UR Chat View --- */
+.wy-view-muthur {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.wy-muthur-output {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  font-size: var(--wy-font-size);
+  line-height: 1.6;
+}
+
+.wy-muthur-line {
+  margin: 4px 0;
+  padding: 2px 0;
+}
+
+.wy-muthur-line.system {
+  color: var(--wy-green-dim);
+  font-size: var(--wy-font-size-sm);
+}
+
+.wy-muthur-line.muthur {
+  color: var(--wy-green);
+}
+
+.wy-muthur-line.user {
+  color: var(--wy-cyan);
+}
+
+.wy-muthur-line .prefix {
+  color: var(--wy-green-dim);
+  margin-right: 8px;
+}
+
+.wy-muthur-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-top: 1px solid var(--wy-border);
+  background: #080808;
+  flex-shrink: 0;
+}
+
+.wy-muthur-prompt {
+  color: var(--wy-green);
+  font-size: var(--wy-font-size);
+  flex-shrink: 0;
+}
+
+.wy-muthur-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--wy-cyan);
+  font-family: var(--wy-font);
+  font-size: var(--wy-font-size);
+  caret-color: var(--wy-green);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.wy-muthur-input::placeholder {
+  color: var(--wy-green-dark);
+  text-transform: uppercase;
+}
+
+.wy-muthur-send {
+  background: none;
+  border: 1px solid var(--wy-border);
+  color: var(--wy-green-dim);
+  font-family: var(--wy-font);
+  font-size: 12px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: var(--wy-transition);
+  letter-spacing: 1px;
+}
+
+.wy-muthur-send:hover {
+  background: var(--wy-green-glow);
+  border-color: var(--wy-green);
+  color: var(--wy-green);
+}
+
+/* --- Scene Viewer Frame (Foundry Scene embed) --- */
+.wy-view-scene {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.wy-scene-select {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--wy-border);
+  overflow-x: auto;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.wy-scene-btn {
+  background: none;
+  border: 1px solid var(--wy-border);
+  color: var(--wy-green-dim);
+  font-family: var(--wy-font);
+  font-size: 10px;
+  padding: 4px 10px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: var(--wy-transition);
+  white-space: nowrap;
+}
+
+.wy-scene-btn:hover {
+  border-color: var(--wy-green);
+  color: var(--wy-green);
+  background: var(--wy-green-glow);
+}
+
+.wy-scene-btn.active {
+  background: var(--wy-green-dark);
+  border-color: var(--wy-green-bright);
+  color: var(--wy-green-bright);
+}
+
+.wy-scene-canvas {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.wy-scene-canvas img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* --- Iframe display (for muthurGPT web interface) --- */
+.wy-iframe-container {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.wy-iframe-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #000;
+}
+
+/* ============================================================================
+   LOG ENTRIES
+   ============================================================================ */
+
+.wy-log-entry {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(58, 122, 0, 0.15);
+}
+
+.wy-log-timestamp {
+  font-size: 10px;
+  color: var(--wy-green-dim);
+  letter-spacing: 1px;
+}
+
+.wy-log-message {
+  color: var(--wy-green);
+  margin-top: 2px;
+}
+
+.wy-log-entry.warning .wy-log-message {
+  color: var(--wy-amber);
+}
+
+.wy-log-entry.critical .wy-log-message {
+  color: var(--wy-red);
+}
+
+/* ============================================================================
+   STATUS BAR — Bottom bar
+   ============================================================================ */
+
+.wy-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 16px;
+  background: #080808;
+  border-top: 1px solid var(--wy-border);
+  font-size: 10px;
+  color: var(--wy-green-dim);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  min-height: 24px;
+}
+
+.wy-footer-left,
+.wy-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.wy-footer .wy-blink-cursor::after {
+  content: '█';
+  animation: wy-blink 1s step-end infinite;
+}
+
+/* ============================================================================
+   ANIMATIONS
+   ============================================================================ */
+
+@keyframes wy-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+
+@keyframes wy-glow-pulse {
+  0%, 100% { text-shadow: 0 0 10px var(--wy-green-glow); }
+  50%      { text-shadow: 0 0 20px var(--wy-green-glow-strong), 0 0 40px var(--wy-green-glow); }
+}
+
+@keyframes wy-scan-down {
+  0%   { top: -4px; }
+  100% { top: 100%; }
+}
+
+/* --- Noise / Static Effect (For boot) --- */
+.wy-noise-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 99;
+  opacity: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(127, 255, 0, 0.03) 0px,
+    transparent 2px,
+    transparent 4px
+  );
+  animation: wy-noise-fade 3s ease forwards;
+}
+
+@keyframes wy-noise-fade {
+  0%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ============================================================================
+   WEYLAND-YUTANI LOGO (SVG styling)
+   ============================================================================ */
+
+.wy-logo-mark {
+  fill: var(--wy-green);
+  filter: drop-shadow(0 0 4px var(--wy-green-glow));
+}
+
+/* ============================================================================
+   EMERGENCY PANEL
+   ============================================================================ */
+
+.wy-emergency-panel {
+  padding: 20px;
+}
+
+.wy-emergency-btn {
+  display: block;
+  width: 100%;
+  padding: 14px 20px;
+  margin: 8px 0;
+  background: rgba(255, 51, 51, 0.05);
+  border: 2px solid var(--wy-red-dim);
+  color: var(--wy-red);
+  font-family: var(--wy-font);
+  font-size: var(--wy-font-size);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: var(--wy-transition);
+  text-align: center;
+}
+
+.wy-emergency-btn:hover {
+  background: rgba(255, 51, 51, 0.12);
+  border-color: var(--wy-red);
+  text-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
+}
+
+/* ============================================================================
+   SETTINGS VIEW
+   ============================================================================ */
+
+.wy-view-settings {
+  padding: 16px 20px;
+}
+
+.wy-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(58, 122, 0, 0.15);
+}
+
+.wy-setting-label {
+  color: var(--wy-green);
+  letter-spacing: 1px;
+  font-size: var(--wy-font-size-sm);
+}
+
+.wy-setting-input {
+  background: var(--wy-bg);
+  border: 1px solid var(--wy-border);
+  color: var(--wy-green);
+  font-family: var(--wy-font);
+  font-size: var(--wy-font-size-sm);
+  padding: 4px 8px;
+  width: 240px;
+}
+
+.wy-setting-input:focus {
+  outline: none;
+  border-color: var(--wy-green-bright);
+  box-shadow: 0 0 6px var(--wy-green-glow);
+}
+
+/* ============================================================================
+   RESPONSIVE / TOUCH SUPPORT
+   ============================================================================ */
+
+@media (max-width: 800px) {
+  .wy-nav-column {
+    width: 48px;
+    min-width: 48px;
+  }
+
+  .wy-nav-btn .btn-label {
+    display: none;
+  }
+
+  .wy-nav-btn .btn-icon {
+    margin: 0 auto;
+  }
+
+  .wy-nav-btn {
+    justify-content: center;
+    padding: 10px 4px;
+  }
+
+  .wy-header-title {
+    font-size: 18px;
+    letter-spacing: 3px;
+  }
+
+  .wy-header-subtitle {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .wy-nav-column.right {
+    display: none;
+  }
+}
+
+/* Touch-friendly button sizes */
+@media (pointer: coarse) {
+  .wy-nav-btn {
+    min-height: 48px;
+    padding: 12px 10px;
+  }
+
+  .wy-toolbar-btn {
+    min-height: 36px;
+    padding: 6px 12px;
+  }
+
+  .wy-scene-btn {
+    min-height: 36px;
+    padding: 6px 14px;
+  }
+
+  .wy-muthur-input {
+    font-size: 16px; /* Prevent iOS zoom */
+  }
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+.wy-text-green  { color: var(--wy-green); }
+.wy-text-amber  { color: var(--wy-amber); }
+.wy-text-red    { color: var(--wy-red); }
+.wy-text-cyan   { color: var(--wy-cyan); }
+.wy-text-dim    { color: var(--wy-green-dim); }
+.wy-text-glow   { text-shadow: 0 0 10px var(--wy-green-glow-strong); }
+.wy-text-blink  { animation: wy-blink 1s step-end infinite; }
+
+.wy-border-box {
+  border: 1px solid var(--wy-border);
+  padding: var(--wy-padding);
+  margin: 8px 0;
+}
+
+.wy-hidden { display: none !important; }

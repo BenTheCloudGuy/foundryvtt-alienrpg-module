@@ -1,0 +1,18 @@
+<div class="wy-view-logs">
+  <div class="wy-section-title">SHIP LOG — {{shipName}}</div>
+
+  <div class="wy-border-box">
+    {{#each logs}}
+    <div class="wy-log-entry {{this.level}}">
+      <div class="wy-log-timestamp">[{{this.timestamp}}] — {{this.source}}</div>
+      <div class="wy-log-message">{{this.message}}</div>
+    </div>
+    {{/each}}
+
+    {{#unless logs}}
+    <div class="wy-text-dim" style="padding: 16px; text-align: center; letter-spacing: 2px;">
+      NO LOG ENTRIES AVAILABLE
+    </div>
+    {{/unless}}
+  </div>
+</div>

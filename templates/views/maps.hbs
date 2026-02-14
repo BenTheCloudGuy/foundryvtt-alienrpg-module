@@ -1,0 +1,23 @@
+<div class="wy-view-map wy-view-maps">
+  <div class="wy-section-title">DIGITAL CARTOGRAPHY</div>
+  
+  <div class="wy-border-box" style="margin-bottom: 16px;">
+    <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+      {{#each maps}}
+      <button class="wy-scene-btn {{#if this.active}}active{{/if}}" data-map-id="{{this.id}}">
+        {{this.name}}
+      </button>
+      {{/each}}
+    </div>
+  </div>
+
+  <div id="wy-map-viewport" style="flex: 1; overflow: hidden; position: relative; touch-action: none; border: 1px solid var(--wy-border);">
+    {{#if activeMapImg}}
+    <img src="{{activeMapImg}}" alt="{{activeMapName}}" id="wy-map-img" style="transform-origin: 0 0;" />
+    {{else}}
+    <div style="display: flex; align-items: center; justify-content: center; height: 300px; color: var(--wy-green-dim); letter-spacing: 3px;">
+      NO MAP DATA LOADED
+    </div>
+    {{/if}}
+  </div>
+</div>

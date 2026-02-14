@@ -1,0 +1,41 @@
+<div class="wy-view-systems">
+  <div class="wy-section-title">SHIP SYSTEMS DIAGNOSTIC</div>
+
+  <div class="wy-border-box">
+    <table class="wy-data-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>SYSTEM</th>
+          <th>STATUS</th>
+          <th>POWER</th>
+          <th>NOTES</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each systems}}
+        <tr>
+          <td><span class="wy-indicator {{this.statusClass}}"></span></td>
+          <td>{{this.name}}</td>
+          <td class="{{this.statusTextClass}}">{{this.status}}</td>
+          <td>{{this.power}}</td>
+          <td class="wy-text-dim">{{this.notes}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="wy-section-title" style="font-size: 13px; margin-top: 24px;">POWER DISTRIBUTION</div>
+  <div class="wy-border-box">
+    {{#each systems}}
+    <div style="display: flex; align-items: center; gap: 8px; margin: 4px 0;">
+      <span style="width: 120px; font-size: 11px;" class="wy-text-dim">{{this.name}}</span>
+      <div style="flex: 1; height: 8px; background: #111; border: 1px solid var(--wy-border);">
+        <div style="height: 100%; width: {{this.powerPct}}%; background: {{this.powerColor}};"></div>
+      </div>
+      <span style="width: 40px; text-align: right; font-size: 11px;">{{this.powerPct}}%</span>
+    </div>
+    {{/each}}
+  </div>
+</div>

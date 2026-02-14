@@ -1,0 +1,14 @@
+{
+  "debug": false,
+  "skip_intro": false,
+  "openai_model": "gpt-5.2-chat-latest",
+  "openai_api_key": "",
+  "header_name" : "MU/TH/UR",
+  "default_speed": 0.02,
+  "map_speed": 0.3,
+  "prompt_wait_time": 1,
+  "generic_bot_message": "HELLO. ENTER QUERY.",
+  "text_to_speech": false,
+  "misc_addendums": "",
+  "force_upper_case": true
+}

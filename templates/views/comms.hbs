@@ -1,0 +1,35 @@
+<div class="wy-view-comms">
+  <div class="wy-section-title">COMMUNICATIONS ARRAY</div>
+
+  <div class="wy-border-box">
+    <table class="wy-data-table">
+      <tr>
+        <td class="wy-text-dim">COMM STATUS:</td>
+        <td>
+          <span class="wy-indicator {{commStatusClass}}"></span>
+          {{commStatus}}
+        </td>
+      </tr>
+      <tr>
+        <td class="wy-text-dim">FREQUENCY:</td>
+        <td>{{commFrequency}}</td>
+      </tr>
+      <tr>
+        <td class="wy-text-dim">RANGE:</td>
+        <td>{{commRange}}</td>
+      </tr>
+    </table>
+  </div>
+
+  {{#if messages}}
+  <div class="wy-section-title" style="font-size: 13px; margin-top: 24px;">RECEIVED TRANSMISSIONS</div>
+  <div class="wy-border-box">
+    {{#each messages}}
+    <div class="wy-log-entry {{this.level}}">
+      <div class="wy-log-timestamp">[{{this.timestamp}}] — FROM: {{this.source}}</div>
+      <div class="wy-log-message">{{this.text}}</div>
+    </div>
+    {{/each}}
+  </div>
+  {{/if}}
+</div>

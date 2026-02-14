@@ -1,0 +1,96 @@
+<div class="wy-view-settings">
+  <div class="wy-section-title">TERMINAL CONFIGURATION</div>
+
+  <div class="wy-border-box">
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">SHIP NAME</span>
+      <input class="wy-setting-input" type="text"
+             data-setting="shipName"
+             value="{{shipName}}" />
+    </div>
+
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">SHIP CLASS</span>
+      <input class="wy-setting-input" type="text"
+             data-setting="shipClass"
+             value="{{shipClass}}" />
+    </div>
+
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">SHIP REGISTRY</span>
+      <input class="wy-setting-input" type="text"
+             data-setting="shipRegistry"
+             value="{{shipRegistry}}" />
+    </div>
+
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">CRT SCANLINES</span>
+      <input type="checkbox" data-setting="scanlines" {{#if scanlines}}checked{{/if}} />
+    </div>
+
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">CRT FLICKER</span>
+      <input type="checkbox" data-setting="crtFlicker" {{#if crtFlicker}}checked{{/if}} />
+    </div>
+
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">SOUND EFFECTS</span>
+      <input type="checkbox" data-setting="soundEnabled" {{#if soundEnabled}}checked{{/if}} />
+    </div>
+  </div>
+
+  {{#if isGM}}
+  <div class="wy-section-title" style="margin-top: 16px;">MU/TH/UR AI ENGINE</div>
+
+  <div class="wy-border-box">
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">OPENAI API KEY</span>
+      <input class="wy-setting-input" type="password"
+             data-setting="openaiApiKey"
+             value="{{openaiApiKey}}"
+             placeholder="sk-..." />
+    </div>
+
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">AI MODEL</span>
+      <input class="wy-setting-input" type="text"
+             data-setting="openaiModel"
+             value="{{openaiModel}}"
+             placeholder="gpt-4o-mini" />
+    </div>
+
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">SCENARIO PLUGIN</span>
+      <select class="wy-setting-input" data-setting="muthurPlugin">
+        {{#each availablePlugins}}
+        <option value="{{this.id}}" {{#if (eq this.id ../muthurPlugin)}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">EXTERNAL SERVER URL</span>
+      <input class="wy-setting-input" type="text"
+             data-setting="muthurUrl"
+             value="{{muthurUrl}}"
+             placeholder="(BLANK = USE BUILT-IN ENGINE)" />
+    </div>
+
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">STATUS FILE PATH</span>
+      <input class="wy-setting-input" type="text"
+             data-setting="statusPath"
+             value="{{statusPath}}"
+             placeholder="modules/wy-terminal/status/" />
+    </div>
+  </div>
+  {{/if}}
+
+  <div style="margin-top: 16px; display: flex; gap: 8px;">
+    <button class="wy-muthur-send" data-action="save-settings" style="flex:1;">SAVE CONFIGURATION</button>
+    <button class="wy-muthur-send" data-action="reload-status" style="flex:1;">RELOAD STATUS</button>
+    {{#if isGM}}
+    <button class="wy-muthur-send" data-action="clear-chat" style="flex:1;">CLEAR CHAT LOG</button>
+    {{/if}}
+  </div>
+</div>

@@ -1,0 +1,52 @@
+<div class="wy-view-nav">
+  <div class="wy-section-title">NAVIGATION — STELLAR CARTOGRAPHY</div>
+
+  <div class="wy-border-box">
+    <table class="wy-data-table">
+      <tr>
+        <td class="wy-text-dim">CURRENT POSITION:</td>
+        <td>{{currentPosition}}</td>
+      </tr>
+      <tr>
+        <td class="wy-text-dim">DESTINATION:</td>
+        <td>{{destination}}</td>
+      </tr>
+      <tr>
+        <td class="wy-text-dim">ETA:</td>
+        <td class="wy-text-amber">{{eta}}</td>
+      </tr>
+      <tr>
+        <td class="wy-text-dim">SPEED:</td>
+        <td>{{speed}}</td>
+      </tr>
+      <tr>
+        <td class="wy-text-dim">FUEL RESERVES:</td>
+        <td class="{{fuelClass}}">{{fuelLevel}}</td>
+      </tr>
+    </table>
+  </div>
+
+  {{#if navPoints}}
+  <div class="wy-section-title" style="font-size: 13px; margin-top: 24px;">WAYPOINTS</div>
+  <div class="wy-border-box">
+    <table class="wy-data-table">
+      <thead>
+        <tr>
+          <th>DESIGNATION</th>
+          <th>DISTANCE</th>
+          <th>TYPE</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each navPoints}}
+        <tr>
+          <td>{{this.name}}</td>
+          <td>{{this.distance}}</td>
+          <td class="wy-text-dim">{{this.type}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+  {{/if}}
+</div>

@@ -1,0 +1,21 @@
+<div class="wy-view-scene">
+  <div class="wy-scene-select" id="wy-scene-select">
+    {{#each scenes}}
+    <button class="wy-scene-btn {{#if this.active}}active{{/if}}" data-scene-id="{{this.id}}">
+      {{this.name}}
+    </button>
+    {{/each}}
+    {{#unless scenes}}
+    <span class="wy-text-dim" style="padding: 4px; letter-spacing: 2px;">NO SCENES AVAILABLE</span>
+    {{/unless}}
+  </div>
+  <div class="wy-scene-canvas" id="wy-scene-canvas">
+    {{#if activeSceneImg}}
+    <img src="{{activeSceneImg}}" alt="{{activeSceneName}}" id="wy-scene-img" />
+    {{else}}
+    <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--wy-green-dim); letter-spacing: 3px;">
+      SELECT A SCENE TO DISPLAY
+    </div>
+    {{/if}}
+  </div>
+</div>

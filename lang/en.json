@@ -1,0 +1,64 @@
+{
+  "WY_TERMINAL": {
+    "title": "W-Y Terminal",
+    "openTerminal": "Open Terminal",
+    "closeTerminal": "Close Terminal",
+    "buttons": {
+      "muthur": "MU/TH/UR",
+      "crew": "CREW",
+      "systems": "SYSTEMS",
+      "logs": "LOGS",
+      "maps": "MAPS",
+      "scenes": "SCENES",
+      "nav": "NAVIGATION",
+      "emergency": "EMERGENCY",
+      "status": "STATUS",
+      "comms": "COMMS",
+      "cargo": "CARGO",
+      "settings": "SETTINGS"
+    },
+    "status": {
+      "online": "ONLINE",
+      "offline": "OFFLINE",
+      "nominal": "NOMINAL",
+      "warning": "WARNING",
+      "critical": "CRITICAL",
+      "unknown": "UNKNOWN"
+    },
+    "messages": {
+      "boot": "INTERFACE 2037 READY. ALL SYSTEMS NOMINAL.",
+      "welcome": "WELCOME TO WEYLAND-YUTANI SHIPBOARD TERMINAL",
+      "accessGranted": "ACCESS GRANTED — CLEARANCE LEVEL: CREW",
+      "muthurConnecting": "ESTABLISHING UPLINK TO MU/TH/UR...",
+      "muthurOnline": "MU/TH/UR 6000 SERIES — ONLINE",
+      "noScene": "NO SCENE DATA AVAILABLE",
+      "loadingScene": "LOADING SCENE DATA...",
+      "statusUpdate": "SHIP STATUS UPDATE RECEIVED",
+      "zoomIn": "ZOOM IN",
+      "zoomOut": "ZOOM OUT",
+      "resetView": "RESET VIEW"
+    },
+    "settings": {
+      "muthurUrl": {
+        "name": "MU/TH/UR Server URL",
+        "hint": "The URL where the MuthurGPT web interface is accessible."
+      },
+      "statusPath": {
+        "name": "Ship Status File Path",
+        "hint": "Path to the ship status JSON file that MuthurGPT references."
+      },
+      "soundEnabled": {
+        "name": "Terminal Sound Effects",
+        "hint": "Enable keyboard clicks and terminal sound effects."
+      },
+      "scanlines": {
+        "name": "CRT Scanlines",
+        "hint": "Enable CRT scanline overlay effect."
+      },
+      "crtFlicker": {
+        "name": "CRT Flicker",
+        "hint": "Enable subtle CRT flicker animation."
+      }
+    }
+  }
+}

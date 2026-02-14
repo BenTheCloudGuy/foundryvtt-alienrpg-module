@@ -1,0 +1,18 @@
+<div class="wy-view-cargo">
+  <div class="wy-section-title">CARGO MANIFEST</div>
+
+  <div class="wy-border-box">
+    {{#each cargoItems}}
+    <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(58, 122, 0, 0.15);">
+      <span>{{this.name}}</span>
+      <span class="wy-text-dim">{{this.quantity}} {{this.unit}}</span>
+    </div>
+    {{/each}}
+
+    {{#unless cargoItems}}
+    <div class="wy-text-dim" style="padding: 16px; text-align: center; letter-spacing: 2px;">
+      CARGO BAY EMPTY
+    </div>
+    {{/unless}}
+  </div>
+</div>
