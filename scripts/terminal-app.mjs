@@ -393,15 +393,66 @@ export class WYTerminalApp extends Application {
 
     let activeSceneImg = null;
     let activeSceneName = null;
+    let tokens = [];
+
     if (this.activeSceneId) {
       const scene = game.scenes.get(this.activeSceneId);
       if (scene) {
         activeSceneImg = scene.background?.src || scene.img;
         activeSceneName = scene.name;
+
+        // Extract token data for the selected scene
+        tokens = this._getSceneTokens(scene);
       }
     }
 
-    return { scenes, activeSceneImg, activeSceneName };
+    return { scenes, activeSceneImg, activeSceneName, tokens };
+  }
+
+  /**
+   * Extract token positions/data from a Foundry scene for terminal overlay.
+   * Token positions are converted to percentages relative to scene dimensions.
+   */
+  _getSceneTokens(scene) {
+    if (!scene?.tokens?.contents) return [];
+
+    const sceneWidth = scene.width || 1;
+    const sceneHeight = scene.height || 1;
+
+    return scene.tokens.contents.map(t => {
+      // Convert pixel position to percentage of scene dimensions
+      const xPct = ((t.x || 0) / sceneWidth) * 100;
+      const yPct = ((t.y || 0) / sceneHeight) * 100;
+
+      // Determine disposition class
+      let disposition = 'neutral';
+      const disp = t.disposition ?? t.document?.disposition;
+      if (disp === 1) disposition = 'friendly';      // FRIENDLY
+      else if (disp === 0) disposition = 'neutral';   // NEUTRAL
+      else if (disp === -1) disposition = 'hostile';   // HOSTILE
+      else if (disp === -2) disposition = 'secret';    // SECRET
+
+      // Token image
+      const img = t.texture?.src || t.img || null;
+
+      // Token size (grid-relative)
+      const gridSize = scene.grid?.size || scene.data?.grid || 100;
+      const tokenWidth = (t.width || 1) * gridSize;
+      const displaySize = Math.max(24, Math.min(64, tokenWidth * 0.5));
+
+      return {
+        id: t.id,
+        name: (t.name || 'UNKNOWN').toUpperCase(),
+        actor: (t.actor?.name || t.actorId || '').toUpperCase(),
+        x: xPct.toFixed(2),
+        y: yPct.toFixed(2),
+        size: displaySize,
+        img,
+        icon: disposition === 'hostile' ? '▲' : disposition === 'friendly' ? '◆' : '●',
+        disposition,
+        hidden: t.hidden || false,
+      };
+    }).filter(t => !t.hidden); // Don't show hidden tokens to players
   }
 
   /* ── Maps data ── */

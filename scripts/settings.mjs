@@ -3,6 +3,21 @@
  */
 
 export function registerSettings() {
+  // Display Mode — determines how the client renders
+  game.settings.register('wy-terminal', 'displayMode', {
+    name: 'Display Mode',
+    hint: 'Terminal Display: Full-screen terminal overlay, hides all Foundry UI (for shared touch-screen / player display). Normal: Standard Foundry UI with terminal as a pop-out window.',
+    scope: 'client',
+    config: true,
+    type: String,
+    default: 'normal',
+    choices: {
+      normal: 'Normal (Foundry + Terminal window)',
+      terminal: 'Terminal Display (Full-screen, no Foundry UI)',
+    },
+    requiresReload: true,
+  });
+
   game.settings.register('wy-terminal', 'shipName', {
     name: 'Ship Name',
     hint: 'The name of the vessel displayed in the terminal.',
@@ -86,7 +101,7 @@ export function registerSettings() {
 
   game.settings.register('wy-terminal', 'terminalWidth', {
     name: 'Terminal Width',
-    hint: 'Width of the terminal window in pixels.',
+    hint: 'Width of the terminal window in pixels (Normal mode only — ignored in Terminal Display mode).',
     scope: 'client',
     config: true,
     type: Number,
@@ -95,7 +110,7 @@ export function registerSettings() {
 
   game.settings.register('wy-terminal', 'terminalHeight', {
     name: 'Terminal Height',
-    hint: 'Height of the terminal window in pixels.',
+    hint: 'Height of the terminal window in pixels (Normal mode only — ignored in Terminal Display mode).',
     scope: 'client',
     config: true,
     type: Number,

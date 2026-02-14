@@ -11,7 +11,37 @@
   </div>
   <div class="wy-scene-canvas" id="wy-scene-canvas">
     {{#if activeSceneImg}}
-    <img src="{{activeSceneImg}}" alt="{{activeSceneName}}" id="wy-scene-img" />
+    <div class="wy-scene-viewport" id="wy-scene-viewport">
+      <img src="{{activeSceneImg}}" alt="{{activeSceneName}}" id="wy-scene-img" />
+      {{!-- Token overlay layer --}}
+      <div class="wy-token-layer" id="wy-token-layer">
+        {{#each tokens}}
+        <div class="wy-token {{this.disposition}}" 
+             style="left: {{this.x}}%; top: {{this.y}}%; width: {{this.size}}px; height: {{this.size}}px;"
+             title="{{this.name}}">
+          {{#if this.img}}
+          <img src="{{this.img}}" alt="{{this.name}}" />
+          {{else}}
+          <span class="wy-token-icon">{{this.icon}}</span>
+          {{/if}}
+          <span class="wy-token-label">{{this.name}}</span>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+    {{!-- Token roster for this scene --}}
+    {{#if tokens.length}}
+    <div class="wy-scene-roster" id="wy-scene-roster">
+      <div class="wy-roster-title">DETECTED SIGNATURES — {{tokens.length}}</div>
+      {{#each tokens}}
+      <div class="wy-roster-entry {{this.disposition}}">
+        <span class="wy-indicator {{this.disposition}}"></span>
+        <span class="wy-roster-name">{{this.name}}</span>
+        <span class="wy-roster-detail wy-text-dim">{{this.actor}}</span>
+      </div>
+      {{/each}}
+    </div>
+    {{/if}}
     {{else}}
     <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--wy-green-dim); letter-spacing: 3px;">
       SELECT A SCENE TO DISPLAY

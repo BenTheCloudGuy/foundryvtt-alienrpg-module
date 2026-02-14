@@ -728,6 +728,135 @@
   object-fit: contain;
 }
 
+/* --- Scene Viewport (background + token overlay) --- */
+.wy-scene-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.wy-scene-viewport > img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* --- Token Overlay Layer --- */
+.wy-token-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.wy-token {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: auto;
+  cursor: default;
+  z-index: 11;
+}
+
+.wy-token img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid var(--wy-green);
+  box-shadow: 0 0 8px var(--wy-green-glow);
+  filter: brightness(0.9) saturate(0.7);
+  object-fit: cover;
+}
+
+.wy-token.hostile img {
+  border-color: var(--wy-red);
+  box-shadow: 0 0 8px rgba(255, 51, 51, 0.4);
+}
+
+.wy-token.friendly img {
+  border-color: var(--wy-cyan);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
+}
+
+.wy-token.neutral img {
+  border-color: var(--wy-amber);
+  box-shadow: 0 0 8px rgba(255, 191, 0, 0.3);
+}
+
+.wy-token-icon {
+  font-size: 16px;
+  color: var(--wy-green);
+  text-shadow: 0 0 6px var(--wy-green-glow-strong);
+}
+
+.wy-token.hostile .wy-token-icon { color: var(--wy-red); text-shadow: 0 0 6px rgba(255, 51, 51, 0.4); }
+.wy-token.friendly .wy-token-icon { color: var(--wy-cyan); text-shadow: 0 0 6px rgba(0, 229, 255, 0.3); }
+.wy-token.neutral .wy-token-icon { color: var(--wy-amber); text-shadow: 0 0 6px rgba(255, 191, 0, 0.3); }
+
+.wy-token-label {
+  font-family: var(--wy-font);
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--wy-green);
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8), 0 0 8px var(--wy-green-glow);
+  white-space: nowrap;
+  margin-top: 2px;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.wy-token.hostile .wy-token-label { color: var(--wy-red); }
+.wy-token.friendly .wy-token-label { color: var(--wy-cyan); }
+
+/* --- Scene Token Roster --- */
+.wy-scene-roster {
+  padding: 8px 12px;
+  border-top: 1px solid var(--wy-border);
+  background: #080808;
+  flex-shrink: 0;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.wy-roster-title {
+  font-size: 10px;
+  color: var(--wy-green-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.wy-roster-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: var(--wy-font-size-sm);
+}
+
+.wy-roster-name {
+  color: var(--wy-green);
+  letter-spacing: 1px;
+}
+
+.wy-roster-entry.hostile .wy-roster-name { color: var(--wy-red); }
+.wy-roster-entry.friendly .wy-roster-name { color: var(--wy-cyan); }
+.wy-roster-entry.neutral .wy-roster-name { color: var(--wy-amber); }
+
+.wy-roster-detail {
+  font-size: 10px;
+  margin-left: auto;
+}
+
 /* --- Iframe display (for muthurGPT web interface) --- */
 .wy-iframe-container {
   width: 100%;
