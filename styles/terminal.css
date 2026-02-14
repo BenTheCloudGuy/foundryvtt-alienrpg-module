@@ -197,27 +197,7 @@
   animation: wy-blink 1s step-end infinite;
 }
 
-.wy-header-close {
-  background: none;
-  border: 1px solid var(--wy-border);
-  color: var(--wy-green-dim);
-  font-family: var(--wy-font);
-  font-size: 18px;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--wy-transition);
-  margin-left: 16px;
-}
 
-.wy-header-close:hover {
-  color: var(--wy-red);
-  border-color: var(--wy-red);
-  background: var(--wy-red-dim);
-}
 
 /* ============================================================================
    ALERT BAR — Status alerts / warnings

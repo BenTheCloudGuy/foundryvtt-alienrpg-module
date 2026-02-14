@@ -127,9 +127,6 @@ export class WYTerminalApp extends Application {
       });
     });
 
-    // Close button
-    el.querySelector('[data-action="close-terminal"]')?.addEventListener('click', () => this.close());
-
     // Zoom buttons
     el.querySelector('[data-action="zoom-in"]')?.addEventListener('click', () => this.zoomHandler?.zoomIn());
     el.querySelector('[data-action="zoom-out"]')?.addEventListener('click', () => this.zoomHandler?.zoomOut());
@@ -147,7 +144,12 @@ export class WYTerminalApp extends Application {
   }
 
   close(options) {
-    // Cleanup
+    // Prevent closing for player clients — terminal is always on
+    if (!game.user.isGM) {
+      console.log('WY-Terminal | Terminal cannot be closed on player display');
+      return;
+    }
+    // GM can close for debugging
     if (this.zoomHandler) {
       this.zoomHandler.destroy();
       this.zoomHandler = null;

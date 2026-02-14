@@ -50,14 +50,10 @@ Hooks.once('ready', () => {
   // Initialize ship status manager
   shipStatus = new ShipStatusManager();
 
-  // Determine display mode
-  let displayMode = 'normal';
-  try {
-    displayMode = game.settings.get('wy-terminal', 'displayMode') || 'normal';
-  } catch (e) { /* first load */ }
-
-  const isTerminalDisplay = displayMode === 'terminal';
-  console.log(`WY-Terminal | Display mode: ${displayMode}`);
+  // Players ALWAYS get full-screen terminal display mode
+  // GM gets normal Foundry UI with terminal as a pop-out
+  const isTerminalDisplay = !game.user.isGM;
+  console.log(`WY-Terminal | Display mode: ${isTerminalDisplay ? 'TERMINAL (full-screen)' : 'GM (normal)'}`);
 
   // Expose to global scope for macros / debugging
   game.wyTerminal = {
@@ -72,9 +68,9 @@ Hooks.once('ready', () => {
     isTerminalDisplay,
   };
 
-  // Terminal Display mode: hide ALL Foundry UI chrome and go full-screen
+  // Player clients: hide ALL Foundry UI chrome and go full-screen
   if (isTerminalDisplay) {
-    console.log('WY-Terminal | Enabling Terminal Display mode — hiding Foundry UI');
+    console.log('WY-Terminal | Player display — hiding all Foundry UI, full-screen terminal');
     _enableTerminalDisplayMode();
   }
 
@@ -219,19 +215,19 @@ function _enableTerminalDisplayMode() {
       margin: 0 !important;
     }
 
-    /* Hide the terminal close button in display mode */
-    .wy-terminal-display .wy-header-close {
+    /* Hide the terminal close button — always hidden */
+    .wy-header-close {
       display: none !important;
     }
 
-    /* Slightly enlarge nav buttons for touch on large displays */
-    .wy-terminal-display .wy-nav-btn {
+    /* Enlarge nav buttons for touch on large displays */
+    .wy-terminal .wy-nav-btn {
       min-height: 52px;
       font-size: 12px;
     }
 
-    /* Ensure terminal fills its container */
-    .wy-terminal-display {
+    /* Terminal fills its container — no border/radius */
+    .wy-terminal {
       border-radius: 0 !important;
       border: none !important;
     }
@@ -253,17 +249,6 @@ function openTerminal() {
   }
   terminalApp = new WYTerminalApp({ shipStatus });
   terminalApp.render(true);
-
-  // In Terminal Display mode, add the display class after render
-  if (game.wyTerminal?.isTerminalDisplay) {
-    Hooks.once('renderWYTerminalApp', (app, html) => {
-      const el = html[0] ?? html;
-      const terminal = el.querySelector('.wy-terminal') ?? el;
-      terminal.classList.add('wy-terminal-display');
-      console.log('WY-Terminal | Terminal Display mode active — full viewport');
-    });
-  }
-
   return terminalApp;
 }
 
