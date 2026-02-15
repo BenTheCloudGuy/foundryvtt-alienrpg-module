@@ -1,4 +1,4 @@
-<div class="wy-terminal {{#if scanlines}}scanlines{{/if}} {{#if crtFlicker}}crt-flicker{{/if}}">
+<div class="wy-terminal {{#if scanlines}}scanlines{{/if}} {{#if crtFlicker}}crt-flicker{{/if}} wy-theme-{{uiTheme}}">
   
   {{!-- Noise overlay for boot-up effect --}}
   <div class="wy-noise-overlay"></div>
@@ -12,7 +12,7 @@
       </svg>
       <div>
         <div class="wy-header-title">WEYLAND-YUTANI</div>
-        <div class="wy-header-subtitle">{{shipName}} — INTERFACE 2037</div>
+        <div class="wy-header-subtitle">{{shipName}} — INTERFACE {{interfaceVersion}}</div>
       </div>
     </div>
     <div class="wy-header-status">
@@ -65,12 +65,31 @@
         <span class="btn-label">NAV</span>
       </button>
 
+      {{!-- Ship-specific extra nav buttons --}}
+      {{#if extraNavButtons.length}}
       <div class="wy-nav-separator"></div>
+      <div class="wy-nav-label">TACTICAL</div>
+      {{#each extraNavButtons}}
+      <button class="wy-nav-btn {{#if (eq this.view ../activeView)}}active{{/if}}" data-view="{{this.view}}">
+        <span class="btn-icon">{{this.icon}}</span>
+        <span class="btn-label">{{this.label}}</span>
+      </button>
+      {{/each}}
+      {{/if}}
+
+      {{#if isGM}}
+      <div class="wy-nav-separator"></div>
+
+      <button class="wy-nav-btn {{#if (eq activeView 'gameclock')}}active{{/if}}" data-view="gameclock">
+        <span class="btn-icon">⏱</span>
+        <span class="btn-label">GAME CLOCK</span>
+      </button>
 
       <button class="wy-nav-btn emergency {{#if (eq activeView 'emergency')}}active{{/if}}" data-view="emergency">
         <span class="btn-icon">⚠</span>
-        <span class="btn-label">EMRGCY</span>
+        <span class="btn-label">EMERGENCY</span>
       </button>
+      {{/if}}
     </div>
 
     {{!-- ──── DISPLAY FRAME ──── --}}
@@ -79,7 +98,7 @@
       {{!-- Display toolbar --}}
       <div class="wy-display-toolbar">
         <div class="wy-display-toolbar-title" id="wy-display-title">{{displayTitle}}</div>
-        <div class="wy-display-toolbar-actions">
+        <div class="wy-display-toolbar-actions" id="wy-zoom-controls" style="display: none;">
           <button class="wy-toolbar-btn" data-action="zoom-in" title="Zoom In">+</button>
           <button class="wy-toolbar-btn" data-action="zoom-out" title="Zoom Out">−</button>
           <button class="wy-toolbar-btn" data-action="zoom-reset" title="Reset Zoom">⊡</button>
@@ -119,15 +138,24 @@
 
       <button class="wy-nav-btn {{#if (eq activeView 'scenes')}}active{{/if}}" data-view="scenes">
         <span class="btn-icon">⊞</span>
-        <span class="btn-label">SCENES</span>
+        <span class="btn-label">SCHEMATICS</span>
       </button>
 
       <div class="wy-nav-separator"></div>
 
+      <button class="wy-nav-btn wy-nav-btn-cmdcode {{#if (eq activeView 'commandcode')}}active{{/if}}" data-view="commandcode">
+        <span class="btn-icon">⌘</span>
+        <span class="btn-label">CMD CODE</span>
+      </button>
+
+      {{#if isGM}}
+      <div class="wy-nav-separator"></div>
+
       <button class="wy-nav-btn {{#if (eq activeView 'settings')}}active{{/if}}" data-view="settings">
         <span class="btn-icon">⚙</span>
-        <span class="btn-label">CONFIG</span>
+        <span class="btn-label">GM CONTROLS</span>
       </button>
+      {{/if}}
     </div>
   </div>
 
@@ -137,6 +165,8 @@
       <span>TERM://{{shipName}}/MAIN</span>
       <span>|</span>
       <span>USER: {{userName}}</span>
+      <span>|</span>
+      <span class="wy-footer-clearance wy-cc-level-{{activeClearance}}">CLEARANCE: {{activeClearance}}</span>
     </div>
     <div class="wy-footer-right">
       <span>MEM: OK</span>

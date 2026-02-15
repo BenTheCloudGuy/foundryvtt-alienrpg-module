@@ -1,6 +1,59 @@
 <div class="wy-view-systems">
   <div class="wy-section-title">SHIP SYSTEMS DIAGNOSTIC</div>
 
+  {{#if isGM}}
+  {{!-- ═══ GM CONFIGURATION MODE ═══ --}}
+  <div class="wy-border-box">
+    <table class="wy-data-table wy-sys-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>SYSTEM</th>
+          <th>STATUS</th>
+          <th>POWER %</th>
+          <th>NOTES</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each systems}}
+        <tr class="wy-sys-row" data-idx="{{this.idx}}">
+          <td><span class="wy-indicator {{this.statusClass}}"></span></td>
+          <td>
+            <input type="text" class="wy-sys-name wy-terminal-input" value="{{this.name}}" />
+          </td>
+          <td>
+            <select class="wy-sys-status wy-terminal-select">
+              <option value="ONLINE" {{#if (eq this.status 'ONLINE')}}selected{{/if}}>ONLINE</option>
+              <option value="NOMINAL" {{#if (eq this.status 'NOMINAL')}}selected{{/if}}>NOMINAL</option>
+              <option value="WARNING" {{#if (eq this.status 'WARNING')}}selected{{/if}}>WARNING</option>
+              <option value="CRITICAL" {{#if (eq this.status 'CRITICAL')}}selected{{/if}}>CRITICAL</option>
+              <option value="OFFLINE" {{#if (eq this.status 'OFFLINE')}}selected{{/if}}>OFFLINE</option>
+            </select>
+          </td>
+          <td class="wy-sys-pct-cell">
+            <input type="range" class="wy-sys-pct wy-terminal-range" min="0" max="100" value="{{this.powerPct}}" />
+            <span class="wy-sys-pct-label">{{this.powerPct}}%</span>
+          </td>
+          <td>
+            <input type="text" class="wy-sys-detail wy-terminal-input" value="{{this.detail}}" placeholder="Notes..." />
+          </td>
+          <td>
+            <button class="wy-toolbar-btn wy-text-red" data-action="remove-system" data-idx="{{this.idx}}" title="Remove">✕</button>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+
+  <div style="display: flex; gap: 8px; margin-top: 12px;">
+    <button class="wy-muthur-send" data-action="save-systems" style="flex: 1;">SAVE CONFIGURATION</button>
+    <button class="wy-muthur-send" data-action="add-system" style="flex: 1;">+ ADD SYSTEM</button>
+  </div>
+
+  {{else}}
+  {{!-- ═══ PLAYER READ-ONLY MODE ═══ --}}
   <div class="wy-border-box">
     <table class="wy-data-table">
       <thead>
@@ -25,6 +78,7 @@
       </tbody>
     </table>
   </div>
+  {{/if}}
 
   <div class="wy-section-title" style="font-size: 13px; margin-top: 24px;">POWER DISTRIBUTION</div>
   <div class="wy-border-box">
@@ -32,7 +86,7 @@
     <div style="display: flex; align-items: center; gap: 8px; margin: 4px 0;">
       <span style="width: 120px; font-size: 11px;" class="wy-text-dim">{{this.name}}</span>
       <div style="flex: 1; height: 8px; background: #111; border: 1px solid var(--wy-border);">
-        <div style="height: 100%; width: {{this.powerPct}}%; background: {{this.powerColor}};"></div>
+        <div class="wy-power-bar-fill" data-idx="{{this.idx}}" style="height: 100%; width: {{this.powerPct}}%; background: {{this.powerColor}};"></div>
       </div>
       <span style="width: 40px; text-align: right; font-size: 11px;">{{this.powerPct}}%</span>
     </div>

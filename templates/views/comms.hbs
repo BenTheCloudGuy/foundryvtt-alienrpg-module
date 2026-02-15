@@ -21,6 +21,28 @@
     </table>
   </div>
 
+  {{!-- Frequency Keypad --}}
+  <div class="wy-freq-keypad-container">
+    <div class="wy-keypad-title">SET FREQUENCY</div>
+    <div class="wy-keypad-subtitle">FORMAT: ###.## MHz</div>
+    <div class="wy-keypad-display" id="wy-freq-keypad-display"></div>
+    <div class="wy-keypad-grid">
+      <button class="wy-keypad-btn" data-freq-keypad="1">1</button>
+      <button class="wy-keypad-btn" data-freq-keypad="2">2</button>
+      <button class="wy-keypad-btn" data-freq-keypad="3">3</button>
+      <button class="wy-keypad-btn" data-freq-keypad="4">4</button>
+      <button class="wy-keypad-btn" data-freq-keypad="5">5</button>
+      <button class="wy-keypad-btn" data-freq-keypad="6">6</button>
+      <button class="wy-keypad-btn" data-freq-keypad="7">7</button>
+      <button class="wy-keypad-btn" data-freq-keypad="8">8</button>
+      <button class="wy-keypad-btn" data-freq-keypad="9">9</button>
+      <button class="wy-keypad-btn wy-keypad-decimal" data-freq-keypad=".">.</button>
+      <button class="wy-keypad-btn" data-freq-keypad="0">0</button>
+      <button class="wy-keypad-btn wy-keypad-clear" data-freq-keypad="clear">CLR</button>
+    </div>
+    <button class="wy-keypad-btn wy-keypad-enter wy-freq-enter-wide" data-freq-keypad="enter">SET FREQUENCY</button>
+  </div>
+
   {{#if messages}}
   <div class="wy-section-title" style="font-size: 13px; margin-top: 24px;">RECEIVED TRANSMISSIONS</div>
   <div class="wy-border-box">

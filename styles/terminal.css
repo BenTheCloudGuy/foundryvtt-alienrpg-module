@@ -419,12 +419,12 @@
   background: var(--wy-green-dim);
 }
 
-/* Content wrapper for zoom transforms */
+/* Content wrapper — fills frame by default, zoom only for scenes */
 .wy-display-content {
   transform-origin: 0 0;
   transition: transform 0.1s ease;
-  min-width: 100%;
-  min-height: 100%;
+  width: 100%;
+  height: 100%;
   padding: var(--wy-padding);
   box-sizing: border-box;
 }
@@ -544,28 +544,633 @@
 .wy-indicator.offline  { background: #444; }
 .wy-indicator.critical { background: var(--wy-red); box-shadow: 0 0 6px rgba(255, 51, 51, 0.4); animation: wy-blink 1s step-end infinite; }
 
-/* --- Map / Image View --- */
-.wy-view-map {
+/* --- GM System Configuration Inputs --- */
+.wy-terminal-input,
+.wy-terminal-select {
+  background: transparent;
+  border: 1px solid var(--wy-border);
+  color: var(--wy-green);
+  font-family: var(--wy-font);
+  font-size: 11px;
+  padding: 3px 6px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.wy-terminal-input:focus,
+.wy-terminal-select:focus {
+  border-color: var(--wy-green);
+  box-shadow: 0 0 4px var(--wy-green-glow);
+}
+
+.wy-terminal-select {
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%2333ff33'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+}
+
+.wy-terminal-select option {
+  background: #0a0a0a;
+  color: var(--wy-green);
+}
+
+.wy-sys-pct-cell {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
+  min-width: 120px;
+}
+
+.wy-terminal-range {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  height: 4px;
+  background: #222;
+  border: 1px solid var(--wy-border);
+  border-radius: 0;
+  outline: none;
+  cursor: pointer;
+}
+
+.wy-terminal-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 16px;
+  background: var(--wy-green);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 4px var(--wy-green-glow);
+}
+
+.wy-sys-pct-label {
+  font-size: 11px;
+  color: var(--wy-green-dim);
+  min-width: 36px;
+  text-align: right;
+}
+
+.wy-sys-table .wy-sys-name { max-width: 140px; }
+.wy-sys-table .wy-sys-detail { max-width: 200px; }
+
+/* --- Map / Image View --- */
+.wy-view-map {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  touch-action: none; /* Allow Hammer.js to handle touch */
   overflow: hidden;
 }
 
-.wy-view-map img {
-  max-width: none;
-  max-height: none;
-  image-rendering: auto;
+#wy-map-viewport {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  touch-action: none;
+}
+
+#wy-map-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform-origin: 0 0;
   pointer-events: none;
+  filter: brightness(0.8) saturate(0.5) hue-rotate(80deg);
+}
+
+.wy-map-controls {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+}
+
+.wy-map-zoom-btn {
+  width: 36px;
+  height: 36px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--wy-green-dim);
+  color: var(--wy-green);
+  font-family: var(--wy-font);
+  font-size: 18px;
+  line-height: 34px;
+  text-align: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all var(--wy-transition);
+}
+
+.wy-map-zoom-btn:hover {
+  border-color: var(--wy-green);
+  background: rgba(0, 0, 0, 0.85);
+  text-shadow: 0 0 6px var(--wy-green-glow);
+}
+
+.wy-map-reset-btn {
+  font-size: 20px;
+}
+
+/* === NAV Star Map === */
+.wy-nav-status-table td {
+  padding: 4px 10px;
+}
+
+.wy-nav-starmap-container {
+  margin-top: 12px;
+  border: 1px solid var(--wy-border);
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.wy-nav-starmap-label {
+  font-size: 10px;
+  color: var(--wy-green-dim);
+  letter-spacing: 3px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--wy-border);
+}
+
+.wy-nav-starmap {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.wy-nav-starmap-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  filter: brightness(0.7) saturate(0.4) hue-rotate(80deg);
+  transform-origin: 0 0;
+}
+
+.wy-nav-starmap-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transform-origin: 0 0;
+}
+
+/* === CREW — List/Detail/Keypad Layout === */
+.wy-view-crew {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.wy-crew-list-view {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.wy-crew-list {
+  overflow-y: auto;
+}
+
+.wy-crew-row {
+  display: grid;
+  grid-template-columns: 24px 1fr 1fr 1fr 80px 60px;
+  gap: 6px;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid rgba(58, 122, 0, 0.15);
+  font-size: var(--wy-font-size-sm);
+  transition: background var(--wy-transition);
+}
+
+.wy-crew-row:not(.wy-crew-row-header):hover {
+  background: var(--wy-green-glow);
+}
+
+.wy-crew-row-header {
+  font-size: 10px;
+  color: var(--wy-green-dim);
+  letter-spacing: 2px;
+  border-bottom: 1px solid rgba(58, 122, 0, 0.3);
+  padding: 6px 8px;
+}
+
+.wy-crew-col-indicator { text-align: center; }
+.wy-crew-col-name { color: var(--wy-green); letter-spacing: 1px; }
+.wy-crew-col-role { color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px; }
+.wy-crew-col-location { letter-spacing: 1px; }
+.wy-crew-col-status { font-size: 10px; letter-spacing: 1px; }
+.wy-crew-col-action { text-align: right; }
+
+/* === Keypad === */
+.wy-crew-keypad-view {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wy-keypad-container {
+  text-align: center;
+  max-width: 300px;
+  width: 100%;
+}
+
+.wy-keypad-title {
+  font-size: var(--wy-font-size-base);
+  color: var(--wy-green);
+  letter-spacing: 4px;
+  margin-bottom: 4px;
+}
+
+.wy-keypad-subtitle {
+  font-size: 10px;
+  color: var(--wy-green-dim);
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+}
+
+.wy-keypad-display {
+  width: 100%;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--wy-border);
+  color: var(--wy-green);
+  font-family: var(--wy-font);
+  font-size: 24px;
+  letter-spacing: 8px;
+  line-height: 40px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.wy-keypad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.wy-keypad-btn {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--wy-green-dim);
+  color: var(--wy-green);
+  font-family: var(--wy-font);
+  font-size: 20px;
+  padding: 14px 0;
+  cursor: pointer;
+  transition: all var(--wy-transition);
+  letter-spacing: 2px;
+}
+
+.wy-keypad-btn:hover {
+  background: var(--wy-green-glow);
+  border-color: var(--wy-green);
+  text-shadow: 0 0 6px var(--wy-green-glow);
+}
+
+.wy-keypad-btn:active {
+  background: rgba(127, 255, 0, 0.15);
+}
+
+.wy-keypad-clear {
+  color: var(--wy-amber);
+  border-color: var(--wy-amber-dim);
+}
+.wy-keypad-clear:hover {
+  border-color: var(--wy-amber);
+}
+
+.wy-keypad-enter {
+  color: var(--wy-green);
+  border-color: var(--wy-green);
+  font-weight: bold;
+}
+
+.wy-keypad-footer {
+  margin-top: 12px;
+}
+
+/* === Frequency Keypad (Comms View) === */
+.wy-freq-keypad-container {
+  text-align: center;
+  max-width: 300px;
+  width: 100%;
+  margin: 20px auto 0;
+}
+
+.wy-keypad-decimal {
+  color: var(--wy-green);
+  border-color: var(--wy-green-dim);
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.wy-freq-enter-wide {
+  width: 100%;
+  margin-top: 6px;
+  padding: 12px 0;
+  font-size: 14px;
+  letter-spacing: 4px;
+}
+
+/* === Game Clock View === */
+.wy-view-gameclock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.wy-clock-display {
+  text-align: center;
+  margin: 30px 0 40px;
+}
+
+.wy-clock-date {
+  font-family: var(--wy-font);
+  font-size: 42px;
+  color: var(--wy-green);
+  letter-spacing: 6px;
+  text-shadow: 0 0 12px var(--wy-green-glow);
+  margin-bottom: 8px;
+}
+
+.wy-clock-time {
+  font-family: var(--wy-font);
+  font-size: 72px;
+  color: var(--wy-green);
+  letter-spacing: 10px;
+  text-shadow: 0 0 20px var(--wy-green-glow);
+  line-height: 1;
+}
+
+.wy-clock-rate {
+  font-size: 11px;
+  color: var(--wy-green-dim);
+  letter-spacing: 3px;
+  margin-top: 16px;
+}
+
+.wy-clock-controls {
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+}
+
+.wy-clock-controls-title {
+  font-size: var(--wy-font-size-base);
+  color: var(--wy-green);
+  letter-spacing: 4px;
+  margin-bottom: 16px;
+}
+
+.wy-clock-grid {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.wy-clock-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.wy-clock-label {
+  font-family: var(--wy-font);
+  font-size: 11px;
+  color: var(--wy-green-dim);
+  letter-spacing: 2px;
+}
+
+.wy-clock-btn {
+  width: 48px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--wy-green-dim);
+  color: var(--wy-green);
+  font-family: var(--wy-font);
+  font-size: 22px;
+  cursor: pointer;
+  transition: all var(--wy-transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wy-clock-btn:hover {
+  background: var(--wy-green-glow);
+  border-color: var(--wy-green);
+  text-shadow: 0 0 6px var(--wy-green-glow);
+}
+
+.wy-clock-btn:active {
+  background: rgba(127, 255, 0, 0.15);
+}
+
+.wy-clock-plus {
+  border-color: var(--wy-green);
+}
+
+.wy-clock-minus {
+  color: var(--wy-amber);
+  border-color: var(--wy-amber-dim);
+}
+.wy-clock-minus:hover {
+  border-color: var(--wy-amber);
+}
+
+.wy-clock-actions {
+  margin-top: 24px;
+}
+
+.wy-clock-action-btn {
+  padding: 10px 24px;
+  font-size: 12px;
+  letter-spacing: 3px;
+}
+
+/* === Crew Detail View === */
+.wy-crew-detail-view {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.wy-crew-detail-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.wy-crew-detail-header {
+  display: flex;
+  gap: 16px;
+  padding: 12px 8px;
+  border-bottom: 1px solid rgba(58, 122, 0, 0.3);
+  flex-shrink: 0;
+}
+
+.wy-crew-detail-portrait-wrap {
+  flex-shrink: 0;
+}
+
+.wy-crew-detail-portrait {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border: 1px solid var(--wy-green-dim);
+  filter: brightness(0.9) saturate(0.6);
+}
+
+.wy-crew-detail-info {
+  flex: 1;
+}
+
+.wy-crew-det-name {
+  font-size: var(--wy-font-size-lg, 18px);
+  color: var(--wy-green);
+  letter-spacing: 3px;
+  margin-bottom: 8px;
+}
+
+.wy-crew-det-row {
+  display: flex;
+  gap: 8px;
+  font-size: var(--wy-font-size-sm);
+  letter-spacing: 1px;
+  margin: 4px 0;
+}
+
+.wy-crew-det-status-val {
+  letter-spacing: 1px;
+}
+
+.wy-crew-detail-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 8px;
+}
+
+.wy-crew-detail-text {
+  font-family: var(--wy-font);
+  font-size: var(--wy-font-size-sm);
+  color: var(--wy-green);
+  line-height: 1.7;
+  letter-spacing: 0.5px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+}
+
+.wy-crew-detail-footer {
+  padding: 8px;
+  border-top: 1px solid rgba(58, 122, 0, 0.3);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* GM Crew Edit Controls */
+.wy-crew-gm-edit {
+  padding: 10px 8px;
+  border-top: 1px dashed var(--wy-green-dim);
+  border-bottom: 1px dashed var(--wy-green-dim);
+  flex-shrink: 0;
+}
+.wy-crew-gm-edit-title {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--wy-green-dim);
+  margin-bottom: 8px;
+}
+.wy-crew-gm-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.wy-crew-gm-label {
+  font-size: var(--wy-font-size-sm);
+  color: var(--wy-green-dim);
+  letter-spacing: 1px;
+  min-width: 70px;
+  flex-shrink: 0;
+}
+.wy-crew-gm-edit-actions {
+  margin-top: 8px;
+  text-align: right;
+}
+.wy-crew-gm-edit-actions .wy-muthur-send {
+  min-width: 100px;
+}
+
+/* === Command Code Row === */
+.wy-cmd-code-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 120px 28px;
+  gap: 6px;
+  margin: 4px 0;
+  align-items: center;
+}
+
+.wy-cmd-code-delete {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--wy-red-dim);
+  color: var(--wy-red);
+  font-family: var(--wy-font);
+  font-size: 12px;
+  line-height: 26px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--wy-transition);
+}
+
+.wy-cmd-code-delete:hover {
+  border-color: var(--wy-red);
+  background: rgba(255, 51, 51, 0.12);
+}
+
+/* --- Full-height view mode (muthur chat) --- */
+.wy-display-frame.wy-fullheight-view {
+  display: flex;
+  flex-direction: column;
+}
+
+.wy-display-frame.wy-fullheight-view .wy-display-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0;
 }
 
 /* --- MU/TH/UR Chat View --- */
 .wy-view-muthur {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
 }
 
 .wy-muthur-output {
@@ -579,6 +1184,9 @@
 .wy-muthur-line {
   margin: 4px 0;
   padding: 2px 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .wy-muthur-line.system {
@@ -591,7 +1199,7 @@
 }
 
 .wy-muthur-line.user {
-  color: var(--wy-cyan);
+  color: var(--wy-green);
 }
 
 .wy-muthur-line .prefix {
@@ -603,7 +1211,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 10px 16px;
   border-top: 1px solid var(--wy-border);
   background: #080808;
   flex-shrink: 0;
@@ -620,12 +1228,14 @@
   background: transparent;
   border: none;
   outline: none;
-  color: var(--wy-cyan);
+  color: var(--wy-green);
   font-family: var(--wy-font);
-  font-size: var(--wy-font-size);
+  font-size: 1.1rem;
   caret-color: var(--wy-green);
   text-transform: uppercase;
   letter-spacing: 1px;
+  padding: 10px 4px;
+  min-height: 36px;
 }
 
 .wy-muthur-input::placeholder {
@@ -638,17 +1248,88 @@
   border: 1px solid var(--wy-border);
   color: var(--wy-green-dim);
   font-family: var(--wy-font);
-  font-size: 12px;
-  padding: 4px 12px;
+  font-size: 14px;
+  padding: 4px 10px;
   cursor: pointer;
   transition: var(--wy-transition);
-  letter-spacing: 1px;
+  letter-spacing: 0;
+  flex-shrink: 0;
+  min-width: 32px;
+  text-align: center;
 }
 
 .wy-muthur-send:hover {
   background: var(--wy-green-glow);
   border-color: var(--wy-green);
   color: var(--wy-green);
+}
+
+/* ── On-Screen Keyboard ── */
+.wy-osk {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background: #0a0a0a;
+  border-top: 1px solid var(--wy-border);
+  flex-shrink: 0;
+}
+.wy-osk-row {
+  display: flex;
+  gap: 4px;
+}
+.wy-osk-key {
+  background: rgba(0, 255, 65, 0.05);
+  border: 1px solid var(--wy-border);
+  color: var(--wy-green);
+  font-family: var(--wy-font);
+  font-size: 13px;
+  padding: 10px 0;
+  flex: 1;
+  cursor: pointer;
+  text-align: center;
+  letter-spacing: 1px;
+  transition: all 0.1s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.wy-osk-key:hover,
+.wy-osk-key:active {
+  background: var(--wy-green-glow);
+  border-color: var(--wy-green);
+  color: var(--wy-green-bright);
+}
+.wy-osk-key:active {
+  transform: scale(0.95);
+}
+.wy-osk-space {
+  flex: 4;
+}
+.wy-osk-enter {
+  flex: 2.5;
+  background: rgba(0, 255, 65, 0.12);
+  border-color: var(--wy-green-dim);
+  color: var(--wy-green-bright);
+  font-weight: bold;
+  font-size: 14px;
+  letter-spacing: 3px;
+}
+.wy-osk-enter:hover,
+.wy-osk-enter:active {
+  background: rgba(0, 255, 65, 0.25);
+  border-color: var(--wy-green);
+  box-shadow: 0 0 8px rgba(0, 255, 65, 0.2);
+}
+.wy-osk-backspace {
+  flex: 2.5;
+  color: var(--wy-amber);
+  border-color: var(--wy-amber-dim);
+}
+.wy-osk-backspace:hover,
+.wy-osk-backspace:active {
+  background: rgba(255, 183, 77, 0.15);
+  border-color: var(--wy-amber);
 }
 
 /* --- Scene Viewer Frame (Foundry Scene embed) --- */
@@ -855,76 +1536,195 @@
    LOG ENTRIES — Expandable detail view
    ============================================================================ */
 
-.wy-log-list {
-  max-height: 100%;
-  overflow-y: auto;
+/* === LOGS — List/Detail Layout === */
+
+.wy-view-logs {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 
-.wy-log-entry {
-  padding: 0;
+.wy-log-list-view {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.wy-log-list {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Log row — grid layout: DATE | SENDER | SUBJECT | [VIEW] */
+.wy-log-row {
+  display: grid;
+  grid-template-columns: 140px 100px 1fr 60px;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
   border-bottom: 1px solid rgba(58, 122, 0, 0.15);
-  cursor: pointer;
   transition: background var(--wy-transition);
 }
 
-.wy-log-entry:hover {
+.wy-log-row:not(.wy-log-row-header):hover {
   background: var(--wy-green-glow);
 }
 
-.wy-log-entry.expanded {
-  background: rgba(127, 255, 0, 0.04);
-}
-
-.wy-log-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 8px;
-}
-
-.wy-log-expand-icon {
-  font-size: 10px;
-  color: var(--wy-green-dim);
-  flex-shrink: 0;
-  width: 12px;
-  transition: transform 0.15s ease;
-}
-
-.wy-log-entry.expanded .wy-log-expand-icon {
-  transform: rotate(90deg);
-  color: var(--wy-green);
-}
-
-.wy-log-timestamp {
-  font-size: 10px;
-  color: var(--wy-green-dim);
-  letter-spacing: 1px;
-  flex-shrink: 0;
-}
-
-.wy-log-source {
+.wy-log-row-header {
   font-size: 10px;
   color: var(--wy-green-dim);
   letter-spacing: 2px;
-  flex-shrink: 0;
-  min-width: 60px;
+  border-bottom: 1px solid rgba(58, 122, 0, 0.3);
+  padding: 6px 8px;
 }
 
-.wy-log-title {
+.wy-log-col-date {
+  font-size: 10px;
+  color: var(--wy-green-dim);
+  letter-spacing: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wy-log-col-sender {
+  font-size: 10px;
+  color: var(--wy-green-dim);
+  letter-spacing: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wy-log-col-subject {
   color: var(--wy-green);
   font-size: var(--wy-font-size-sm);
   letter-spacing: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.wy-log-entry.warning .wy-log-title { color: var(--wy-amber); }
-.wy-log-entry.warning .wy-log-source { color: var(--wy-amber-dim); }
-.wy-log-entry.critical .wy-log-title { color: var(--wy-red); }
-.wy-log-entry.critical .wy-log-source { color: var(--wy-red-dim); }
+.wy-log-col-action {
+  text-align: right;
+}
 
-.wy-log-detail {
-  padding: 0 8px 12px 30px;
-  border-top: 1px solid rgba(58, 122, 0, 0.1);
-  background: rgba(0, 0, 0, 0.3);
+.wy-log-view-btn {
+  background: none;
+  border: 1px solid var(--wy-green-dim);
+  color: var(--wy-green);
+  font-family: var(--wy-font);
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: all var(--wy-transition);
+}
+
+.wy-log-view-btn:hover {
+  background: var(--wy-green-glow);
+  border-color: var(--wy-green);
+}
+
+.wy-log-del-btn {
+  background: none;
+  border: 1px solid var(--wy-red-dim);
+  color: var(--wy-red);
+  font-family: var(--wy-font);
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 2px 8px;
+  cursor: pointer;
+  margin-left: 4px;
+  transition: all var(--wy-transition);
+}
+
+.wy-log-del-btn:hover {
+  background: rgba(255, 0, 0, 0.15);
+  border-color: var(--wy-red);
+}
+
+/* Warning/Critical row colors */
+.wy-log-row.warning .wy-log-col-subject { color: var(--wy-amber); }
+.wy-log-row.warning .wy-log-col-sender { color: var(--wy-amber-dim); }
+.wy-log-row.warning .wy-log-view-btn { color: var(--wy-amber); border-color: var(--wy-amber-dim); }
+.wy-log-row.critical .wy-log-col-subject { color: var(--wy-red); }
+.wy-log-row.critical .wy-log-col-sender { color: var(--wy-red-dim); }
+.wy-log-row.critical .wy-log-view-btn { color: var(--wy-red); border-color: var(--wy-red-dim); }
+
+/* Classification badges */
+.wy-log-classification {
+  font-size: 9px;
+  letter-spacing: 1px;
+  padding: 1px 4px;
+  margin-left: 6px;
+  border: 1px solid var(--wy-green-dim);
+  color: var(--wy-green-dim);
+  vertical-align: middle;
+}
+.wy-class-PERSONAL { color: var(--wy-green); border-color: var(--wy-green-dim); }
+.wy-class-SYSTEM { color: var(--wy-blue, #4fc3f7); border-color: rgba(79, 195, 247, 0.4); }
+.wy-class-MU\/TH\/UR { color: var(--wy-blue, #4fc3f7); border-color: rgba(79, 195, 247, 0.4); }
+.wy-class-MEDICAL { color: var(--wy-amber); border-color: var(--wy-amber-dim); }
+.wy-class-CONFIDENTIAL { color: var(--wy-amber); border-color: var(--wy-amber-dim); }
+.wy-class-SENSITIVE { color: #ff8a65; border-color: rgba(255, 138, 101, 0.4); }
+.wy-class-RESTRICTED { color: var(--wy-red); border-color: var(--wy-red-dim); }
+.wy-class-CORPORATE { color: var(--wy-red); border-color: var(--wy-red-dim); }
+
+/* === Log Detail View === */
+
+.wy-log-detail-view {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.wy-log-detail-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.wy-log-detail-header {
+  padding: 12px 8px;
+  border-bottom: 1px solid rgba(58, 122, 0, 0.3);
+  flex-shrink: 0;
+}
+
+.wy-log-detail-meta {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 6px;
+}
+
+.wy-log-detail-date {
+  font-size: 10px;
+  color: var(--wy-green-dim);
+  letter-spacing: 1px;
+}
+
+.wy-log-detail-sender {
+  font-size: 10px;
+  color: var(--wy-green-dim);
+  letter-spacing: 2px;
+}
+
+.wy-log-detail-subject {
+  color: var(--wy-green);
+  font-size: var(--wy-font-size-base);
+  letter-spacing: 2px;
+}
+
+.wy-log-detail-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 8px;
 }
 
 .wy-log-detail-text {
@@ -936,24 +1736,37 @@
   white-space: pre-wrap;
   word-wrap: break-word;
   margin: 0;
-  padding: 10px 0;
+  padding: 0;
 }
 
-.wy-log-entry.warning .wy-log-detail-text { color: var(--wy-amber); }
-.wy-log-entry.critical .wy-log-detail-text { color: var(--wy-red); }
-
-.wy-log-message {
-  color: var(--wy-green);
-  margin-top: 2px;
+.wy-log-media-img {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 12px;
+  border: 1px solid var(--wy-green-dim);
 }
 
-.wy-log-entry.warning .wy-log-message {
-  color: var(--wy-amber);
+.wy-log-media-video {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 12px;
+  border: 1px solid var(--wy-green-dim);
 }
 
-.wy-log-entry.critical .wy-log-message {
-  color: var(--wy-red);
+.wy-log-detail-footer {
+  padding: 8px;
+  border-top: 1px solid rgba(58, 122, 0, 0.3);
+  text-align: center;
+  flex-shrink: 0;
 }
+
+/* Warning/Critical detail colors */
+.wy-log-detail-container.warning .wy-log-detail-subject { color: var(--wy-amber); }
+.wy-log-detail-container.warning .wy-log-detail-sender { color: var(--wy-amber-dim); }
+.wy-log-detail-container.warning .wy-log-detail-text { color: var(--wy-amber); }
+.wy-log-detail-container.critical .wy-log-detail-subject { color: var(--wy-red); }
+.wy-log-detail-container.critical .wy-log-detail-sender { color: var(--wy-red-dim); }
+.wy-log-detail-container.critical .wy-log-detail-text { color: var(--wy-red); }
 
 /* --- GM Log Add Button --- */
 .wy-log-add-btn {
@@ -1002,7 +1815,7 @@
   font-size: 10px;
   color: var(--wy-green-dim);
   letter-spacing: 2px;
-  min-width: 60px;
+  min-width: 80px;
   padding-top: 5px;
   flex-shrink: 0;
 }
@@ -1050,6 +1863,102 @@
 .wy-footer .wy-blink-cursor::after {
   content: '█';
   animation: wy-blink 1s step-end infinite;
+}
+
+/* === Command Code View === */
+.wy-view-commandcode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 16px;
+}
+
+.wy-cc-status-display {
+  text-align: center;
+  padding: 16px 32px;
+  border: 1px solid var(--wy-border);
+  background: rgba(0, 0, 0, 0.4);
+  min-width: 280px;
+}
+
+.wy-cc-current-label {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--wy-green-dim);
+  margin-bottom: 8px;
+}
+
+.wy-cc-current-value {
+  font-size: var(--wy-font-size-lg, 18px);
+  font-weight: bold;
+  letter-spacing: 4px;
+}
+
+.wy-cc-keypad-container {
+  text-align: center;
+  max-width: 300px;
+  width: 100%;
+}
+
+/* Clearance level color classes — used on footer badge, current-value, etc. */
+.wy-cc-level-NONE {
+  color: var(--wy-green-dim) !important;
+}
+.wy-cc-level-MEDICAL {
+  color: var(--wy-amber) !important;
+}
+.wy-cc-level-CAPTAIN {
+  color: var(--wy-green) !important;
+}
+.wy-cc-level-CORPORATE {
+  color: var(--wy-red) !important;
+}
+.wy-cc-level-MASTER_OVERRIDE {
+  color: #ff1744 !important;
+  text-shadow: 0 0 8px rgba(255, 23, 68, 0.5);
+}
+
+/* Footer clearance badge */
+.wy-footer-clearance {
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+/* CMD CODE nav button accent */
+.wy-nav-btn-cmdcode {
+  color: var(--wy-amber) !important;
+  border-color: var(--wy-amber-dim) !important;
+}
+.wy-nav-btn-cmdcode:hover {
+  background: rgba(255, 183, 77, 0.1);
+  border-color: var(--wy-amber) !important;
+}
+.wy-nav-btn-cmdcode.active {
+  background: rgba(255, 183, 77, 0.15);
+  border-color: var(--wy-amber) !important;
+  box-shadow: inset 0 0 15px rgba(255, 183, 77, 0.1),
+              0 0 8px rgba(255, 183, 77, 0.15);
+}
+
+/* New-log flash on LOGS nav button */
+.wy-nav-btn.wy-nav-flash {
+  animation: navLogFlash 0.8s ease-in-out infinite;
+}
+@keyframes navLogFlash {
+  0%, 100% { background: transparent; border-color: var(--wy-green-dim); color: var(--wy-green); }
+  50%      { background: rgba(0, 255, 65, 0.2); border-color: var(--wy-green); color: #fff;
+             box-shadow: 0 0 12px rgba(0, 255, 65, 0.3), inset 0 0 8px rgba(0, 255, 65, 0.1); }
+}
+
+/* Emergency RED flash on STATUS nav button */
+.wy-nav-btn.wy-nav-flash-red {
+  animation: navRedFlash 0.6s ease-in-out infinite;
+}
+@keyframes navRedFlash {
+  0%, 100% { background: transparent; border-color: var(--wy-red-dim); color: var(--wy-red); }
+  50%      { background: rgba(255, 51, 51, 0.25); border-color: var(--wy-red); color: #fff;
+             box-shadow: 0 0 14px rgba(255, 51, 51, 0.4), inset 0 0 8px rgba(255, 51, 51, 0.15); }
 }
 
 /* ============================================================================
@@ -1130,6 +2039,113 @@
   background: rgba(255, 51, 51, 0.12);
   border-color: var(--wy-red);
   text-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
+}
+
+/* ============================================================================
+   EMERGENCY OVERLAYS (Status + Emergency Views)
+   ============================================================================ */
+
+/* --- Base overlay box (used by all emergency types) --- */
+.wy-emergency-overlay {
+  border: 2px solid var(--wy-red);
+  background: rgba(255, 0, 0, 0.06);
+  padding: 20px;
+  margin-bottom: 16px;
+  text-align: center;
+  animation: wy-eo-pulse 2s ease-in-out infinite;
+}
+
+/* Self-destruct gets a stronger glow variant */
+.wy-emergency-overlay.wy-emergency-self-destruct {
+  border-width: 3px;
+  box-shadow: inset 0 0 30px rgba(255, 0, 0, 0.08), 0 0 20px rgba(255, 0, 0, 0.1);
+}
+
+/* Lockdown uses amber tones */
+.wy-emergency-overlay.wy-emergency-lockdown {
+  border-color: var(--wy-amber);
+  background: rgba(255, 183, 77, 0.06);
+  animation: wy-eo-pulse-amber 2s ease-in-out infinite;
+}
+
+/* Active box in emergency panel view */
+.wy-emergency-active-box {
+  border-color: var(--wy-red) !important;
+  margin-top: 16px;
+  text-align: center;
+  animation: wy-eo-pulse 2s ease-in-out infinite;
+}
+
+/* --- Warning title text (blinking) --- */
+.wy-eo-warning {
+  font-size: 16px;
+  font-family: var(--wy-font-display);
+  color: var(--wy-red);
+  letter-spacing: 4px;
+  margin-bottom: 12px;
+  text-shadow: 0 0 12px rgba(255, 51, 51, 0.6);
+}
+
+/* --- Countdown timer (self-destruct) --- */
+.wy-eo-countdown {
+  font-size: 36px;
+  font-family: var(--wy-font-display);
+  color: var(--wy-red);
+  letter-spacing: 8px;
+  text-shadow: 0 0 20px rgba(255, 51, 51, 0.8), 0 0 40px rgba(255, 0, 0, 0.4);
+  margin: 8px 0;
+}
+
+/* --- Triggered-by line --- */
+.wy-eo-triggered-by {
+  font-size: 12px;
+  font-family: var(--wy-font);
+  color: var(--wy-red);
+  letter-spacing: 3px;
+  opacity: 0.8;
+  margin-top: 8px;
+}
+
+/* --- Sub-instruction text --- */
+.wy-eo-sub {
+  font-size: 13px;
+  font-family: var(--wy-font);
+  color: var(--wy-red);
+  letter-spacing: 3px;
+  margin-top: 12px;
+  text-shadow: 0 0 8px rgba(255, 51, 51, 0.5);
+}
+
+/* --- GM Cancel button inside overlays --- */
+.wy-eo-cancel-btn {
+  display: inline-block;
+  padding: 10px 24px;
+  margin-top: 14px;
+  background: rgba(255, 51, 51, 0.08);
+  border: 2px solid var(--wy-red-dim);
+  color: var(--wy-red);
+  font-family: var(--wy-font);
+  font-size: var(--wy-font-size-sm);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: var(--wy-transition);
+}
+.wy-eo-cancel-btn:hover {
+  background: rgba(255, 51, 51, 0.18);
+  border-color: var(--wy-red);
+  text-shadow: 0 0 8px rgba(255, 51, 51, 0.4);
+}
+
+/* --- Pulse animations --- */
+@keyframes wy-eo-pulse {
+  0%, 100% { border-color: var(--wy-red); background: rgba(255, 0, 0, 0.06); }
+  50%      { border-color: rgba(255, 51, 51, 0.3); background: rgba(255, 0, 0, 0.12); }
+}
+
+@keyframes wy-eo-pulse-amber {
+  0%, 100% { border-color: var(--wy-amber); background: rgba(255, 183, 77, 0.06); }
+  50%      { border-color: rgba(255, 183, 77, 0.3); background: rgba(255, 183, 77, 0.12); }
 }
 
 /* ============================================================================
@@ -1250,3 +2266,242 @@
 }
 
 .wy-hidden { display: none !important; }
+
+/* ============================================================================
+   CRONUS LEGACY THEME — USS CRONUS (Interface 2019)
+   Amber-tinted CRT, heavier scanlines, older military aesthetic
+   ============================================================================ */
+
+.wy-theme-legacy {
+  /* Override color palette to amber/orange tones */
+  --wy-green: #ffbf00;
+  --wy-green-bright: #ffd940;
+  --wy-green-dim: #7a5c00;
+  --wy-green-dark: #3a2c00;
+  --wy-green-glow: rgba(255, 191, 0, 0.15);
+  --wy-green-glow-strong: rgba(255, 191, 0, 0.35);
+  --wy-amber: #ff8c00;
+  --wy-amber-dim: #7a4200;
+  --wy-white: #ffecd0;
+  --wy-bg: #0a0800;
+  --wy-bg-panel: #050400;
+  --wy-bg-display: #0a0700;
+  --wy-border: #7a5c00;
+  --wy-border-bright: #ffbf00;
+  --wy-cyan: #ffa500;
+}
+
+/* Heavier scanlines for older CRT */
+.wy-theme-legacy.scanlines::before {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.35) 0px,
+    rgba(0, 0, 0, 0.35) 1px,
+    transparent 1px,
+    transparent 3px
+  ) !important;
+}
+
+/* Stronger CRT flicker for older hardware */
+.wy-theme-legacy.crt-flicker::after {
+  animation: wy-crt-flicker 0.08s infinite !important;
+  opacity: 0.06 !important;
+}
+
+/* Amber phosphor glow on header */
+.wy-theme-legacy .wy-header {
+  text-shadow: 0 0 20px rgba(255, 191, 0, 0.4),
+               0 0 40px rgba(255, 191, 0, 0.15);
+}
+
+.wy-theme-legacy .wy-header-title {
+  letter-spacing: 6px;
+  font-weight: 700;
+}
+
+/* Rougher, blockier subtitle text */
+.wy-theme-legacy .wy-header-subtitle {
+  letter-spacing: 4px;
+  font-size: var(--wy-font-size-sm);
+  opacity: 0.7;
+}
+
+/* Amber glow on nav buttons */
+.wy-theme-legacy .wy-nav-btn {
+  text-shadow: 0 0 6px rgba(255, 191, 0, 0.3);
+}
+
+.wy-theme-legacy .wy-nav-btn:hover {
+  background: rgba(255, 191, 0, 0.12);
+  box-shadow: inset 0 0 10px rgba(255, 191, 0, 0.08);
+}
+
+.wy-theme-legacy .wy-nav-btn.active {
+  background: rgba(255, 191, 0, 0.15);
+  border-color: #ffbf00;
+  box-shadow: inset 0 0 15px rgba(255, 191, 0, 0.1),
+              0 0 8px rgba(255, 191, 0, 0.15);
+}
+
+/* Military classification stripe */
+.wy-theme-legacy .wy-display-frame {
+  border-color: #7a5c00;
+  box-shadow: inset 0 0 30px rgba(255, 191, 0, 0.03);
+}
+
+/* Dim amber for status bar */
+.wy-theme-legacy .wy-status-bar {
+  background: rgba(255, 191, 0, 0.05);
+  border-color: #7a5c00;
+  text-shadow: 0 0 4px rgba(255, 191, 0, 0.3);
+}
+
+/* CLASSIFIED watermark effect for legacy display */
+.wy-theme-legacy .wy-display-content::after {
+  content: 'CLASSIFIED — WY MILITARY DIVISION';
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-size: 9px;
+  color: rgba(255, 191, 0, 0.08);
+  letter-spacing: 3px;
+  pointer-events: none;
+  font-family: var(--wy-font);
+}
+
+/* Weapons/tactical button special style */
+.wy-theme-legacy .wy-nav-btn[data-view="weapons"] {
+  color: var(--wy-red);
+  border-color: var(--wy-red-dim);
+}
+
+.wy-theme-legacy .wy-nav-btn[data-view="weapons"]:hover {
+  background: rgba(255, 51, 51, 0.12);
+}
+
+.wy-theme-legacy .wy-nav-btn[data-view="weapons"].active {
+  background: rgba(255, 51, 51, 0.15);
+  border-color: var(--wy-red);
+  box-shadow: inset 0 0 15px rgba(255, 51, 51, 0.1),
+              0 0 8px rgba(255, 51, 51, 0.15);
+}
+
+/* Science button accent */
+.wy-theme-legacy .wy-nav-btn[data-view="science"] {
+  color: #ffa500;
+  border-color: #7a4200;
+}
+
+.wy-theme-legacy .wy-nav-btn[data-view="science"]:hover {
+  background: rgba(255, 165, 0, 0.10);
+}
+
+.wy-theme-legacy .wy-nav-btn[data-view="science"].active {
+  background: rgba(255, 165, 0, 0.15);
+  border-color: #ffa500;
+  box-shadow: inset 0 0 15px rgba(255, 165, 0, 0.08),
+              0 0 8px rgba(255, 165, 0, 0.12);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CARGO MANIFEST
+   ═══════════════════════════════════════════════════════════ */
+
+/* --- List View --- */
+.wy-cargo-list {
+  max-height: 55vh;
+  overflow-y: auto;
+}
+
+.wy-cargo-row {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px;
+  border-bottom: 1px solid rgba(var(--wy-text-rgb, 58, 122, 0), 0.10);
+  gap: 6px;
+}
+
+.wy-cargo-row:not(.wy-cargo-row-header):hover {
+  background: rgba(var(--wy-text-rgb, 58, 122, 0), 0.06);
+}
+
+.wy-cargo-row-header {
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  color: var(--wy-text-dim);
+  border-bottom: 1px solid var(--wy-border);
+}
+
+.wy-cargo-col-name  { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.82rem; }
+.wy-cargo-col-qty   { flex: 0 0 50px; text-align: center; font-size: 0.82rem; }
+.wy-cargo-col-cat   { flex: 0 0 90px; text-align: center; }
+.wy-cargo-col-action { flex: 0 0 55px; text-align: right; }
+
+/* --- Category Badges --- */
+.wy-cargo-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  font-size: 0.6rem;
+  letter-spacing: 1px;
+  border: 1px solid var(--wy-text-dim);
+  border-radius: 2px;
+  color: var(--wy-text);
+}
+
+/* --- Detail View --- */
+.wy-cargo-detail-view {
+  padding: 12px 0;
+}
+
+.wy-cargo-detail-container {
+  border: 1px solid var(--wy-border);
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.wy-cargo-detail-header {
+  border-bottom: 1px solid var(--wy-border);
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+}
+
+.wy-cargo-detail-name {
+  font-size: 1rem;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+  color: var(--wy-text);
+}
+
+.wy-cargo-detail-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.wy-cargo-detail-qty {
+  color: var(--wy-text-dim);
+  font-size: 0.85rem;
+}
+
+.wy-cargo-detail-field {
+  padding: 6px 0;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+}
+
+.wy-cargo-detail-body {
+  padding: 12px 0;
+  line-height: 1.6;
+  font-size: 0.85rem;
+  color: var(--wy-text-dim);
+  letter-spacing: 0.5px;
+  white-space: pre-wrap;
+}
+
+.wy-cargo-detail-footer {
+  display: flex;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--wy-border);
+  justify-content: flex-end;
+}

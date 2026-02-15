@@ -8,6 +8,7 @@ import { ShipStatusManager } from './ship-status.mjs';
 import { MuthurBridge } from './muthur-bridge.mjs';
 import { MuthurEngine } from './muthur-engine.mjs';
 import { registerSettings } from './settings.mjs';
+import { TerminalSFX } from './terminal-sounds.mjs';
 
 /* ──────────────────────────────────────────────────────────────────
    Module Initialization
@@ -49,6 +50,17 @@ Hooks.once('ready', () => {
 
   // Initialize ship status manager
   shipStatus = new ShipStatusManager();
+
+  // Initialize game clock anchor on first boot (GM only)
+  if (game.user.isGM) {
+    try {
+      const anchor = game.settings.get('wy-terminal', 'gameClockRealAnchor');
+      if (!anchor) {
+        game.settings.set('wy-terminal', 'gameClockRealAnchor', Date.now());
+        console.log('WY-Terminal | Game clock anchor initialized');
+      }
+    } catch (e) { /* settings not yet registered */ }
+  }
 
   // Players ALWAYS get full-screen terminal display mode
   // GM gets normal Foundry UI with terminal as a pop-out
@@ -284,6 +296,7 @@ Hooks.once('ready', () => {
     }
     if (data.type === 'sceneChange' && terminalApp?.rendered) {
       // GM pushed a scene change — switch terminal to that scene
+      TerminalSFX.play('screenChange');
       terminalApp.activeSceneId = data.payload.sceneId;
       terminalApp._switchView('scenes');
     }
@@ -292,6 +305,125 @@ Hooks.once('ready', () => {
       if (terminalApp.activeView === 'scenes') {
         terminalApp._renderView('scenes');
       }
+    }
+    if (data.type === 'shipSwitch' && terminalApp?.rendered) {
+      // GM switched ship profile — full re-render to pick up new theme, nav, and data
+      console.log(`WY-Terminal | Ship switched to ${data.payload.shipName} — refreshing terminal`);
+      terminalApp.activeView = 'status';
+      TerminalSFX.play('boot');
+      terminalApp.render(true);
+    }
+    // Player requests clearance change — only GM writes the setting
+    if (data.type === 'setClearance' && game.user.isGM) {
+      const level = data.payload?.level;
+      if (level && WYTerminalApp.CLEARANCE_RANK?.[level] !== undefined) {
+        const current = game.settings.get('wy-terminal', 'activeClearanceLevel') || 'NONE';
+        const currentRank = WYTerminalApp.CLEARANCE_RANK[current] ?? 0;
+        const newRank = WYTerminalApp.CLEARANCE_RANK[level] ?? 0;
+        if (newRank > currentRank) {
+          game.settings.set('wy-terminal', 'activeClearanceLevel', level).then(() => {
+            console.log(`WY-Terminal | Clearance set to ${level} (requested by player)`);
+            // Broadcast to all clients so they update their footers
+            game.socket.emit('module.wy-terminal', {
+              type: 'clearanceUpdated',
+              payload: { level },
+            });
+            // Update GM's own footer if terminal is open
+            if (terminalApp?.rendered) {
+              terminalApp._updateFooterClearance(level);
+            }
+          });
+        }
+      }
+    }
+    // Clearance was updated by GM — all clients update their footer display
+    if (data.type === 'clearanceUpdated' && terminalApp?.rendered) {
+      terminalApp._updateFooterClearance(data.payload.level);
+    }
+    // Player requests frequency change — only GM writes the setting
+    if (data.type === 'setCommFrequency' && game.user.isGM) {
+      const freq = data.payload?.frequency;
+      if (freq && /^\d{3}\.\d{2}$/.test(freq)) {
+        game.settings.set('wy-terminal', 'commFrequency', freq).then(() => {
+          console.log(`WY-Terminal | Comm frequency set to ${freq} MHz (requested by player)`);
+          // Broadcast refresh so all clients see the new frequency
+          game.socket.emit('module.wy-terminal', {
+            type: 'refreshView',
+            payload: { view: 'comms' },
+          });
+        });
+      }
+    }
+    // View refresh broadcast — re-render if currently on that view
+    if (data.type === 'refreshView' && terminalApp?.rendered) {
+      const view = data.payload?.view;
+      if (view === 'all') {
+        terminalApp.render(true);
+      } else if (view && terminalApp.activeView === view) {
+        terminalApp._renderView(view);
+      }
+    }
+    // New log alert — flash the LOGS nav button for non-GM users
+    if (data.type === 'newLogAlert' && terminalApp?.rendered && !game.user.isGM) {
+      console.log('WY-Terminal | newLogAlert received — flashing LOGS button');
+      const el = terminalApp.element[0] ?? terminalApp.element;
+      const logsBtn = el?.querySelector('[data-view="logs"]');
+      if (logsBtn && !logsBtn.classList.contains('wy-nav-flash')) {
+        logsBtn.classList.add('wy-nav-flash');
+        TerminalSFX.play('beep');
+      }
+    }
+    // Emergency protocol activated — flash STATUS button, play alarm, show alert
+    if (data.type === 'emergencyActivated' && terminalApp?.rendered) {
+      const { protocol, message } = data.payload;
+      console.log(`WY-Terminal | Emergency activated: ${protocol}`);
+
+      // Show persistent alert
+      terminalApp.showAlert(message, 0);
+
+      // Play alarm sound on player terminals
+      if (!game.user.isGM) {
+        TerminalSFX.play('emergency');
+
+        // Flash the STATUS nav button
+        terminalApp._flashStatusButton();
+
+        // Self-destruct: start computer voice warnings every real minute
+        if (protocol === 'self-destruct') {
+          terminalApp._startSelfDestructVoice();
+        }
+        // Evacuation: also play alarm
+        if (protocol === 'evacuate') {
+          TerminalSFX.play('alert');
+        }
+      }
+
+      // Refresh status and emergency views if currently viewing
+      if (terminalApp.activeView === 'status') terminalApp._renderView('status');
+      if (terminalApp.activeView === 'emergency') terminalApp._renderView('emergency');
+    }
+    // Emergency protocol cancelled — stop voice, clear flash if no emergencies remain
+    if (data.type === 'emergencyCancelled' && terminalApp?.rendered) {
+      const { protocol, anyRemaining } = data.payload;
+      console.log(`WY-Terminal | Emergency cancelled: ${protocol}, anyRemaining: ${anyRemaining}`);
+
+      if (!game.user.isGM) {
+        // Stop voice warnings if self-destruct cancelled
+        if (protocol === 'self-destruct') {
+          terminalApp._clearSelfDestructVoice();
+        }
+
+        // Use GM-authoritative flag — local shipStatus may be stale
+        if (!anyRemaining) {
+          const el = terminalApp.element?.[0] ?? terminalApp.element;
+          el?.querySelector('[data-view="status"]')?.classList.remove('wy-nav-flash-red');
+          terminalApp.hideAlert();
+        }
+      }
+
+      // Refresh views
+      if (terminalApp.activeView === 'status') terminalApp._renderView('status');
+      if (terminalApp.activeView === 'emergency') terminalApp._renderView('emergency');
     }
     // GM commands are handled by MuthurEngine's own socket listener
     // (set up when the engine initializes inside MuthurBridge)

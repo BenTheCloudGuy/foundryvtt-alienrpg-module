@@ -1,0 +1,81 @@
+<div class="wy-view-commandcode">
+  <div class="wy-section-title">COMMAND CODE AUTHORIZATION</div>
+
+  {{!-- Current Clearance Display --}}
+  <div class="wy-cc-status-display">
+    <div class="wy-cc-current-label">CURRENT CLEARANCE LEVEL</div>
+    <div class="wy-cc-current-value wy-cc-level-{{activeClearance}}">{{activeClearance}}</div>
+  </div>
+
+  {{#if isGM}}
+  {{!-- GM: No keypad needed — always MASTER_OVERRIDE. Show code management instead. --}}
+  <div class="wy-border-box" style="margin-top: 16px; border-color: var(--wy-amber);">
+    <div style="color: var(--wy-amber); font-size: 11px; letter-spacing: 2px; margin-bottom: 4px;">
+      GM TERMINAL — MASTER OVERRIDE ACTIVE
+    </div>
+    <div style="color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px;">
+      ALL CLASSIFIED SYSTEMS ACCESSIBLE. NO AUTHORIZATION REQUIRED.
+    </div>
+  </div>
+
+  <div class="wy-section-title" style="margin-top: 16px;">COMMAND CODES</div>
+  <div class="wy-border-box" id="wy-command-codes-section">
+    <div style="color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px; margin-bottom: 8px;">
+      PERSONNEL AUTHORIZATION CODES. CLEARANCE DETERMINES ACCESS TO CLASSIFIED LOGS AND CREW FILES.
+    </div>
+
+    <div class="wy-setting-row" style="margin-bottom: 8px; border-bottom: 1px solid var(--wy-border); padding-bottom: 8px;">
+      <span class="wy-setting-label">PLAYER CLEARANCE</span>
+      <select class="wy-setting-input" data-action="set-clearance">
+        <option value="NONE" {{#if (eq activeClearance 'NONE')}}selected{{/if}}>NONE</option>
+        <option value="MEDICAL" {{#if (eq activeClearance 'MEDICAL')}}selected{{/if}}>MEDICAL</option>
+        <option value="CAPTAIN" {{#if (eq activeClearance 'CAPTAIN')}}selected{{/if}}>CAPTAIN</option>
+        <option value="CORPORATE" {{#if (eq activeClearance 'CORPORATE')}}selected{{/if}}>CORPORATE</option>
+        <option value="MASTER_OVERRIDE" {{#if (eq activeClearance 'MASTER_OVERRIDE')}}selected{{/if}}>MASTER OVERRIDE</option>
+      </select>
+    </div>
+
+    <div id="wy-command-codes-list">
+      {{#each commandCodes}}
+      <div class="wy-setting-row wy-cmd-code-row" data-code-index="{{@index}}">
+        <input class="wy-setting-input" type="text" data-field="name" value="{{this.name}}" placeholder="NAME" />
+        <select class="wy-setting-input" data-field="role">
+          <option value="MEDICAL" {{#if (eq this.role 'MEDICAL')}}selected{{/if}}>MEDICAL</option>
+          <option value="CAPTAIN" {{#if (eq this.role 'CAPTAIN')}}selected{{/if}}>CAPTAIN</option>
+          <option value="CORPORATE" {{#if (eq this.role 'CORPORATE')}}selected{{/if}}>CORPORATE</option>
+          <option value="MASTER_OVERRIDE" {{#if (eq this.role 'MASTER_OVERRIDE')}}selected{{/if}}>MASTER OVERRIDE</option>
+        </select>
+        <input class="wy-setting-input" type="text" data-field="code" value="{{this.code}}" placeholder="CODE" maxlength="8" />
+        <button class="wy-cmd-code-delete" data-action="remove-code" data-code-index="{{@index}}" title="Remove">✕</button>
+      </div>
+      {{/each}}
+    </div>
+    <div style="margin-top: 8px; display: flex; gap: 8px;">
+      <button class="wy-muthur-send" data-action="add-code" style="flex: 1;">+ ADD CODE</button>
+      <button class="wy-muthur-send" data-action="save-codes" style="flex: 1;">SAVE CODES</button>
+    </div>
+  </div>
+
+  {{else}}
+  {{!-- Player: Show keypad for code entry --}}
+  <div class="wy-cc-keypad-container">
+    <div class="wy-keypad-title">ENTER COMMAND CODE</div>
+    <div class="wy-keypad-subtitle">AUTHORIZATION REQUIRED FOR CLASSIFIED ACCESS</div>
+    <div class="wy-keypad-display" id="wy-cc-keypad-display"></div>
+    <div class="wy-keypad-grid">
+      <button class="wy-keypad-btn" data-cc-keypad="1">1</button>
+      <button class="wy-keypad-btn" data-cc-keypad="2">2</button>
+      <button class="wy-keypad-btn" data-cc-keypad="3">3</button>
+      <button class="wy-keypad-btn" data-cc-keypad="4">4</button>
+      <button class="wy-keypad-btn" data-cc-keypad="5">5</button>
+      <button class="wy-keypad-btn" data-cc-keypad="6">6</button>
+      <button class="wy-keypad-btn" data-cc-keypad="7">7</button>
+      <button class="wy-keypad-btn" data-cc-keypad="8">8</button>
+      <button class="wy-keypad-btn" data-cc-keypad="9">9</button>
+      <button class="wy-keypad-btn wy-keypad-clear" data-cc-keypad="clear">CLR</button>
+      <button class="wy-keypad-btn" data-cc-keypad="0">0</button>
+      <button class="wy-keypad-btn wy-keypad-enter" data-cc-keypad="enter">ENT</button>
+    </div>
+  </div>
+  {{/if}}
+</div>

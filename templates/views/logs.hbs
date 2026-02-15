@@ -9,14 +9,27 @@
   {{!-- GM: New log entry form (hidden by default) --}}
   {{#if isGM}}
   <div class="wy-log-form wy-hidden" id="wy-log-form">
-    <div class="wy-log-form-title">CREATE NEW LOG ENTRY</div>
+    <div class="wy-log-form-title" id="wy-log-form-title">CREATE NEW LOG ENTRY</div>
     <div class="wy-log-form-row">
-      <label class="wy-log-form-label">SOURCE</label>
-      <input type="text" class="wy-setting-input" id="wy-log-form-source" placeholder="SYSTEM" />
+      <label class="wy-log-form-label">DATE / TIME</label>
+      <input type="text" class="wy-setting-input" id="wy-log-form-date" placeholder="2183-06-12 06:00" value="{{currentDate}}" />
     </div>
     <div class="wy-log-form-row">
-      <label class="wy-log-form-label">TITLE</label>
-      <input type="text" class="wy-setting-input" id="wy-log-form-title" placeholder="LOG ENTRY TITLE" style="width: 100%;" />
+      <label class="wy-log-form-label">SENDER</label>
+      <input type="text" class="wy-setting-input" id="wy-log-form-sender" list="wy-sender-suggestions" placeholder="MUTHUR" />
+      <datalist id="wy-sender-suggestions">
+        <option value="MU/TH/UR">
+        <option value="NAV">
+        <option value="SYSTEM">
+        <option value="CAPTAIN'S LOG">
+        <option value="SCIENCE OFFICER">
+        <option value="WEAPONS">
+        <option value="COMMS">
+      </datalist>
+    </div>
+    <div class="wy-log-form-row">
+      <label class="wy-log-form-label">SUBJECT</label>
+      <input type="text" class="wy-setting-input" id="wy-log-form-subject" placeholder="LOG ENTRY SUBJECT" style="width: 100%;" />
     </div>
     <div class="wy-log-form-row">
       <label class="wy-log-form-label">LEVEL</label>
@@ -25,6 +38,32 @@
         <option value="warning">WARNING</option>
         <option value="critical">CRITICAL</option>
       </select>
+    </div>
+    <div class="wy-log-form-row">
+      <label class="wy-log-form-label">CLASSIFICATION</label>
+      <select class="wy-setting-input" id="wy-log-form-classification">
+        <option value="">UNCLASSIFIED</option>
+        <option value="PERSONAL">PERSONAL</option>
+        <option value="SYSTEM">SYSTEM</option>
+        <option value="MU/TH/UR">MU/TH/UR</option>
+        <option value="MEDICAL">MEDICAL</option>
+        <option value="CONFIDENTIAL">CONFIDENTIAL</option>
+        <option value="SENSITIVE">SENSITIVE</option>
+        <option value="RESTRICTED">RESTRICTED</option>
+        <option value="CORPORATE">CORPORATE</option>
+      </select>
+    </div>
+    <div class="wy-log-form-row">
+      <label class="wy-log-form-label">MEDIA</label>
+      <select class="wy-setting-input" id="wy-log-form-media-type">
+        <option value="text">TEXT</option>
+        <option value="image">IMAGE</option>
+        <option value="video">VIDEO</option>
+      </select>
+    </div>
+    <div class="wy-log-form-row wy-hidden" id="wy-log-form-media-url-row">
+      <label class="wy-log-form-label">MEDIA URL</label>
+      <input type="text" class="wy-setting-input" id="wy-log-form-media-url" placeholder="modules/wy-terminal/images/..." style="width: 100%;" />
     </div>
     <div class="wy-log-form-row">
       <label class="wy-log-form-label">DETAIL</label>
@@ -37,25 +76,51 @@
   </div>
   {{/if}}
 
-  <div class="wy-border-box wy-log-list">
-    {{#each logs}}
-    <div class="wy-log-entry {{this.level}}" data-log-index="{{@index}}">
-      <div class="wy-log-header">
-        <span class="wy-log-expand-icon">▶</span>
-        <span class="wy-log-timestamp">[{{this.timestamp}}]</span>
-        <span class="wy-log-source">{{this.source}}</span>
-        <span class="wy-log-title">{{this.title}}</span>
+  {{!-- Log List View --}}
+  <div class="wy-log-list-view" id="wy-log-list-view">
+    <div class="wy-border-box wy-log-list">
+      <div class="wy-log-row wy-log-row-header">
+        <span class="wy-log-col-date">DATE</span>
+        <span class="wy-log-col-sender">SENDER</span>
+        <span class="wy-log-col-subject">SUBJECT</span>
+        <span class="wy-log-col-action"></span>
       </div>
-      <div class="wy-log-detail wy-hidden">
-        <pre class="wy-log-detail-text">{{this.detail}}</pre>
-      </div>
-    </div>
-    {{/each}}
 
-    {{#unless logs}}
-    <div class="wy-text-dim" style="padding: 16px; text-align: center; letter-spacing: 2px;">
-      NO LOG ENTRIES AVAILABLE
+      {{#each logs}}
+      <div class="wy-log-row {{this.level}}" data-log-id="{{this.id}}">
+        <span class="wy-log-col-date">{{this.timestamp}}</span>
+        <span class="wy-log-col-sender">{{this.sender}}</span>
+        <span class="wy-log-col-subject">{{this.subject}}{{#if this.classification}} <span class="wy-log-classification wy-class-{{this.classification}}">[{{this.classification}}]</span>{{/if}}</span>
+        <span class="wy-log-col-action">
+          <button class="wy-log-view-btn" data-action="view-log" data-log-id="{{this.id}}">[VIEW]</button>
+        </span>
+      </div>
+      {{/each}}
+
+      {{#unless logs}}
+      <div class="wy-text-dim" style="padding: 16px; text-align: center; letter-spacing: 2px;">
+        NO LOG ENTRIES AVAILABLE
+      </div>
+      {{/unless}}
     </div>
-    {{/unless}}
+  </div>
+
+  {{!-- Log Detail View (hidden by default, populated by JS) --}}
+  <div class="wy-log-detail-view wy-hidden" id="wy-log-detail-view">
+    <div class="wy-log-detail-container">
+      <div class="wy-log-detail-header">
+        <div class="wy-log-detail-meta">
+          <span class="wy-log-detail-date" id="wy-log-detail-date"></span>
+          <span class="wy-log-detail-sender" id="wy-log-detail-sender"></span>
+        </div>
+        <div class="wy-log-detail-subject" id="wy-log-detail-subject"></div>
+      </div>
+      <div class="wy-log-detail-body" id="wy-log-detail-body"></div>
+      <div class="wy-log-detail-footer">
+        {{#if isGM}}<button class="wy-scene-btn" data-action="edit-log">[EDIT]</button>{{/if}}
+        {{#if isGM}}<button class="wy-log-del-btn" data-action="delete-log">[DEL]</button>{{/if}}
+        <button class="wy-scene-btn" data-action="close-log">[CLOSE]</button>
+      </div>
+    </div>
   </div>
 </div>

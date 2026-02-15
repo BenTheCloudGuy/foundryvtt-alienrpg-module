@@ -1,6 +1,26 @@
 <div class="wy-view-settings">
   <div class="wy-section-title">TERMINAL CONFIGURATION</div>
 
+  {{#if isGM}}
+  <div class="wy-border-box" style="margin-bottom: 16px; border-color: var(--wy-amber);">
+    <div style="color: var(--wy-amber); font-size: 11px; letter-spacing: 2px; margin-bottom: 8px;">▶ ACTIVE SHIP PROFILE</div>
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">SHIP</span>
+      <select class="wy-setting-input" data-setting="activeShip">
+        {{#each availableShips}}
+        <option value="{{this.id}}" {{#if (eq this.id ../activeShip)}}selected{{/if}}>{{this.label}}</option>
+        {{/each}}
+      </select>
+    </div>
+    <div style="margin-top: 8px;">
+      <button class="wy-muthur-send" data-action="switch-ship" style="width: 100%;">⚡ SWITCH SHIP — APPLY PROFILE DEFAULTS</button>
+    </div>
+    <div style="color: var(--wy-amber-dim); font-size: 10px; margin-top: 6px; letter-spacing: 1px;">
+      WARNING: SWITCHING SHIP RESETS SYSTEMS, CREW, AND SHIP IDENTITY TO PROFILE DEFAULTS.
+    </div>
+  </div>
+  {{/if}}
+
   <div class="wy-border-box">
     <div class="wy-setting-row">
       <span class="wy-setting-label">SHIP NAME</span>
@@ -61,11 +81,7 @@
 
     <div class="wy-setting-row">
       <span class="wy-setting-label">SCENARIO PLUGIN</span>
-      <select class="wy-setting-input" data-setting="muthurPlugin">
-        {{#each availablePlugins}}
-        <option value="{{this.id}}" {{#if (eq this.id ../muthurPlugin)}}selected{{/if}}>{{this.label}}</option>
-        {{/each}}
-      </select>
+      <span class="wy-setting-input" style="color: var(--wy-green-dim); letter-spacing: 1px;">{{muthurPlugin}} (TIED TO SHIP PROFILE)</span>
     </div>
 
     <div class="wy-setting-row">
@@ -93,4 +109,51 @@
     <button class="wy-muthur-send" data-action="clear-chat" style="flex:1;">CLEAR CHAT LOG</button>
     {{/if}}
   </div>
+
+  {{#if isGM}}
+  <div style="margin-top: 12px; display: flex; gap: 8px;">
+    <button class="wy-muthur-send" data-action="reset-logs" style="flex:1; border-color: var(--wy-amber-dim); color: var(--wy-amber);">⟲ RESET LOGS TO DEFAULTS</button>
+  </div>
+
+  <div class="wy-section-title" style="margin-top: 16px;">NAVIGATION</div>
+  <div class="wy-border-box" id="wy-nav-settings-section">
+    <div style="color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px; margin-bottom: 8px;">
+      SET CURRENT NAVIGATION PARAMETERS. ENGINES AND THRUSTERS STATUS DERIVED FROM SHIP SYSTEMS.
+    </div>
+
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">HEADING</span>
+      <input class="wy-setting-input" type="text" data-nav="heading" value="{{navData.heading}}" placeholder="042.7" />
+    </div>
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">SPEED</span>
+      <input class="wy-setting-input" type="text" data-nav="speed" value="{{navData.speed}}" placeholder="STATION KEEPING" />
+    </div>
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">FUEL</span>
+      <input class="wy-setting-input" type="text" data-nav="fuel" value="{{navData.fuel}}" placeholder="87%" />
+    </div>
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">ETA</span>
+      <input class="wy-setting-input" type="text" data-nav="eta" value="{{navData.eta}}" placeholder="14 WEEKS" />
+    </div>
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">POSITION</span>
+      <input class="wy-setting-input" type="text" data-nav="position" value="{{navData.position}}" placeholder="SECTOR 87-C / ZETA RETICULI" />
+    </div>
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">DESTINATION</span>
+      <input class="wy-setting-input" type="text" data-nav="destination" value="{{navData.destination}}" placeholder="SUTTER'S WORLD" />
+    </div>
+
+    <div style="margin-top: 4px; color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px;">
+      ENGINES: {{navData.engineStatus}} &nbsp;|&nbsp; THRUSTERS: {{navData.thrusterStatus}} &nbsp;(FROM SYSTEMS)
+    </div>
+
+    <div style="margin-top: 8px;">
+      <button class="wy-muthur-send" data-action="save-nav" style="width: 100%;">SAVE NAVIGATION DATA</button>
+    </div>
+  </div>
+
+  {{/if}}
 </div>

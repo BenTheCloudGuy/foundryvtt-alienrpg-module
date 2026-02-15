@@ -1,0 +1,48 @@
+<div class="wy-view-gameclock">
+  <div class="wy-section-title">GAME CLOCK</div>
+
+  {{!-- Large clock display --}}
+  <div class="wy-clock-display">
+    <div class="wy-clock-date" id="wy-clock-date">{{clockDate}}</div>
+    <div class="wy-clock-time" id="wy-clock-time">{{clockTime}}</div>
+    <div class="wy-clock-rate">TIME ACCELERATION: 10:1</div>
+  </div>
+
+  {{!-- GM adjustment controls --}}
+  {{#if isGM}}
+  <div class="wy-clock-controls">
+    <div class="wy-clock-controls-title">ADJUST GAME CLOCK</div>
+    <div class="wy-clock-grid">
+      <div class="wy-clock-unit">
+        <button class="wy-clock-btn wy-clock-plus" data-clock-adjust="year" data-clock-dir="1">+</button>
+        <span class="wy-clock-label">YEAR</span>
+        <button class="wy-clock-btn wy-clock-minus" data-clock-adjust="year" data-clock-dir="-1">−</button>
+      </div>
+      <div class="wy-clock-unit">
+        <button class="wy-clock-btn wy-clock-plus" data-clock-adjust="month" data-clock-dir="1">+</button>
+        <span class="wy-clock-label">MONTH</span>
+        <button class="wy-clock-btn wy-clock-minus" data-clock-adjust="month" data-clock-dir="-1">−</button>
+      </div>
+      <div class="wy-clock-unit">
+        <button class="wy-clock-btn wy-clock-plus" data-clock-adjust="day" data-clock-dir="1">+</button>
+        <span class="wy-clock-label">DAY</span>
+        <button class="wy-clock-btn wy-clock-minus" data-clock-adjust="day" data-clock-dir="-1">−</button>
+      </div>
+      <div class="wy-clock-unit">
+        <button class="wy-clock-btn wy-clock-plus" data-clock-adjust="hour" data-clock-dir="1">+</button>
+        <span class="wy-clock-label">HOUR</span>
+        <button class="wy-clock-btn wy-clock-minus" data-clock-adjust="hour" data-clock-dir="-1">−</button>
+      </div>
+      <div class="wy-clock-unit">
+        <button class="wy-clock-btn wy-clock-plus" data-clock-adjust="minute" data-clock-dir="1">+</button>
+        <span class="wy-clock-label">MIN</span>
+        <button class="wy-clock-btn wy-clock-minus" data-clock-adjust="minute" data-clock-dir="-1">−</button>
+      </div>
+    </div>
+
+    <div class="wy-clock-actions">
+      <button class="wy-keypad-btn wy-clock-action-btn" data-clock-action="reset">RESET TO DEFAULT</button>
+    </div>
+  </div>
+  {{/if}}
+</div>

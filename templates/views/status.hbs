@@ -1,4 +1,77 @@
 <div class="wy-view-status">
+
+  {{!-- ══ ACTIVE EMERGENCY WARNINGS ══ --}}
+
+  {{#if selfDestructActive}}
+  <div class="wy-emergency-overlay wy-emergency-self-destruct">
+    <div class="wy-eo-warning wy-text-blink">⚠ SELF-DESTRUCT SEQUENCE ACTIVE ⚠</div>
+    <div class="wy-eo-countdown" id="wy-sd-countdown">T-{{selfDestructTimer}}</div>
+    {{#if selfDestructArmedBy}}
+    <div class="wy-eo-triggered-by">ARMED BY: {{selfDestructArmedBy}}</div>
+    {{/if}}
+    <div class="wy-eo-sub wy-text-blink">ALL PERSONNEL EVACUATE IMMEDIATELY</div>
+    {{#if isGM}}
+    <button class="wy-eo-cancel-btn" data-cancel-emergency="cancel-self-destruct">ABORT SELF-DESTRUCT</button>
+    {{/if}}
+  </div>
+  {{/if}}
+
+  {{#if evacuationActive}}
+  <div class="wy-emergency-overlay wy-emergency-evacuate">
+    <div class="wy-eo-warning wy-text-blink">⚠ EVACUATION PROTOCOL ACTIVE ⚠</div>
+    <div class="wy-eo-sub">ALL PERSONNEL REPORT TO ESCAPE PODS</div>
+    {{#if evacuationTriggeredBy}}
+    <div class="wy-eo-triggered-by">TRIGGERED BY: {{evacuationTriggeredBy}}</div>
+    {{/if}}
+    {{#if isGM}}
+    <button class="wy-eo-cancel-btn" data-cancel-emergency="cancel-evacuate">CANCEL EVACUATION</button>
+    {{/if}}
+  </div>
+  {{/if}}
+
+  {{#if lockdownActive}}
+  <div class="wy-emergency-overlay wy-emergency-lockdown">
+    <div class="wy-eo-warning wy-text-blink">⚠ SHIP LOCKDOWN — ALL DOORS SEALED ⚠</div>
+    <div class="wy-eo-sub">AIRLOCK AND DOOR CONTROLS DISABLED</div>
+    {{#if lockdownTriggeredBy}}
+    <div class="wy-eo-triggered-by">TRIGGERED BY: {{lockdownTriggeredBy}}</div>
+    {{/if}}
+    {{#if isGM}}
+    <button class="wy-eo-cancel-btn" data-cancel-emergency="cancel-lockdown">LIFT LOCKDOWN</button>
+    {{/if}}
+  </div>
+  {{/if}}
+
+  {{#if distressActive}}
+  <div class="wy-emergency-overlay wy-emergency-distress">
+    <div class="wy-eo-warning wy-text-blink">⚠ DISTRESS SIGNAL BROADCASTING ⚠</div>
+    <div class="wy-eo-sub">TRANSMITTING ON ALL FREQUENCIES</div>
+    {{#if distressTriggeredBy}}
+    <div class="wy-eo-triggered-by">TRIGGERED BY: {{distressTriggeredBy}}</div>
+    {{/if}}
+    {{#if isGM}}
+    <button class="wy-eo-cancel-btn" data-cancel-emergency="cancel-distress">CANCEL BROADCAST</button>
+    {{/if}}
+  </div>
+  {{/if}}
+
+  {{#if purgeActive}}
+  <div class="wy-emergency-overlay wy-emergency-purge">
+    <div class="wy-eo-warning wy-text-blink">⚠ ATMOSPHERE PURGE IN PROGRESS ⚠</div>
+    {{#if purgeTarget}}
+    <div class="wy-eo-sub">TARGET: {{purgeTarget}}</div>
+    {{/if}}
+    {{#if purgeTriggeredBy}}
+    <div class="wy-eo-triggered-by">TRIGGERED BY: {{purgeTriggeredBy}}</div>
+    {{/if}}
+    {{#if isGM}}
+    <button class="wy-eo-cancel-btn" data-cancel-emergency="cancel-purge">CANCEL PURGE</button>
+    {{/if}}
+  </div>
+  {{/if}}
+
+  {{!-- ══ SHIP INFO ══ --}}
+
   <div class="wy-section-title">SHIP STATUS — {{shipName}}</div>
 
   <div class="wy-border-box">
@@ -14,10 +87,6 @@
         <td>{{shipRegistry}}</td>
         <td class="wy-text-dim">OWNER:</td>
         <td>WEYLAND-YUTANI CORP.</td>
-      </tr>
-      <tr>
-        <td class="wy-text-dim">MISSION:</td>
-        <td colspan="3">{{missionName}}</td>
       </tr>
     </table>
   </div>

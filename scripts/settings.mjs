@@ -3,6 +3,16 @@
  */
 
 export function registerSettings() {
+  // Active ship profile — GM switches between ships
+  game.settings.register('wy-terminal', 'activeShip', {
+    name: 'Active Ship Profile',
+    hint: 'Which ship the terminal is configured for. Changes ship identity, systems, and UI theme.',
+    scope: 'world',
+    config: false,  // Managed from in-terminal CONFIG
+    type: String,
+    default: 'montero',
+  });
+
   game.settings.register('wy-terminal', 'shipName', {
     name: 'Ship Name',
     hint: 'The name of the vessel displayed in the terminal.',
@@ -110,14 +120,6 @@ export function registerSettings() {
     default: {},
   });
 
-  // Internal: persisted chat history
-  game.settings.register('wy-terminal', 'chatHistory', {
-    scope: 'world',
-    config: false,
-    type: Array,
-    default: [],
-  });
-
   // Internal: ship maps configuration
   game.settings.register('wy-terminal', 'maps', {
     scope: 'world',
@@ -148,6 +150,39 @@ export function registerSettings() {
     config: false,
     type: Array,
     default: [],
+  });
+
+  // Internal: cargo manifest
+  game.settings.register('wy-terminal', 'cargoManifest', {
+    scope: 'world',
+    config: false,
+    type: Array,
+    default: [],
+  });
+
+  // Internal: comm frequency (###.## format, no MHz suffix)
+  game.settings.register('wy-terminal', 'commFrequency', {
+    scope: 'world',
+    config: false,
+    type: String,
+    default: '475.12',
+  });
+
+  // Internal: game clock epoch (ms since JS epoch for the in-game date/time)
+  // Default: 2183-06-12 06:00 UTC
+  game.settings.register('wy-terminal', 'gameClockEpoch', {
+    scope: 'world',
+    config: false,
+    type: Number,
+    default: Date.UTC(2183, 5, 12, 6, 0, 0),
+  });
+
+  // Internal: real-world anchor timestamp (Date.now() when epoch was last set)
+  game.settings.register('wy-terminal', 'gameClockRealAnchor', {
+    scope: 'world',
+    config: false,
+    type: Number,
+    default: 0,
   });
 
   /* ════════════════════════════════════════════════════════════════
@@ -189,6 +224,33 @@ export function registerSettings() {
 
   // Internal: persisted MU/TH/UR engine conversation
   game.settings.register('wy-terminal', 'muthurConversation', {
+    scope: 'world',
+    config: false,
+    type: Array,
+    default: [],
+  });
+
+  // Internal: navigation data (GM-managed)
+  // { heading, speed, fuel, eta, position, destination, shipPos, routePoints }
+  game.settings.register('wy-terminal', 'navData', {
+    scope: 'world',
+    config: false,
+    type: Object,
+    default: {},
+  });
+
+  // Internal: active clearance level (per-client, persisted for GM reset)
+  // Values: NONE | MEDICAL | CAPTAIN | CORPORATE | MASTER_OVERRIDE
+  game.settings.register('wy-terminal', 'activeClearanceLevel', {
+    scope: 'world',
+    config: false,
+    type: String,
+    default: 'NONE',
+  });
+
+  // Internal: command codes for crew access (GM-managed)
+  // Each entry: { name: 'MILLER', role: 'CAPTAIN', code: '1234' }
+  game.settings.register('wy-terminal', 'commandCodes', {
     scope: 'world',
     config: false,
     type: Array,

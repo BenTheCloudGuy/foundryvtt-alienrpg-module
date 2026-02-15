@@ -28,6 +28,9 @@ export class PinchZoomHandler {
   panX = 0;
   panY = 0;
 
+  /** Whether zoom/pan interactions are enabled */
+  enabled = true;
+
   /** Tracking for touch gestures */
   _touches = [];
   _lastDist = 0;
@@ -98,10 +101,12 @@ export class PinchZoomHandler {
      ────────────────────────────────────────────────────────────────── */
 
   zoomIn() {
+    if (!this.enabled) return;
     this._setScale(this.scale + this.zoomStep);
   }
 
   zoomOut() {
+    if (!this.enabled) return;
     this._setScale(this.scale - this.zoomStep);
   }
 
@@ -117,6 +122,7 @@ export class PinchZoomHandler {
      ────────────────────────────────────────────────────────────────── */
 
   _onWheel(e) {
+    if (!this.enabled) return;
     e.preventDefault();
     const delta = e.deltaY > 0 ? -this.zoomStep : this.zoomStep;
 
@@ -141,6 +147,7 @@ export class PinchZoomHandler {
      ────────────────────────────────────────────────────────────────── */
 
   _onTouchStart(e) {
+    if (!this.enabled) return;
     this._touches = Array.from(e.touches);
 
     if (this._touches.length === 2) {
@@ -214,6 +221,7 @@ export class PinchZoomHandler {
      ────────────────────────────────────────────────────────────────── */
 
   _onMouseDown(e) {
+    if (!this.enabled) return;
     if (e.button !== 0) return; // Left click only
     if (this.scale <= 1) return; // Only pan when zoomed
 

@@ -6,38 +6,140 @@
       AUTHORIZED PERSONNEL ONLY — ALL ACTIONS LOGGED
     </div>
 
+    {{!-- SELF-DESTRUCT --}}
+    {{#unless selfDestructActive}}
     <button class="wy-emergency-btn" data-emergency="self-destruct">
       ⚠ SELF-DESTRUCT SEQUENCE ⚠
     </button>
+    {{/unless}}
 
+    {{!-- EVACUATION --}}
+    {{#unless evacuationActive}}
     <button class="wy-emergency-btn" data-emergency="evacuate">
       EVACUATION PROTOCOL
     </button>
+    {{/unless}}
 
+    {{!-- LOCKDOWN --}}
+    {{#unless lockdownActive}}
     <button class="wy-emergency-btn" data-emergency="lockdown">
       SHIP LOCKDOWN
     </button>
+    {{/unless}}
 
+    {{!-- DISTRESS --}}
+    {{#unless distressActive}}
     <button class="wy-emergency-btn" data-emergency="distress">
       BROADCAST DISTRESS SIGNAL
     </button>
+    {{/unless}}
 
+    {{!-- ATMOSPHERE PURGE --}}
+    {{#unless purgeActive}}
     <button class="wy-emergency-btn" data-emergency="purge">
       ATMOSPHERE PURGE — DECK SELECT
     </button>
+    {{/unless}}
   </div>
 
+  {{!-- ══ ACTIVE EMERGENCY STATUS PANELS ══ --}}
+
   {{#if selfDestructActive}}
-  <div class="wy-border-box" style="border-color: var(--wy-red); margin-top: 16px; text-align: center;">
+  <div class="wy-border-box wy-emergency-active-box">
     <div class="wy-text-red wy-text-blink" style="font-size: 18px; letter-spacing: 4px; margin: 12px 0;">
       ⚠ SELF-DESTRUCT ACTIVE ⚠
     </div>
-    <div class="wy-text-red" style="font-size: 24px; font-family: var(--wy-font-display); letter-spacing: 6px;">
+    <div class="wy-text-red" style="font-size: 24px; font-family: var(--wy-font-display); letter-spacing: 6px;" id="wy-emergency-sd-timer">
       T-{{selfDestructTimer}}
     </div>
+    {{#if selfDestructArmedBy}}
+    <div class="wy-text-red" style="font-size: 11px; letter-spacing: 2px; margin-top: 6px; opacity: 0.8;">
+      ARMED BY: {{selfDestructArmedBy}}
+    </div>
+    {{/if}}
+    {{#if isGM}}
     <button class="wy-emergency-btn" data-emergency="cancel-self-destruct" style="margin-top: 12px;">
       ABORT SELF-DESTRUCT
     </button>
+    {{/if}}
+  </div>
+  {{/if}}
+
+  {{#if evacuationActive}}
+  <div class="wy-border-box wy-emergency-active-box">
+    <div class="wy-text-red wy-text-blink" style="font-size: 16px; letter-spacing: 3px; margin: 12px 0;">
+      ⚠ EVACUATION PROTOCOL ACTIVE ⚠
+    </div>
+    <div class="wy-text-red" style="font-size: 12px; letter-spacing: 2px;">ALL PERSONNEL — REPORT TO ESCAPE PODS</div>
+    {{#if evacuationTriggeredBy}}
+    <div class="wy-text-dim" style="font-size: 11px; letter-spacing: 2px; margin-top: 6px;">
+      TRIGGERED BY: {{evacuationTriggeredBy}}
+    </div>
+    {{/if}}
+    {{#if isGM}}
+    <button class="wy-emergency-btn" data-emergency="cancel-evacuate" style="margin-top: 12px;">
+      CANCEL EVACUATION
+    </button>
+    {{/if}}
+  </div>
+  {{/if}}
+
+  {{#if lockdownActive}}
+  <div class="wy-border-box wy-emergency-active-box">
+    <div class="wy-text-amber wy-text-blink" style="font-size: 16px; letter-spacing: 3px; margin: 12px 0;">
+      ⚠ SHIP LOCKDOWN ACTIVE ⚠
+    </div>
+    <div class="wy-text-amber" style="font-size: 12px; letter-spacing: 2px;">ALL AIRLOCKS AND DOORS SEALED</div>
+    {{#if lockdownTriggeredBy}}
+    <div class="wy-text-dim" style="font-size: 11px; letter-spacing: 2px; margin-top: 6px;">
+      TRIGGERED BY: {{lockdownTriggeredBy}}
+    </div>
+    {{/if}}
+    {{#if isGM}}
+    <button class="wy-emergency-btn" data-emergency="cancel-lockdown" style="margin-top: 12px;">
+      LIFT LOCKDOWN
+    </button>
+    {{/if}}
+  </div>
+  {{/if}}
+
+  {{#if distressActive}}
+  <div class="wy-border-box wy-emergency-active-box">
+    <div class="wy-text-red wy-text-blink" style="font-size: 16px; letter-spacing: 3px; margin: 12px 0;">
+      ⚠ DISTRESS SIGNAL BROADCASTING ⚠
+    </div>
+    <div class="wy-text-red" style="font-size: 12px; letter-spacing: 2px;">TRANSMITTING ON ALL FREQUENCIES</div>
+    {{#if distressTriggeredBy}}
+    <div class="wy-text-dim" style="font-size: 11px; letter-spacing: 2px; margin-top: 6px;">
+      TRIGGERED BY: {{distressTriggeredBy}}
+    </div>
+    {{/if}}
+    {{#if isGM}}
+    <button class="wy-emergency-btn" data-emergency="cancel-distress" style="margin-top: 12px;">
+      CANCEL BROADCAST
+    </button>
+    {{/if}}
+  </div>
+  {{/if}}
+
+  {{#if purgeActive}}
+  <div class="wy-border-box wy-emergency-active-box">
+    <div class="wy-text-red wy-text-blink" style="font-size: 16px; letter-spacing: 3px; margin: 12px 0;">
+      ⚠ ATMOSPHERE PURGE IN PROGRESS ⚠
+    </div>
+    {{#if purgeTarget}}
+    <div class="wy-text-red" style="font-size: 12px; letter-spacing: 2px;">TARGET: {{purgeTarget}}</div>
+    {{/if}}
+    {{#if purgeTriggeredBy}}
+    <div class="wy-text-dim" style="font-size: 11px; letter-spacing: 2px; margin-top: 6px;">
+      TRIGGERED BY: {{purgeTriggeredBy}}
+    </div>
+    {{/if}}
+    {{#if isGM}}
+    <button class="wy-emergency-btn" data-emergency="cancel-purge" style="margin-top: 12px;">
+      CANCEL PURGE
+    </button>
+    {{/if}}
   </div>
   {{/if}}
 </div>

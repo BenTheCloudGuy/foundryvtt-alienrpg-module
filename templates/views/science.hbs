@@ -1,0 +1,76 @@
+<div class="wy-view-science">
+  <div class="wy-section-title" style="color: #ffa500;">⚛ SCIENCE POD — RESEARCH OVERVIEW</div>
+
+  <div class="wy-border-box" style="border-color: #7a4200;">
+    <table class="wy-data-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>FACILITY</th>
+          <th>STATUS</th>
+          <th>ASSIGNMENT</th>
+          <th>NOTES</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each labs}}
+        <tr>
+          <td><span class="wy-indicator {{this.statusClass}}"></span></td>
+          <td style="color: #ffa500;">{{this.name}}</td>
+          <td class="{{this.statusTextClass}}">{{this.status}}</td>
+          <td>{{this.assignment}}</td>
+          <td class="wy-text-dim">{{this.notes}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="wy-section-title" style="font-size: 13px; margin-top: 24px; color: #ffa500;">SPECIMEN CONTAINMENT</div>
+  <div class="wy-border-box" style="border-color: #7a4200;">
+    <table class="wy-data-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>UNIT</th>
+          <th>CONTAINMENT</th>
+          <th>BIO-HAZARD</th>
+          <th>CONTENTS</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each specimens}}
+        <tr>
+          <td><span class="wy-indicator {{this.statusClass}}"></span></td>
+          <td style="color: #ffa500;">{{this.unit}}</td>
+          <td class="{{this.statusTextClass}}">{{this.containment}}</td>
+          <td class="{{this.hazardClass}}">{{this.hazardLevel}}</td>
+          <td class="wy-text-dim">{{this.contents}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="wy-section-title" style="font-size: 13px; margin-top: 24px;">ENVIRONMENTAL MONITORS</div>
+  <div class="wy-border-box" style="border-color: #7a4200;">
+    <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+      <div>
+        <span class="wy-text-dim" style="font-size: 11px;">ATMOSPHERE:</span>
+        <span style="color: #ffa500;">{{atmosphere}}</span>
+      </div>
+      <div>
+        <span class="wy-text-dim" style="font-size: 11px;">RADIATION:</span>
+        <span class="{{radiationClass}}">{{radiation}}</span>
+      </div>
+      <div>
+        <span class="wy-text-dim" style="font-size: 11px;">BIO-CONTAMINANT:</span>
+        <span class="{{bioClass}}">{{bioContaminant}}</span>
+      </div>
+      <div>
+        <span class="wy-text-dim" style="font-size: 11px;">QUARANTINE:</span>
+        <span class="{{quarantineClass}}">{{quarantine}}</span>
+      </div>
+    </div>
+  </div>
+</div>

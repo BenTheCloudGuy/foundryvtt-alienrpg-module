@@ -1,0 +1,59 @@
+<div class="wy-view-weapons">
+  <div class="wy-section-title" style="color: var(--wy-red);">⊗ WEAPONS SYSTEMS — TACTICAL OVERVIEW</div>
+
+  <div class="wy-border-box" style="border-color: var(--wy-red-dim);">
+    <table class="wy-data-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>WEAPON</th>
+          <th>STATUS</th>
+          <th>AMMUNITION</th>
+          <th>NOTES</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each weapons}}
+        <tr>
+          <td><span class="wy-indicator {{this.statusClass}}"></span></td>
+          <td style="color: var(--wy-red);">{{this.name}}</td>
+          <td class="{{this.statusTextClass}}">{{this.status}}</td>
+          <td>{{this.ammo}}</td>
+          <td class="wy-text-dim">{{this.notes}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="wy-section-title" style="font-size: 13px; margin-top: 24px; color: var(--wy-red);">TARGETING SYSTEM</div>
+  <div class="wy-border-box" style="border-color: var(--wy-red-dim);">
+    <div style="display: flex; gap: 24px;">
+      <div>
+        <span class="wy-text-dim" style="font-size: 11px;">MODE:</span>
+        <span style="color: var(--wy-red);">{{targetingMode}}</span>
+      </div>
+      <div>
+        <span class="wy-text-dim" style="font-size: 11px;">LOCK:</span>
+        <span class="{{targetLockClass}}">{{targetLock}}</span>
+      </div>
+      <div>
+        <span class="wy-text-dim" style="font-size: 11px;">THREAT LEVEL:</span>
+        <span class="{{threatClass}}">{{threatLevel}}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="wy-section-title" style="font-size: 13px; margin-top: 24px;">POWER ALLOCATION — WEAPONS GRID</div>
+  <div class="wy-border-box">
+    {{#each weapons}}
+    <div style="display: flex; align-items: center; gap: 8px; margin: 4px 0;">
+      <span style="width: 140px; font-size: 11px; color: var(--wy-red);">{{this.name}}</span>
+      <div style="flex: 1; height: 8px; background: #111; border: 1px solid var(--wy-red-dim);">
+        <div style="height: 100%; width: {{this.powerPct}}%; background: {{this.powerColor}};"></div>
+      </div>
+      <span style="width: 40px; text-align: right; font-size: 11px;">{{this.powerPct}}%</span>
+    </div>
+    {{/each}}
+  </div>
+</div>

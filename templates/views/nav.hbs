@@ -2,32 +2,46 @@
   <div class="wy-section-title">NAVIGATION — STELLAR CARTOGRAPHY</div>
 
   <div class="wy-border-box">
-    <table class="wy-data-table">
+    <table class="wy-data-table wy-nav-status-table">
       <tr>
-        <td class="wy-text-dim">CURRENT POSITION:</td>
-        <td>{{currentPosition}}</td>
-      </tr>
-      <tr>
-        <td class="wy-text-dim">DESTINATION:</td>
-        <td>{{destination}}</td>
-      </tr>
-      <tr>
-        <td class="wy-text-dim">ETA:</td>
-        <td class="wy-text-amber">{{eta}}</td>
-      </tr>
-      <tr>
+        <td class="wy-text-dim">HEADING:</td>
+        <td>{{heading}}°</td>
         <td class="wy-text-dim">SPEED:</td>
         <td>{{speed}}</td>
       </tr>
       <tr>
         <td class="wy-text-dim">FUEL RESERVES:</td>
         <td class="{{fuelClass}}">{{fuelLevel}}</td>
+        <td class="wy-text-dim">ETA:</td>
+        <td class="wy-text-amber">{{eta}}</td>
+      </tr>
+      <tr>
+        <td class="wy-text-dim">ENGINES:</td>
+        <td class="{{engineClass}}">{{engineStatus}}</td>
+        <td class="wy-text-dim">THRUSTERS:</td>
+        <td class="{{thrusterClass}}">{{thrusterStatus}}</td>
+      </tr>
+      <tr>
+        <td class="wy-text-dim">POSITION:</td>
+        <td colspan="3">{{currentPosition}}</td>
+      </tr>
+      <tr>
+        <td class="wy-text-dim">DESTINATION:</td>
+        <td colspan="3">{{destination}}</td>
       </tr>
     </table>
   </div>
 
+  <div class="wy-nav-starmap-container">
+    <div class="wy-nav-starmap-label">STELLAR NAVIGATION CHART</div>
+    <div class="wy-nav-starmap" id="wy-nav-starmap">
+      <img src="modules/wy-terminal/images/starmap.jpg" alt="STAR MAP" class="wy-nav-starmap-img" id="wy-nav-starmap-img" />
+      <canvas id="wy-nav-starmap-overlay" class="wy-nav-starmap-overlay"></canvas>
+    </div>
+  </div>
+
   {{#if navPoints}}
-  <div class="wy-section-title" style="font-size: 13px; margin-top: 24px;">WAYPOINTS</div>
+  <div class="wy-section-title" style="font-size: 13px; margin-top: 12px;">WAYPOINTS</div>
   <div class="wy-border-box">
     <table class="wy-data-table">
       <thead>

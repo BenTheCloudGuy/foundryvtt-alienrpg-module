@@ -1,18 +1,109 @@
 <div class="wy-view-cargo">
-  <div class="wy-section-title">CARGO MANIFEST</div>
+  <div class="wy-section-title">
+    CARGO MANIFEST — {{shipName}}
+    {{#if isGM}}
+    <button class="wy-log-add-btn" data-action="add-cargo" title="Add Cargo Item">+ ADD ITEM</button>
+    {{/if}}
+  </div>
 
-  <div class="wy-border-box">
-    {{#each cargoItems}}
-    <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(58, 122, 0, 0.15);">
-      <span>{{this.name}}</span>
-      <span class="wy-text-dim">{{this.quantity}} {{this.unit}}</span>
+  {{!-- GM: Cargo item form (hidden by default) --}}
+  {{#if isGM}}
+  <div class="wy-log-form wy-hidden" id="wy-cargo-form">
+    <div class="wy-log-form-title" id="wy-cargo-form-title">ADD CARGO ITEM</div>
+    <div class="wy-log-form-row">
+      <label class="wy-log-form-label">ITEM NAME</label>
+      <input type="text" class="wy-setting-input" id="wy-cargo-form-name" placeholder="ITEM DESIGNATION" style="width: 100%;" />
     </div>
-    {{/each}}
+    <div class="wy-log-form-row">
+      <label class="wy-log-form-label">QUANTITY</label>
+      <input type="number" class="wy-setting-input" id="wy-cargo-form-qty" placeholder="1" value="1" min="0" />
+    </div>
+    <div class="wy-log-form-row">
+      <label class="wy-log-form-label">CATEGORY</label>
+      <select class="wy-setting-input" id="wy-cargo-form-category">
+        <option value="CARGO">CARGO</option>
+        <option value="EQUIPMENT">EQUIPMENT</option>
+        <option value="SUPPLIES">SUPPLIES</option>
+        <option value="WEAPON">WEAPON</option>
+        <option value="TOOL">TOOL</option>
+        <option value="VEHICLE">VEHICLE</option>
+        <option value="HAZMAT">HAZMAT</option>
+      </select>
+    </div>
+    <div class="wy-log-form-row">
+      <label class="wy-log-form-label">LOCATION</label>
+      <select class="wy-setting-input" id="wy-cargo-form-location">
+        {{#each shipLocations}}
+        {{#if this.group}}
+        <optgroup label="{{this.group}}">
+          {{#each this.items}}
+          <option value="{{this}}">{{this}}</option>
+          {{/each}}
+        </optgroup>
+        {{/if}}
+        {{/each}}
+      </select>
+    </div>
+    <div class="wy-log-form-row">
+      <label class="wy-log-form-label">DESCRIPTION</label>
+      <textarea class="wy-setting-input wy-log-form-detail" id="wy-cargo-form-desc" rows="4" placeholder="ITEM DESCRIPTION / NOTES..."></textarea>
+    </div>
+    <div class="wy-log-form-actions">
+      <button class="wy-scene-btn" data-action="submit-cargo">COMMIT</button>
+      <button class="wy-scene-btn" data-action="cancel-cargo">CANCEL</button>
+    </div>
+  </div>
+  {{/if}}
 
-    {{#unless cargoItems}}
-    <div class="wy-text-dim" style="padding: 16px; text-align: center; letter-spacing: 2px;">
-      CARGO BAY EMPTY
+  {{!-- Cargo List View --}}
+  <div class="wy-cargo-list-view" id="wy-cargo-list-view">
+    <div class="wy-border-box wy-cargo-list">
+      <div class="wy-cargo-row wy-cargo-row-header">
+        <span class="wy-cargo-col-name">ITEM</span>
+        <span class="wy-cargo-col-qty">QTY</span>
+        <span class="wy-cargo-col-cat">TYPE</span>
+        <span class="wy-cargo-col-action"></span>
+      </div>
+
+      {{#each cargoItems}}
+      <div class="wy-cargo-row wy-cargo-cat-{{this.category}}" data-cargo-idx="{{@index}}" data-cargo-cat="{{this.category}}">
+        <span class="wy-cargo-col-name">{{this.name}}</span>
+        <span class="wy-cargo-col-qty">{{this.qty}}</span>
+        <span class="wy-cargo-col-cat"><span class="wy-cargo-badge">{{this.category}}</span></span>
+        <span class="wy-cargo-col-action">
+          <button class="wy-log-view-btn" data-action="view-cargo" data-cargo-idx="{{@index}}">[VIEW]</button>
+        </span>
+      </div>
+      {{/each}}
+
+      {{#unless cargoItems}}
+      <div class="wy-text-dim" style="padding: 16px; text-align: center; letter-spacing: 2px;">
+        CARGO Bay EMPTY
+      </div>
+      {{/unless}}
     </div>
-    {{/unless}}
+  </div>
+
+  {{!-- Cargo Detail View (hidden by default, populated by JS) --}}
+  <div class="wy-cargo-detail-view wy-hidden" id="wy-cargo-detail-view">
+    <div class="wy-cargo-detail-container">
+      <div class="wy-cargo-detail-header">
+        <div class="wy-cargo-detail-name" id="wy-cargo-detail-name"></div>
+        <div class="wy-cargo-detail-meta">
+          <span class="wy-cargo-detail-badge" id="wy-cargo-detail-badge"></span>
+          <span class="wy-cargo-detail-qty" id="wy-cargo-detail-qty"></span>
+        </div>
+      </div>
+      <div class="wy-cargo-detail-field">
+        <span class="wy-text-dim">LOCATION:</span>
+        <span id="wy-cargo-detail-location"></span>
+      </div>
+      <div class="wy-cargo-detail-body" id="wy-cargo-detail-body"></div>
+      <div class="wy-cargo-detail-footer">
+        {{#if isGM}}<button class="wy-scene-btn" data-action="edit-cargo">[EDIT]</button>{{/if}}
+        {{#if isGM}}<button class="wy-log-del-btn" data-action="delete-cargo">[DEL]</button>{{/if}}
+        <button class="wy-scene-btn" data-action="close-cargo">[CLOSE]</button>
+      </div>
+    </div>
   </div>
 </div>

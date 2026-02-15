@@ -1,52 +1,119 @@
 <div class="wy-view-crew">
   <div class="wy-section-title">CREW MANIFEST</div>
 
-  <div class="wy-border-box">
-    <table class="wy-data-table">
-      <thead>
-        <tr>
-          <th></th>
-          <th>NAME</th>
-          <th>ROLE</th>
-          <th>LOCATION</th>
-          <th>STATUS</th>
-        </tr>
-      </thead>
-      <tbody>
-        {{#each crew}}
-        <tr>
-          <td><span class="wy-indicator {{this.statusClass}}"></span></td>
-          <td>{{this.name}}</td>
-          <td class="wy-text-dim">{{this.role}}</td>
-          <td>{{this.location}}</td>
-          <td class="{{this.statusTextClass}}">{{this.status}}</td>
-        </tr>
-        {{/each}}
-      </tbody>
-    </table>
+  {{!-- Crew List View --}}
+  <div class="wy-crew-list-view" id="wy-crew-list-view">
+    <div class="wy-border-box wy-crew-list">
+      <div class="wy-crew-row wy-crew-row-header">
+        <span class="wy-crew-col-indicator"></span>
+        <span class="wy-crew-col-name">NAME</span>
+        <span class="wy-crew-col-role">ROLE</span>
+        <span class="wy-crew-col-location">LOCATION</span>
+        <span class="wy-crew-col-status">STATUS</span>
+        <span class="wy-crew-col-action"></span>
+      </div>
+
+      {{#each crew}}
+      <div class="wy-crew-row" data-crew-index="{{@index}}">
+        <span class="wy-crew-col-indicator"><span class="wy-indicator {{this.statusClass}}"></span></span>
+        <span class="wy-crew-col-name">{{this.name}}</span>
+        <span class="wy-crew-col-role">{{this.role}}</span>
+        <span class="wy-crew-col-location">{{this.location}}</span>
+        <span class="wy-crew-col-status {{this.statusTextClass}}">{{this.status}}</span>
+        <span class="wy-crew-col-action">
+          <button class="wy-log-view-btn" data-action="view-crew" data-crew-index="{{@index}}">[VIEW]</button>
+        </span>
+      </div>
+      {{/each}}
+    </div>
+
+    {{#if activeTasks}}
+    <div class="wy-section-title" style="font-size: 13px; margin-top: 24px;">ACTIVE TASKS</div>
+    <div class="wy-border-box">
+      <table class="wy-data-table">
+        <thead>
+          <tr>
+            <th>CREW</th>
+            <th>TASK</th>
+            <th>ETA</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each activeTasks}}
+          <tr>
+            <td>{{this.crewName}}</td>
+            <td>{{this.task}}</td>
+            <td class="wy-text-amber">{{this.eta}}</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+    {{/if}}
   </div>
 
-  {{#if activeTasks}}
-  <div class="wy-section-title" style="font-size: 13px; margin-top: 24px;">ACTIVE TASKS</div>
-  <div class="wy-border-box">
-    <table class="wy-data-table">
-      <thead>
-        <tr>
-          <th>CREW</th>
-          <th>TASK</th>
-          <th>ETA</th>
-        </tr>
-      </thead>
-      <tbody>
-        {{#each activeTasks}}
-        <tr>
-          <td>{{this.crewName}}</td>
-          <td>{{this.task}}</td>
-          <td class="wy-text-amber">{{this.eta}}</td>
-        </tr>
-        {{/each}}
-      </tbody>
-    </table>
+  {{!-- Crew Detail View (hidden by default) --}}
+  <div class="wy-crew-detail-view wy-hidden" id="wy-crew-detail-view">
+    <div class="wy-crew-detail-container">
+      <div class="wy-crew-detail-header">
+        <div class="wy-crew-detail-portrait-wrap">
+          <img id="wy-crew-detail-portrait" class="wy-crew-detail-portrait" src="" alt="CREW PORTRAIT" style="display:none;" />
+        </div>
+        <div class="wy-crew-detail-info">
+          <div class="wy-crew-det-name" id="wy-crew-detail-name"></div>
+          <div class="wy-crew-det-row">
+            <span class="wy-text-dim">ROLE:</span>
+            <span id="wy-crew-detail-role"></span>
+          </div>
+          <div class="wy-crew-det-row">
+            <span class="wy-text-dim">LOCATION:</span>
+            <span id="wy-crew-detail-location"></span>
+          </div>
+          <div class="wy-crew-det-row">
+            <span class="wy-text-dim">STATUS:</span>
+            <span id="wy-crew-detail-status"></span>
+          </div>
+        </div>
+      </div>
+
+      {{#if isGM}}
+      <div class="wy-crew-gm-edit" id="wy-crew-gm-edit">
+        <div class="wy-crew-gm-edit-title">GM — UPDATE CREW MEMBER</div>
+        <div class="wy-crew-gm-edit-row">
+          <label class="wy-crew-gm-label">STATUS</label>
+          <select class="wy-setting-input" id="wy-crew-edit-status">
+            <option value="ACTIVE">ACTIVE</option>
+            <option value="ON DUTY">ON DUTY</option>
+            <option value="OFF DUTY">OFF DUTY</option>
+            <option value="RESTING">RESTING</option>
+            <option value="IN CRYO">IN CRYO</option>
+            <option value="INJURED">INJURED</option>
+            <option value="CRITICAL">CRITICAL</option>
+            <option value="MIA">MIA</option>
+            <option value="KIA">KIA</option>
+            <option value="QUARANTINED">QUARANTINED</option>
+            <option value="DETAINED">DETAINED</option>
+            <option value="UNKNOWN">UNKNOWN</option>
+          </select>
+        </div>
+        <div class="wy-crew-gm-edit-row">
+          <label class="wy-crew-gm-label">LOCATION</label>
+          <select class="wy-setting-input" id="wy-crew-edit-location">
+            {{!-- Options populated dynamically by JS based on active ship --}}
+          </select>
+        </div>
+        <div class="wy-crew-gm-edit-actions">
+          <button class="wy-muthur-send" data-action="save-crew-edit">SAVE</button>
+        </div>
+      </div>
+      {{/if}}
+
+      <div class="wy-crew-detail-body">
+        <pre class="wy-crew-detail-text" id="wy-crew-detail-body">NO ADDITIONAL PERSONNEL DATA ON FILE.</pre>
+      </div>
+      <div class="wy-crew-detail-footer">
+        <button class="wy-scene-btn" data-action="close-crew">[CLOSE]</button>
+      </div>
+    </div>
   </div>
-  {{/if}}
 </div>
