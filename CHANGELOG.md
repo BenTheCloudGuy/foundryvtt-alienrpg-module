@@ -2,6 +2,32 @@
 
 
 
+## v1.0.4 — 2026-02-16
+
+### Compendium Packs
+
+- Added WYT-COG-ACTORS compendium with all 24 Chariot of the Gods actors organized into folders: USCSS MONTERO (5), USCSS CRONUS (6), SOTILLO (4), and CREATURES (9).
+- Removed legacy bulk compendium packs (actors, items, scenes, macros, journal, tables) that contained unfiltered world data.
+- Module compendiums now auto-import into the world on first load (GM only). Actors are placed into matching world folders and duplicates are skipped.
+- Import state is tracked per-world so the import only runs once.
+
+### Compendium Build Pipeline
+
+- Added `compendium-src/` directory with raw JSON source files for each actor, organized by ship subfolder.
+- Added `compendium-src/build-packs.mjs` script that reads the JSON source files and writes LevelDB compendium packs.
+- Run `npm run build-packs` to rebuild packs after editing JSON source files.
+- Adding or removing actors from the compendium is now as simple as adding or deleting a JSON file and rebuilding.
+
+### Documentation
+
+- Rewrote README.md with hero image, demo video, focused feature overview, and cleaner install instructions.
+- Added To Do section with planned features.
+- Added Acknowledgments section crediting ecattell and muthurGPT.
+- Updated License to clarify this is an unofficial fan production.
+- Added DEMO.md with a narration script for demo video recording.
+
+---
+
 ## v1.0.3 — 2026-02-15
 
 ### GM Terminal Window

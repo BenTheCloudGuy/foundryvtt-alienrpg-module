@@ -1,0 +1,13 @@
+{
+  "name": "wy-terminal",
+  "version": "1.0.4",
+  "private": true,
+  "type": "module",
+  "description": "Build tools for the Weyland-Yutani Ship Terminal FoundryVTT module",
+  "scripts": {
+    "build-packs": "node compendium-src/build-packs.mjs"
+  },
+  "dependencies": {
+    "classic-level": "^3.0.0"
+  }
+}

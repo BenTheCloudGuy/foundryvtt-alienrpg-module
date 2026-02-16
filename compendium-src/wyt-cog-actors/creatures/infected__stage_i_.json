@@ -1,0 +1,171 @@
+{
+  "_id": "93j15hcp07XSsaeX",
+  "name": "Infected (Stage I)",
+  "type": "creature",
+  "img": "modules/alienrpg-starterset/images/avatar/freak.png",
+  "items": [],
+  "effects": [],
+  "folder": "VGNmXUSgLmAEsqNY",
+  "sort": 0,
+  "flags": {
+    "core": {}
+  },
+  "system": {
+    "header": {
+      "health": {
+        "value": 0,
+        "label": "Health",
+        "max": 0
+      }
+    },
+    "attributes": {
+      "speed": {
+        "value": 0,
+        "label": "Speed"
+      },
+      "armorrating": {
+        "value": 0,
+        "label": "Number"
+      },
+      "armorvfire": {
+        "value": 0,
+        "label": "Number"
+      }
+    },
+    "general": {
+      "mobility": {
+        "value": "-",
+        "label": "Mobility"
+      },
+      "observation": {
+        "value": "-",
+        "label": "Observation"
+      },
+      "comment": {
+        "value": ""
+      },
+      "special": {
+        "value": "Traits: Anger, Confusion, Acidosis\n\nInfection: Exposure to the 26 Draconis Strain is handled as a disease with Virulence 6. If the first Sickness Roll fails, the patient becomes infected and enters Stage 1. Within one Shift, the patient starts to exhibit the first symptoms, which causes their Stress Level to increase by one. At the beginning of the next Shift, and each Shift thereafter, the patient must make a new Sickness Roll-failure will cause the patient to advance to Stage II. No further Sickness Rolls are made after this.",
+        "label": "Text"
+      },
+      "acidSplash": {
+        "value": "-",
+        "label": "Acid Splash"
+      },
+      "critInj": {
+        "value": 0
+      }
+    },
+    "notes": "<p>Changes begin with the onset of rapid skin mottling that starts in the subject's extremities and moves inward towards the core body. Eventually the subject's skull begins to soften and elongate as their brain grows and is rewired. By the end of this stage, the process becomes excruciating and the subject lashes out. As acidosis takes effect, the subject's pH levels shift significantly.</p>",
+    "rTables": "None",
+    "cTables": ""
+  },
+  "prototypeToken": {
+    "flags": {},
+    "name": "Infected (Stage I)",
+    "displayName": 20,
+    "width": 1,
+    "height": 1,
+    "lockRotation": false,
+    "rotation": 0,
+    "actorLink": false,
+    "disposition": -1,
+    "displayBars": 20,
+    "bar1": {
+      "attribute": "header.health"
+    },
+    "bar2": {
+      "attribute": "None"
+    },
+    "randomImg": false,
+    "alpha": 1,
+    "light": {
+      "alpha": 1,
+      "angle": 360,
+      "bright": 0,
+      "coloration": 1,
+      "dim": 0,
+      "luminosity": 0.5,
+      "saturation": 0,
+      "contrast": 0,
+      "shadows": 0,
+      "animation": {
+        "speed": 5,
+        "intensity": 5,
+        "type": null,
+        "reverse": false
+      },
+      "darkness": {
+        "min": 0,
+        "max": 1
+      },
+      "color": null,
+      "attenuation": 0.5,
+      "negative": false,
+      "priority": 0
+    },
+    "texture": {
+      "src": "modules/alienrpg-starterset/images/Tokens/freak-token.png",
+      "tint": "#ffffff",
+      "scaleX": 1,
+      "scaleY": 1,
+      "offsetX": 0,
+      "offsetY": 0,
+      "rotation": 0,
+      "anchorX": 0.5,
+      "anchorY": 0.5,
+      "fit": "contain",
+      "alphaThreshold": 0.75
+    },
+    "sight": {
+      "angle": 360,
+      "enabled": false,
+      "range": 12,
+      "brightness": 1,
+      "color": null,
+      "attenuation": 0.1,
+      "saturation": 0,
+      "contrast": 0,
+      "visionMode": "basic"
+    },
+    "detectionModes": [],
+    "appendNumber": false,
+    "prependAdjective": false,
+    "occludable": {
+      "radius": 0
+    },
+    "ring": {
+      "enabled": false,
+      "colors": {
+        "ring": null,
+        "background": null
+      },
+      "effects": 1,
+      "subject": {
+        "scale": 1,
+        "texture": null
+      }
+    },
+    "turnMarker": {
+      "mode": 1,
+      "animation": null,
+      "src": null,
+      "disposition": false
+    },
+    "movementAction": null
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.alienrpg-starterset.alienrpg-cotg-creatures.BrcjoB5qaqNUhDg3",
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "alienrpg",
+    "systemVersion": "4.0.10",
+    "createdTime": 1767587571136,
+    "modifiedTime": 1767587606067,
+    "lastModifiedBy": "H1vAw0KeNomo6NHk"
+  },
+  "ownership": {
+    "default": 0
+  }
+}

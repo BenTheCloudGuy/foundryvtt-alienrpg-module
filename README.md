@@ -114,6 +114,14 @@ game.wyTerminal.sendGmCommand({ type: 'switch_plugin', plugin: 'cronus_life_supp
 
 ---
 
+
+## BUG ##
+- If ACTOR Sheets are missing - CREW setting defaults to standand layout.. 
+  - Need to package ACTORS with Module so they align with SHIP
+  - Need to make sure ACTORs sheets are correct and upto date.
+
+
+
 ## Compatibility
 
 - **FoundryVTT:** v13+

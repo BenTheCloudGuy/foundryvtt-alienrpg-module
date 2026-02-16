@@ -1,0 +1,171 @@
+{
+  "_id": "4kx0T1FiU82P7hUi",
+  "name": "Mutant (Stage II)",
+  "type": "creature",
+  "img": "modules/alienrpg-starterset/images/avatar/mutantstage-ii-avatar.png",
+  "items": [],
+  "effects": [],
+  "folder": "VGNmXUSgLmAEsqNY",
+  "sort": 0,
+  "flags": {
+    "core": {}
+  },
+  "system": {
+    "header": {
+      "health": {
+        "value": 0,
+        "label": "Health",
+        "max": 0
+      }
+    },
+    "attributes": {
+      "speed": {
+        "value": 0,
+        "label": "Speed"
+      },
+      "armorrating": {
+        "value": 0,
+        "label": "Number"
+      },
+      "armorvfire": {
+        "value": 0,
+        "label": "Number"
+      }
+    },
+    "general": {
+      "mobility": {
+        "value": "-",
+        "label": "Mobility"
+      },
+      "observation": {
+        "value": "-",
+        "label": "Observation"
+      },
+      "comment": {
+        "value": ""
+      },
+      "special": {
+        "value": "Traits: Aggressive Dementia, Cerebral Dysmorphia\n\nEffects: Subject gets Speed 2, i.e. gets to act twice per Round, Strength increases by 3 (and Health along with it). Agility is increased by 1, while Empathy is reduced to 1. Empathy based skilll cannot be used. Firearms and other technological items cannot be used. Immune to Manipulation. At this point, the subject becomes aggressive and attacks other humans on sight. An infected PC can play out one such attack, then the subject turns into an NPC controlled by the GM. Within one Shift, the subject advances to Stage III.",
+        "label": "Text"
+      },
+      "acidSplash": {
+        "value": "-",
+        "label": "Acid Splash"
+      },
+      "critInj": {
+        "value": 0
+      }
+    },
+    "notes": "<p>Painful cellular mutations ravage the Abomination's body, causing them to take on an aggressive posture. The subject's limbs distend and become pliable, allowing them to contrort into strange positions. The brain and skull continue to elongate and the subject takes on a feral appearance and attitude. Strength, speed, and agility are all heightened. Only a rudimentary knowledge of their former self remains, but they are still aware enough to use basic tools and weapons.</p>",
+    "rTables": "None",
+    "cTables": "None"
+  },
+  "prototypeToken": {
+    "flags": {},
+    "name": "Mutant (Stage II)",
+    "displayName": 20,
+    "width": 1,
+    "height": 1,
+    "lockRotation": false,
+    "rotation": 0,
+    "actorLink": false,
+    "disposition": -1,
+    "displayBars": 20,
+    "bar1": {
+      "attribute": "header.health"
+    },
+    "bar2": {
+      "attribute": "None"
+    },
+    "randomImg": false,
+    "alpha": 1,
+    "light": {
+      "alpha": 1,
+      "angle": 360,
+      "bright": 0,
+      "coloration": 1,
+      "dim": 0,
+      "luminosity": 0.5,
+      "saturation": 0,
+      "contrast": 0,
+      "shadows": 0,
+      "animation": {
+        "speed": 5,
+        "intensity": 5,
+        "type": null,
+        "reverse": false
+      },
+      "darkness": {
+        "min": 0,
+        "max": 1
+      },
+      "color": null,
+      "attenuation": 0.5,
+      "negative": false,
+      "priority": 0
+    },
+    "texture": {
+      "src": "modules/alienrpg-starterset/images/Tokens/mutantstage-ii-token.png",
+      "tint": "#ffffff",
+      "scaleX": 1,
+      "scaleY": 1,
+      "offsetX": 0,
+      "offsetY": 0,
+      "rotation": 0,
+      "anchorX": 0.5,
+      "anchorY": 0.5,
+      "fit": "contain",
+      "alphaThreshold": 0.75
+    },
+    "sight": {
+      "angle": 360,
+      "enabled": false,
+      "range": 12,
+      "brightness": 0,
+      "color": null,
+      "attenuation": 0.1,
+      "saturation": 0,
+      "contrast": 0,
+      "visionMode": "basic"
+    },
+    "detectionModes": [],
+    "appendNumber": false,
+    "prependAdjective": false,
+    "occludable": {
+      "radius": 0
+    },
+    "ring": {
+      "enabled": false,
+      "colors": {
+        "ring": null,
+        "background": null
+      },
+      "effects": 1,
+      "subject": {
+        "scale": 1,
+        "texture": null
+      }
+    },
+    "turnMarker": {
+      "mode": 1,
+      "animation": null,
+      "src": null,
+      "disposition": false
+    },
+    "movementAction": null
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.alienrpg-starterset.alienrpg-cotg-creatures.n1y9NOZEkdqVrBoI",
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "alienrpg",
+    "systemVersion": "4.0.10",
+    "createdTime": 1767587571136,
+    "modifiedTime": 1767587606067,
+    "lastModifiedBy": "H1vAw0KeNomo6NHk"
+  },
+  "ownership": {
+    "default": 0
+  }
+}

@@ -1,0 +1,171 @@
+{
+  "_id": "vPyngsIYOcWJvGSa",
+  "name": "Egg Sacs (Stage I Neomorph)",
+  "type": "creature",
+  "img": "modules/alienrpg-starterset/images/avatar/egg-sacsstage-i-neomorph-avatar.png",
+  "items": [],
+  "effects": [],
+  "folder": "VGNmXUSgLmAEsqNY",
+  "sort": 0,
+  "flags": {
+    "core": {}
+  },
+  "system": {
+    "header": {
+      "health": {
+        "value": 0,
+        "label": "Health",
+        "max": 0
+      }
+    },
+    "attributes": {
+      "speed": {
+        "value": 0,
+        "label": "Speed"
+      },
+      "armorrating": {
+        "value": 0,
+        "label": "Number"
+      },
+      "armorvfire": {
+        "value": 0,
+        "label": "Number"
+      }
+    },
+    "general": {
+      "mobility": {
+        "value": "-",
+        "label": "Mobility"
+      },
+      "observation": {
+        "value": "-",
+        "label": "Observation"
+      },
+      "comment": {
+        "value": ""
+      },
+      "special": {
+        "value": "Containment and Termination Protocol: The best way to be rid of the Egg Sacs is to expose them to severe temperature changes-they can be destroyed with fire or made inert with liquid nitrogen (at least until they thaw).",
+        "label": "Text"
+      },
+      "acidSplash": {
+        "value": "",
+        "label": "Acid Splash"
+      },
+      "critInj": {
+        "value": 0
+      }
+    },
+    "notes": "<p>Small, bulbous pods that grow like fungus, the egg sacs are the result of the mutagenic Agent AO-3959X.91-15 interacting with pollen and microbial elements on a planet or in a spacecraft. Once formed, these bird's egg-sized pods tend to grow in clutches of 2d6-and there are often several clutches in any infected area. The egg sacs are the delivery system for the Neomorphic Motes.</p>",
+    "rTables": "None",
+    "cTables": ""
+  },
+  "prototypeToken": {
+    "flags": {},
+    "name": "Egg Sacs (Stage I Neomorph)",
+    "displayName": 20,
+    "width": 1,
+    "height": 1,
+    "lockRotation": false,
+    "rotation": 0,
+    "actorLink": false,
+    "disposition": -1,
+    "displayBars": 20,
+    "bar1": {
+      "attribute": "header.health"
+    },
+    "bar2": {
+      "attribute": "None"
+    },
+    "randomImg": false,
+    "alpha": 1,
+    "light": {
+      "alpha": 1,
+      "angle": 360,
+      "bright": 0,
+      "coloration": 1,
+      "dim": 0,
+      "luminosity": 0.5,
+      "saturation": 0,
+      "contrast": 0,
+      "shadows": 0,
+      "animation": {
+        "speed": 5,
+        "intensity": 5,
+        "type": null,
+        "reverse": false
+      },
+      "darkness": {
+        "min": 0,
+        "max": 1
+      },
+      "color": null,
+      "attenuation": 0.5,
+      "negative": false,
+      "priority": 0
+    },
+    "texture": {
+      "src": "modules/alienrpg-starterset/images/Tokens/egg-sacsstage-i-neomorph-token.png",
+      "tint": "#ffffff",
+      "scaleX": 1,
+      "scaleY": 1,
+      "offsetX": 0,
+      "offsetY": 0,
+      "rotation": 0,
+      "anchorX": 0.5,
+      "anchorY": 0.5,
+      "fit": "contain",
+      "alphaThreshold": 0.75
+    },
+    "sight": {
+      "angle": 360,
+      "enabled": false,
+      "range": 12,
+      "brightness": 0,
+      "color": null,
+      "attenuation": 0.1,
+      "saturation": 0,
+      "contrast": 0,
+      "visionMode": "basic"
+    },
+    "detectionModes": [],
+    "appendNumber": false,
+    "prependAdjective": false,
+    "occludable": {
+      "radius": 0
+    },
+    "ring": {
+      "enabled": false,
+      "colors": {
+        "ring": null,
+        "background": null
+      },
+      "effects": 1,
+      "subject": {
+        "scale": 1,
+        "texture": null
+      }
+    },
+    "turnMarker": {
+      "mode": 1,
+      "animation": null,
+      "src": null,
+      "disposition": false
+    },
+    "movementAction": null
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.alienrpg-starterset.alienrpg-cotg-creatures.AopX8nzWLyfb6bmA",
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "alienrpg",
+    "systemVersion": "4.0.10",
+    "createdTime": 1767587571136,
+    "modifiedTime": 1767587606067,
+    "lastModifiedBy": "H1vAw0KeNomo6NHk"
+  },
+  "ownership": {
+    "default": 0
+  }
+}
