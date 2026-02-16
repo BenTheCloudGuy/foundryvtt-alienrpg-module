@@ -73,6 +73,89 @@
             <span class="wy-text-dim">STATUS:</span>
             <span id="wy-crew-detail-status"></span>
           </div>
+          <div class="wy-crew-det-row">
+            <span class="wy-text-dim">SHIP:</span>
+            <span id="wy-crew-detail-ship" class="wy-text-green"></span>
+          </div>
+        </div>
+      </div>
+
+      {{!-- Health / Stress / Radiation bars --}}
+      <div class="wy-crew-vitals" id="wy-crew-vitals">
+        <div class="wy-crew-vital-row">
+          <span class="wy-text-dim">HEALTH:</span>
+          <span class="wy-crew-vital-bar" id="wy-crew-health-bar"></span>
+          <span id="wy-crew-health-val" class="wy-text-green"></span>
+        </div>
+        <div class="wy-crew-vital-row">
+          <span class="wy-text-dim">STRESS:</span>
+          <span class="wy-crew-vital-bar" id="wy-crew-stress-bar"></span>
+          <span id="wy-crew-stress-val" class="wy-text-amber"></span>
+        </div>
+        <div class="wy-crew-vital-row">
+          <span class="wy-text-dim">RADIATION:</span>
+          <span class="wy-crew-vital-bar" id="wy-crew-rad-bar"></span>
+          <span id="wy-crew-rad-val" class="wy-text-red"></span>
+        </div>
+      </div>
+
+      {{!-- Conditions --}}
+      <div class="wy-crew-conditions" id="wy-crew-conditions" style="display:none;">
+        <span class="wy-text-dim wy-cond-label">⚠ CONDITIONS:</span>
+        <div id="wy-crew-conditions-list" class="wy-cond-tags"></div>
+      </div>
+
+      {{!-- Attributes --}}
+      <div class="wy-crew-stats" id="wy-crew-stats">
+        <div class="wy-section-divider">ATTRIBUTES</div>
+        <div class="wy-crew-attr-grid">
+          <div class="wy-crew-attr-block">
+            <div class="wy-crew-attr-val" id="wy-crew-attr-str"></div>
+            <div class="wy-crew-attr-label">STR</div>
+          </div>
+          <div class="wy-crew-attr-block">
+            <div class="wy-crew-attr-val" id="wy-crew-attr-agl"></div>
+            <div class="wy-crew-attr-label">AGL</div>
+          </div>
+          <div class="wy-crew-attr-block">
+            <div class="wy-crew-attr-val" id="wy-crew-attr-wit"></div>
+            <div class="wy-crew-attr-label">WIT</div>
+          </div>
+          <div class="wy-crew-attr-block">
+            <div class="wy-crew-attr-val" id="wy-crew-attr-emp"></div>
+            <div class="wy-crew-attr-label">EMP</div>
+          </div>
+        </div>
+      </div>
+
+      {{!-- Skills grouped by attribute --}}
+      <div class="wy-crew-skills" id="wy-crew-skills">
+        <div class="wy-section-divider">SKILLS</div>
+        <div class="wy-crew-skill-groups">
+          <div class="wy-crew-skill-group">
+            <div class="wy-crew-skill-group-hdr">STRENGTH</div>
+            <div class="wy-crew-skill-row"><span class="wy-text-dim">HEAVY MACHINERY</span><span id="wy-crew-sk-heavyMach" class="wy-crew-skill-val"></span></div>
+            <div class="wy-crew-skill-row"><span class="wy-text-dim">CLOSE COMBAT</span><span id="wy-crew-sk-closeCbt" class="wy-crew-skill-val"></span></div>
+            <div class="wy-crew-skill-row"><span class="wy-text-dim">STAMINA</span><span id="wy-crew-sk-stamina" class="wy-crew-skill-val"></span></div>
+          </div>
+          <div class="wy-crew-skill-group">
+            <div class="wy-crew-skill-group-hdr">AGILITY</div>
+            <div class="wy-crew-skill-row"><span class="wy-text-dim">RANGED COMBAT</span><span id="wy-crew-sk-rangedCbt" class="wy-crew-skill-val"></span></div>
+            <div class="wy-crew-skill-row"><span class="wy-text-dim">MOBILITY</span><span id="wy-crew-sk-mobility" class="wy-crew-skill-val"></span></div>
+            <div class="wy-crew-skill-row"><span class="wy-text-dim">PILOTING</span><span id="wy-crew-sk-piloting" class="wy-crew-skill-val"></span></div>
+          </div>
+          <div class="wy-crew-skill-group">
+            <div class="wy-crew-skill-group-hdr">WITS</div>
+            <div class="wy-crew-skill-row"><span class="wy-text-dim">OBSERVATION</span><span id="wy-crew-sk-observation" class="wy-crew-skill-val"></span></div>
+            <div class="wy-crew-skill-row"><span class="wy-text-dim">COMTECH</span><span id="wy-crew-sk-comtech" class="wy-crew-skill-val"></span></div>
+            <div class="wy-crew-skill-row"><span class="wy-text-dim">SURVIVAL</span><span id="wy-crew-sk-survival" class="wy-crew-skill-val"></span></div>
+          </div>
+          <div class="wy-crew-skill-group">
+            <div class="wy-crew-skill-group-hdr">EMPATHY</div>
+            <div class="wy-crew-skill-row"><span class="wy-text-dim">COMMAND</span><span id="wy-crew-sk-command" class="wy-crew-skill-val"></span></div>
+            <div class="wy-crew-skill-row"><span class="wy-text-dim">MANIPULATION</span><span id="wy-crew-sk-manipulation" class="wy-crew-skill-val"></span></div>
+            <div class="wy-crew-skill-row"><span class="wy-text-dim">MEDICAL AID</span><span id="wy-crew-sk-medicalAid" class="wy-crew-skill-val"></span></div>
+          </div>
         </div>
       </div>
 
@@ -102,13 +185,23 @@
             {{!-- Options populated dynamically by JS based on active ship --}}
           </select>
         </div>
+        <div class="wy-crew-gm-edit-row">
+          <label class="wy-crew-gm-label">SHIP ASSIGNMENT</label>
+          <select class="wy-setting-input" id="wy-crew-edit-ship">
+            <option value="">UNASSIGNED</option>
+            {{#each availableShips}}
+            <option value="{{this.id}}">{{this.label}}</option>
+            {{/each}}
+          </select>
+        </div>
         <div class="wy-crew-gm-edit-actions">
           <button class="wy-muthur-send" data-action="save-crew-edit">SAVE</button>
         </div>
       </div>
       {{/if}}
 
-      <div class="wy-crew-detail-body">
+      <div class="wy-crew-detail-body" id="wy-crew-detail-body-wrap">
+        <div class="wy-section-divider">PERSONNEL FILE</div>
         <pre class="wy-crew-detail-text" id="wy-crew-detail-body">NO ADDITIONAL PERSONNEL DATA ON FILE.</pre>
       </div>
       <div class="wy-crew-detail-footer">

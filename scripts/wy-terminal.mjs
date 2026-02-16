@@ -9,6 +9,7 @@ import { MuthurBridge } from './muthur-bridge.mjs';
 import { MuthurEngine } from './muthur-engine.mjs';
 import { registerSettings } from './settings.mjs';
 import { TerminalSFX } from './terminal-sounds.mjs';
+import { SHIP_PROFILES, getAvailableProfiles } from './ship-profiles.mjs';
 
 /* ──────────────────────────────────────────────────────────────────
    Module Initialization
@@ -301,9 +302,33 @@ Hooks.once('ready', () => {
       terminalApp._switchView('scenes');
     }
     if (data.type === 'refreshTokens' && terminalApp?.rendered) {
-      // Token update on the active scene — re-render if on scenes view
-      if (terminalApp.activeView === 'scenes') {
-        terminalApp._renderView('scenes');
+      // GM sent pre-computed token positions — apply them directly.
+      // This avoids reading from local scene docs which may have stale data
+      // if this socket message arrives before Foundry's own document sync.
+      const { sceneId, tokens } = data.payload || {};
+      if (terminalApp.activeView === 'scenes' &&
+          sceneId && sceneId === terminalApp.activeSceneId) {
+        if (tokens && tokens.length > 0) {
+          // Use GM-authoritative positions (debounced internally)
+          terminalApp.scheduleTokenUpdate(tokens);
+        } else {
+          // Fallback: no tokens in payload — read from local scene data after delay
+          terminalApp.scheduleTokenUpdate(null);
+        }
+      }
+    }
+    // Player requests to move a token they can't directly update —
+    // GM performs the update on their behalf
+    if (data.type === 'moveToken' && game.user.isGM) {
+      const { sceneId, tokenId, x, y } = data.payload || {};
+      const scene = game.scenes?.get(sceneId);
+      const tokenDoc = scene?.tokens?.get(tokenId);
+      if (tokenDoc) {
+        tokenDoc.update({ x: Math.round(x), y: Math.round(y) }).then(() => {
+          console.log(`WY-Terminal | GM executed player-requested token move: ${tokenId}`);
+        }).catch(err => {
+          console.warn('WY-Terminal | Failed to execute player token move:', err);
+        });
       }
     }
     if (data.type === 'shipSwitch' && terminalApp?.rendered) {
@@ -456,8 +481,13 @@ Hooks.on('canvasReady', (canvas) => {
 Hooks.on('createToken', (token) => {
   _broadcastTokenRefresh(token.parent);
 });
-Hooks.on('updateToken', (token) => {
-  _broadcastTokenRefresh(token.parent);
+Hooks.on('updateToken', (token, change) => {
+  // Only broadcast when position or visibility changed (skip name edits, etc.)
+  if ('x' in change || 'y' in change || 'hidden' in change ||
+      'width' in change || 'height' in change || 'texture' in change ||
+      'disposition' in change) {
+    _broadcastTokenRefresh(token.parent);
+  }
 });
 Hooks.on('deleteToken', (token) => {
   _broadcastTokenRefresh(token.parent);
@@ -465,16 +495,30 @@ Hooks.on('deleteToken', (token) => {
 
 function _broadcastTokenRefresh(scene) {
   if (!scene) return;
-  // Only GM broadcasts, to avoid duplicate messages
+
+  // GM pre-computes token positions and sends them in the socket payload.
+  // This means player clients get authoritative positions immediately
+  // without needing to wait for Foundry's document sync to complete.
   if (game.user.isGM) {
+    let tokens = [];
+    if (terminalApp) {
+      try {
+        tokens = terminalApp._getSceneTokens(scene);
+      } catch (err) {
+        console.warn('WY-Terminal | Failed to compute token positions for socket:', err);
+      }
+    }
     game.socket.emit('module.wy-terminal', {
       type: 'refreshTokens',
-      payload: { sceneId: scene.id },
+      payload: { sceneId: scene.id, tokens },
     });
   }
-  // Also refresh locally if this is the display
-  if (terminalApp?.rendered && terminalApp.activeView === 'scenes' && terminalApp.activeSceneId === scene.id) {
-    terminalApp._renderView('scenes');
+
+  // Also refresh locally (GM's own terminal, or player hook backup).
+  // Use debounced schedule to coalesce rapid successive updates.
+  if (terminalApp?.rendered && terminalApp.activeView === 'scenes'
+      && terminalApp.activeSceneId === scene.id) {
+    terminalApp.scheduleTokenUpdate(null);
   }
 }
 
@@ -493,3 +537,117 @@ function _registerHandlebarsHelpers() {
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
   });
 }
+
+/* ──────────────────────────────────────────────────────────────────
+   Actor Sheet Injection — Ship Assignment Field
+   ────────────────────────────────────────────────────────────────── */
+
+/**
+ * Inject a "Ship Assignment" dropdown into AlienRPG character/synthetic
+ * actor sheets so the GM can assign crew to ships directly from the
+ * Actor sidebar.  Works with both ApplicationV1 (jQuery) and V2 (HTMLElement).
+ */
+function _injectShipAssignment(app, html) {
+  const actor = app.actor || app.document;
+  if (!actor || (actor.type !== 'character' && actor.type !== 'synthetic')) return;
+  if (!game.user.isGM) return;
+
+  try {
+    // Normalise to raw HTMLElement (v1 passes jQuery, v2 passes HTMLElement)
+    const el = html instanceof HTMLElement ? html : (html[0] ?? html);
+    if (!el || !(el instanceof HTMLElement)) return;
+
+    // Guard against double-injection (re-render)
+    if (el.querySelector('.wy-ship-assign-row')) return;
+
+    const currentShip = actor.getFlag('wy-terminal', 'shipAssignment') || '';
+    const profiles = getAvailableProfiles();
+
+    const options = profiles.map(p =>
+      `<option value="${p.id}"${p.id === currentShip ? ' selected' : ''}>${p.label}</option>`
+    ).join('');
+
+    const fieldHtml = `
+      <div class="wy-ship-assign-row" style="
+        display: flex; align-items: center; gap: 6px;
+        padding: 4px 8px; margin: 4px 0;
+        border: 1px solid rgba(58,122,0,0.3);
+        background: rgba(0,10,0,0.3);
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 12px; color: #3a7a00;
+      ">
+        <label style="flex-shrink:0; letter-spacing:1px; font-size:11px; color:#3a7a00;">⛴ SHIP ASSIGNMENT</label>
+        <select class="wy-ship-assign-select" style="
+          flex: 1; background: rgba(0,10,0,0.6); color: #3a7a00;
+          border: 1px solid rgba(58,122,0,0.3); font-family: inherit;
+          font-size: 12px; padding: 2px 4px; height: 26px;
+        ">
+          <option value=""${!currentShip ? ' selected' : ''}>— UNASSIGNED —</option>
+          ${options}
+        </select>
+      </div>
+    `;
+
+    // Find injection point — try several selectors for AlienRPG / generic sheets
+    const selectors = [
+      '.header-fields',
+      '.sheet-header',
+      '.charheader',
+      'header.sheet-header',
+      '.window-content > form > header',
+      '.window-content > form',
+      '.sheet-body',
+      '.window-content',
+    ];
+
+    let target = null;
+    let insertMode = 'after'; // 'after' = insertAdjacentHTML afterend, 'prepend' = afterbegin
+    for (const sel of selectors) {
+      target = el.querySelector(sel);
+      if (target) {
+        // For form/body/window-content, prepend instead of after
+        if (sel === '.window-content > form' || sel === '.sheet-body' || sel === '.window-content') {
+          insertMode = 'prepend';
+        }
+        break;
+      }
+    }
+
+    if (target) {
+      target.insertAdjacentHTML(
+        insertMode === 'prepend' ? 'afterbegin' : 'afterend',
+        fieldHtml
+      );
+    } else {
+      // Last resort: append to the element itself
+      el.insertAdjacentHTML('afterbegin', fieldHtml);
+    }
+
+    // Bind change handler
+    const select = el.querySelector('.wy-ship-assign-select');
+    if (select) {
+      select.addEventListener('change', async () => {
+        const newVal = select.value;
+        if (newVal) {
+          await actor.setFlag('wy-terminal', 'shipAssignment', newVal);
+        } else {
+          await actor.unsetFlag('wy-terminal', 'shipAssignment');
+        }
+        const shipLabel = newVal ? (SHIP_PROFILES[newVal]?.name || newVal.toUpperCase()) : 'UNASSIGNED';
+        ui.notifications.info(`WY-Terminal: ${actor.name} assigned to ${shipLabel}`);
+      });
+    }
+
+    console.log(`WY-Terminal | Ship Assignment field injected for ${actor.name}`);
+  } catch (err) {
+    console.error('WY-Terminal | Failed to inject Ship Assignment field:', err);
+  }
+}
+
+// Hook both v1 and v2 render patterns to cover all AlienRPG sheet versions
+Hooks.on('renderActorSheet', (app, html, data) => _injectShipAssignment(app, html));
+Hooks.on('renderDocumentSheet', (app, html) => {
+  // Only fire for actor documents (avoid items, journals, etc.)
+  const doc = app.actor || app.document;
+  if (doc?.documentName === 'Actor') _injectShipAssignment(app, html);
+});

@@ -1,5 +1,57 @@
 # Changelog
 
+
+
+## v1.0.3 — 2026-02-15
+
+### GM Terminal Window
+
+- GM terminal is now a standard movable, resizable pop-out window instead of a full-screen takeover.
+- GM can minimize and maximize the terminal, making it easy to access the underlying FoundryVTT interface during gameplay.
+- GM can drag the terminal window around the screen and resize it as needed.
+
+### Schematics (Scenes View)
+
+- Fixed schematic controls for both GM and Player terminals.
+- Added ship selection page with deck dropdown so players can browse schematics across enabled ships.
+- GM toolbar now includes a PUSH TO PLAYERS button that forces the Player terminal to display a specific schematic.
+- GM toolbar includes a SYNC TOKENS button to refresh token positions on both terminals.
+- Added pinch-zoom and pan support for schematics on touch-screen displays.
+- Token positions sync in real time between GM and Player terminals via socket.
+
+### Token Management
+
+- GM can now manage tokens on schematics directly from the terminal, including drag-to-move.
+- Token create/update/delete hooks automatically broadcast position changes to Player terminals.
+- Tokens must still be added to scenes via FoundryVTT's built-in scene editor.
+
+### Crew Manifest — Live Actor Data
+
+- Crew manifest now pulls live data from FoundryVTT Actor character sheets instead of static defaults.
+- Displays health, stress, and radiation as visual bars with color coding (green/amber/red).
+- Shows all four attributes (STR, AGL, WIT, EMP) in a centered block layout.
+- Skills are grouped by parent attribute (Strength, Agility, Wits, Empathy) in a two-column grid.
+- Active conditions from the Actor sheet (starving, dehydrated, exhausted, freezing, hypoxia, panic effects, critical injuries) display as individual red-bordered tags.
+- Personnel file section shows appearance, personal agenda, buddy, rival, signature item, and notes pulled from the Actor sheet.
+- Actor notes field (which may contain HTML) is automatically stripped to plain text for terminal display.
+- GM can update crew member status and location from the crew detail view; changes broadcast to Player terminals.
+
+### Crew — Ship Assignment
+
+- GM can assign crew members to specific ships via a Ship Assignment dropdown in both the terminal crew detail view and the FoundryVTT Actor sheet.
+- Ship assignment is stored as a FoundryVTT actor flag (flags.wy-terminal.shipAssignment).
+- Crew list automatically filters by the active ship profile, showing only crew assigned to that ship plus any unassigned crew.
+- If no explicit assignment is set, the system infers ship assignment from the actor's folder name (e.g., a folder named "Montero Crew" auto-assigns to the Montero).
+
+### Internal
+
+- Module version bumped to 1.0.3
+- Added renderActorSheet and renderDocumentSheet hooks for ship assignment injection (v13 compatible, no jQuery dependency).
+- Added _inferShipFromFolder() method for folder-name-based ship auto-detection.
+- Added _renderVitalBar() helper for health/stress/radiation bar rendering.
+- Added CSS for crew vitals, attribute blocks, skill groups, condition tags, and section dividers.
+
+
 ## v1.0.2 — 2026-02-14
 
 ### Emergency Protocols — Full Implementation

@@ -7,7 +7,7 @@
 import { PinchZoomHandler } from './pinch-zoom.mjs';
 import { MuthurBridge } from './muthur-bridge.mjs';
 import { MuthurEngine } from './muthur-engine.mjs';
-import { getShipProfile, getAvailableProfiles } from './ship-profiles.mjs';
+import { getShipProfile, getAvailableProfiles, SHIP_PROFILES } from './ship-profiles.mjs';
 import { TerminalSFX } from './terminal-sounds.mjs';
 
 export class WYTerminalApp extends Application {
@@ -65,6 +65,7 @@ export class WYTerminalApp extends Application {
         height: game.settings.get('wy-terminal', 'terminalHeight') || h,
         classes: ['wy-terminal-app'],
         resizable: true,
+        minimizable: true,
         popOut: true,
       });
     } catch {
@@ -76,6 +77,7 @@ export class WYTerminalApp extends Application {
         height: h,
         classes: ['wy-terminal-app'],
         resizable: true,
+        minimizable: true,
         popOut: true,
       });
     }
@@ -136,6 +138,11 @@ export class WYTerminalApp extends Application {
     super.activateListeners(html);
     const el = html[0] ?? html;
 
+    // Add GM-specific class so the window header is visible for minimize/close
+    if (game.user.isGM) {
+      this.element[0]?.classList.add('wy-gm-terminal');
+    }
+
     // Preload sounds for player clients
     TerminalSFX.preload();
 
@@ -154,10 +161,10 @@ export class WYTerminalApp extends Application {
       });
     });
 
-    // Zoom buttons
-    el.querySelector('[data-action="zoom-in"]')?.addEventListener('click', () => this.zoomHandler?.zoomIn());
-    el.querySelector('[data-action="zoom-out"]')?.addEventListener('click', () => this.zoomHandler?.zoomOut());
-    el.querySelector('[data-action="zoom-reset"]')?.addEventListener('click', () => this.zoomHandler?.reset());
+    // Zoom buttons — use per-scene zoom when in schematics, fallback to global
+    el.querySelector('[data-action="zoom-in"]')?.addEventListener('click', () => (this._sceneZoom || this.zoomHandler)?.zoomIn());
+    el.querySelector('[data-action="zoom-out"]')?.addEventListener('click', () => (this._sceneZoom || this.zoomHandler)?.zoomOut());
+    el.querySelector('[data-action="zoom-reset"]')?.addEventListener('click', () => (this._sceneZoom || this.zoomHandler)?.reset());
 
     // Initialize pinch-zoom on the display frame (disabled until scenes view)
     const displayFrame = el.querySelector('#wy-display-frame');
@@ -227,17 +234,26 @@ export class WYTerminalApp extends Application {
     const titleEl = el.querySelector('#wy-display-title');
     if (titleEl) titleEl.textContent = this._getDisplayTitle();
 
-    // Only allow zoom on scenes (ship schematics) view
+    // Only show zoom controls on scenes (ship schematics) view with an active scene
     const zoomControls = el.querySelector('#wy-zoom-controls');
-    const isSchematicsView = viewName === 'scenes';
+    const isSchematicsView = viewName === 'scenes' && (game.user.isGM || this.activeSceneId);
     if (isSchematicsView) {
       if (zoomControls) zoomControls.style.display = '';
-      if (this.zoomHandler) this.zoomHandler.enabled = true;
+      // Per-scene zoom is created in _setupScenesView; global zoom stays disabled
     } else {
       if (zoomControls) zoomControls.style.display = 'none';
       if (this.zoomHandler) {
         this.zoomHandler.enabled = false;
         this.zoomHandler.reset();
+      }
+      // Clean up per-scene zoom when leaving schematics
+      if (this._sceneZoom) {
+        this._sceneZoom.destroy();
+        this._sceneZoom = null;
+      }
+      if (this._sceneResizeObserver) {
+        this._sceneResizeObserver.disconnect();
+        this._sceneResizeObserver = null;
       }
     }
 
@@ -357,7 +373,7 @@ export class WYTerminalApp extends Application {
       }
 
       case 'crew':
-        return { ...base, crew: this._getCrewData(), activeTasks: this._getActiveTasksData(), isGM: game.user.isGM };
+        return { ...base, crew: this._getCrewData(), activeTasks: this._getActiveTasksData(), isGM: game.user.isGM, availableShips: getAvailableProfiles() };
 
       case 'systems':
         return { ...base, systems: this._getSystemsDetailData(), isGM: game.user.isGM };
@@ -398,7 +414,16 @@ export class WYTerminalApp extends Application {
       case 'science':
         return { ...base, ...this._getScienceData() };
 
-      case 'settings':
+      case 'settings': {
+        // Build ship access list for GM controls
+        const enabledShips = game.settings.get('wy-terminal', 'enabledShips') || [];
+        const shipAccessList = Object.values(SHIP_PROFILES).map(p => ({
+          id: p.id,
+          name: p.name,
+          shipClass: p.shipClass,
+          enabled: enabledShips.length === 0 || enabledShips.includes(p.id),
+        }));
+
         return {
           ...base,
           muthurUrl: game.settings.get('wy-terminal', 'muthurUrl'),
@@ -412,10 +437,12 @@ export class WYTerminalApp extends Application {
           availablePlugins: MuthurEngine.getAvailablePlugins(),
           activeShip: game.settings.get('wy-terminal', 'activeShip'),
           availableShips: getAvailableProfiles(),
+          shipAccessList,
           navData: this._getNavSettingsData(),
           activeClearance: this._getActiveClearance(),
           isGM: game.user.isGM,
         };
+      }
 
       default:
         return base;
@@ -465,12 +492,164 @@ export class WYTerminalApp extends Application {
 
   /* ── Crew data ── */
   _getCrewData() {
-    const crew = this._loadSetting('crewRoster');
-    if (crew.length) return crew;
+    // Pull live actor data from FoundryVTT actors collection
+    const actors = game.actors?.filter(a =>
+      (a.type === 'character' || a.type === 'synthetic') && !a.system?.header?.npc
+    ) || [];
 
-    // Use defaults from active ship profile
-    const profile = this._getShipProfile();
-    return [...profile.defaultCrew];
+    // Load GM overrides (status, location) keyed by actor name
+    const overrides = this._loadSetting('crewRoster');
+    const overrideMap = {};
+    for (const o of overrides) {
+      if (o.name) overrideMap[o.name.toUpperCase()] = o;
+    }
+
+    // Career ID → label mapping for AlienRPG
+    const CAREERS = {
+      '0': 'COLONIAL MARSHAL', '1': 'COMPANY AGENT', '2': 'KID',
+      '3': 'MEDIC', '4': 'OFFICER', '5': 'PILOT',
+      '6': 'ROUGHNECK', '7': 'SCIENTIST', '8': 'MARINE',
+      '9': 'FREELANCER', '10': 'OPERATIVE', '11': 'SYNTHETIC',
+    };
+
+    const crew = actors.map(actor => {
+      const sys = actor.system || {};
+      const header = sys.header || {};
+      const attrs = sys.attributes || {};
+      const skills = sys.skills || {};
+      const gen = sys.general || {};
+
+      // GM override for this actor (status & location)
+      const over = overrideMap[(actor.name || '').toUpperCase()] || {};
+
+      // Determine status and class
+      const status = over.status || 'ACTIVE';
+      const statusClass = this._crewStatusToClass(status);
+      const statusTextClass = statusClass === 'online' ? 'wy-text-green' :
+        statusClass === 'warning' ? 'wy-text-amber' : 'wy-text-red';
+
+      // Career/role
+      const careerKey = gen.career?.value ?? '';
+      const role = over.role || CAREERS[careerKey] || careerKey || 'UNASSIGNED';
+
+      // Health & stress
+      const health = header.health || {};
+      const stress = header.stress || {};
+
+      // Conditions
+      const conditions = [];
+      if (gen.starving) conditions.push('STARVING');
+      if (gen.dehydrated) conditions.push('DEHYDRATED');
+      if (gen.exhausted) conditions.push('EXHAUSTED');
+      if (gen.freezing) conditions.push('FREEZING');
+      if (gen.hypoxia) conditions.push('HYPOXIA');
+      if (gen.gravitydyspraxia) conditions.push('G-DYSPRAXIA');
+      if (gen.critInj?.value > 0) conditions.push(`CRIT INJ x${gen.critInj.value}`);
+
+      // Panic conditions (including overwatch/fatigued)
+      const panicFlags = ['overwatch','fatigued','jumpy','tunnelvision','aggravated','shakes','frantic',
+        'deflated','paranoid','hesitant','freeze','seekcover','scream','flee','frenzy','catatonic'];
+      for (const pf of panicFlags) {
+        if (gen[pf]) conditions.push(pf.toUpperCase());
+      }
+
+      // Ship assignment: flag on actor → GM override → folder-name fallback
+      const flagShip = actor.getFlag?.('wy-terminal', 'shipAssignment') || '';
+      const shipAssignment = (flagShip || over.shipAssignment || this._inferShipFromFolder(actor) || '').toLowerCase();
+
+      return {
+        actorId: actor.id,
+        name: (actor.name || 'UNKNOWN').toUpperCase(),
+        role: role.toUpperCase(),
+        location: (over.location || 'UNKNOWN').toUpperCase(),
+        status,
+        statusClass,
+        statusTextClass,
+        shipAssignment,
+        img: actor.img || null,
+        // Actor sheet data
+        health: { value: health.value ?? 0, max: health.max ?? 0 },
+        stress: { value: stress.value ?? 0, max: stress.max ?? 10 },
+        radiation: { value: gen.radiation?.value ?? 0, max: gen.radiation?.max ?? 10 },
+        attributes: {
+          str: attrs.str?.value ?? 0,
+          agl: attrs.agl?.value ?? 0,
+          wit: attrs.wit?.value ?? 0,
+          emp: attrs.emp?.value ?? 0,
+        },
+        skills: {
+          heavyMach:    skills.heavyMach?.value ?? 0,
+          closeCbt:     skills.closeCbt?.value ?? 0,
+          stamina:      skills.stamina?.value ?? 0,
+          rangedCbt:    skills.rangedCbt?.value ?? 0,
+          mobility:     skills.mobility?.value ?? 0,
+          piloting:     skills.piloting?.value ?? 0,
+          command:      skills.command?.value ?? 0,
+          manipulation: skills.manipulation?.value ?? 0,
+          medicalAid:   skills.medicalAid?.value ?? 0,
+          observation:  skills.observation?.value ?? 0,
+          survival:     skills.survival?.value ?? 0,
+          comtech:      skills.comtech?.value ?? 0,
+        },
+        conditions,
+        armor: gen.armor?.value ?? 0,
+        appearance: gen.appearance?.value || '',
+        agenda: gen.agenda?.value || '',
+        buddy: gen.relOne?.value || '',
+        rival: gen.relTwo?.value || '',
+        sigItem: gen.sigItem?.value || '',
+        bio: over.bio || '',
+        notes: sys.notes || over.notes || '',
+        specialization: over.specialization || '',
+        isSynthetic: actor.type === 'synthetic',
+      };
+    });
+
+    // If no actors matched, fall back to the ship profile defaults
+    if (crew.length === 0) {
+      const profile = this._getShipProfile();
+      return [...profile.defaultCrew];
+    }
+
+    // Filter crew by active ship assignment
+    const activeShipId = (game.settings.get('wy-terminal', 'activeShip') || 'montero').toLowerCase();
+    const filtered = crew.filter(c =>
+      !c.shipAssignment || c.shipAssignment === activeShipId
+    );
+
+    return filtered;
+  }
+
+  /**
+   * Infer ship assignment from the actor's folder name.
+   * Checks the actor's folder (and parent folder) names against ship profile IDs and names.
+   * e.g. a folder named "Montero Crew" or "USCSS MONTERO" → 'montero'
+   * @param {Actor} actor
+   * @returns {string} ship profile id or ''
+   */
+  _inferShipFromFolder(actor) {
+    if (!actor.folder) return '';
+    const folderName = (actor.folder.name || '').toUpperCase();
+    // Check against each ship profile
+    for (const [id, profile] of Object.entries(SHIP_PROFILES)) {
+      const shipName = (profile.name || '').toUpperCase();
+      const shipId = id.toUpperCase();
+      if (folderName.includes(shipId) || folderName.includes(shipName)) {
+        return id;
+      }
+    }
+    // Check parent folder too
+    if (actor.folder.folder) {
+      const parentName = (actor.folder.folder.name || '').toUpperCase();
+      for (const [id, profile] of Object.entries(SHIP_PROFILES)) {
+        const shipName = (profile.name || '').toUpperCase();
+        const shipId = id.toUpperCase();
+        if (parentName.includes(shipId) || parentName.includes(shipName)) {
+          return id;
+        }
+      }
+    }
+    return '';
   }
 
   _getActiveTasksData() {
@@ -533,11 +712,13 @@ export class WYTerminalApp extends Application {
 
   /* ── Scenes data ── */
   _getScenesData() {
-    const scenes = game.scenes?.contents?.map(s => ({
+    const allScenes = game.scenes?.contents ?? [];
+
+    const scenes = allScenes.map(s => ({
       id: s.id,
       name: s.name.toUpperCase(),
       active: s.id === this.activeSceneId,
-    })) ?? [];
+    }));
 
     let activeSceneImg = null;
     let activeSceneName = null;
@@ -554,23 +735,99 @@ export class WYTerminalApp extends Application {
       }
     }
 
-    return { scenes, activeSceneImg, activeSceneName, tokens };
+    // ── Ship selection data (for player ship/deck chooser) ──
+    const isGM = game.user.isGM;
+    const showShipSelect = !isGM && !this.activeSceneId;
+
+    let ships = [];
+    if (showShipSelect) {
+      ships = this._getShipSelectData(allScenes);
+    }
+
+    return { scenes, activeSceneImg, activeSceneName, tokens, isGM, showShipSelect, ships };
+  }
+
+  /**
+   * Build the ship selection cards data by matching Foundry scenes to ship profiles.
+   * Each ship gets its image, name, registry, and a list of available decks.
+   * Respects the GM-configured enabledShips setting — only ships the GM has
+   * enabled will appear for players.
+   */
+  _getShipSelectData(allScenes) {
+    const ships = [];
+    const enabledShips = game.settings.get('wy-terminal', 'enabledShips') || [];
+
+    for (const [profileId, profile] of Object.entries(SHIP_PROFILES)) {
+      // Filter by GM-enabled ships (empty list = all visible)
+      if (enabledShips.length > 0 && !enabledShips.includes(profileId)) continue;
+      // Match scenes whose name contains the ship identifier (case-insensitive)
+      const shipKey = profileId.toLowerCase();                 // e.g. "montero", "cronus"
+      const matched = allScenes.filter(s =>
+        s.name.toLowerCase().includes(shipKey)
+      );
+
+      if (matched.length === 0) continue;
+
+      // Build deck list — extract the deck portion from the scene name
+      const decks = matched.map(s => {
+        const rawName = s.name.toUpperCase();
+        // Strip the ship name prefix to get the deck label
+        const prefix = profile.name.split(' ').pop().toUpperCase(); // e.g. "MONTERO", "CRONUS"
+        let deckName = rawName.replace(prefix, '').trim();
+        if (!deckName) deckName = rawName;  // Single-deck ships keep full name
+        return {
+          sceneId: s.id,
+          deckName: deckName,
+        };
+      }).sort((a, b) => a.deckName.localeCompare(b.deckName));
+
+      ships.push({
+        id: profile.id,
+        name: profile.name,
+        shipClass: profile.shipClass,
+        registry: profile.registry,
+        image: `modules/wy-terminal/images/${profileId.toUpperCase()}.png`,
+        decks,
+      });
+    }
+
+    return ships;
   }
 
   /**
    * Extract token positions/data from a Foundry scene for terminal overlay.
-   * Token positions are converted to percentages relative to scene dimensions.
+   * Token positions are converted to percentages relative to the background image area.
+   * Uses scene.dimensions (grid-snap-aware) for accurate padding offset, with
+   * manual fallback for clients where dimensions may be unavailable.
    */
   _getSceneTokens(scene) {
     if (!scene?.tokens?.contents) return [];
 
-    const sceneWidth = scene.width || 1;
-    const sceneHeight = scene.height || 1;
+    // Use scene.dimensions for accurate scene-origin offset (accounts for
+    // grid-snap rounding of the padding). Falls back to manual calculation.
+    let padX = 0, padY = 0, imgW, imgH;
+    try {
+      const dims = scene.dimensions;
+      if (dims?.sceneWidth > 0 && dims?.sceneHeight > 0) {
+        padX = dims.sceneX || 0;
+        padY = dims.sceneY || 0;
+        imgW = dims.sceneWidth;
+        imgH = dims.sceneHeight;
+      }
+    } catch { /* dimensions unavailable on this client */ }
+
+    if (!imgW || !imgH) {
+      imgW = scene.width || 1;
+      imgH = scene.height || 1;
+      const padding = scene.padding ?? 0;
+      padX = imgW * padding;
+      padY = imgH * padding;
+    }
 
     return scene.tokens.contents.map(t => {
-      // Convert pixel position to percentage of scene dimensions
-      const xPct = ((t.x || 0) / sceneWidth) * 100;
-      const yPct = ((t.y || 0) / sceneHeight) * 100;
+      // Convert from canvas pixel coordinates to image-relative percentages
+      const xPct = (((t.x || 0) - padX) / imgW) * 100;
+      const yPct = (((t.y || 0) - padY) / imgH) * 100;
 
       // Determine disposition class
       let disposition = 'neutral';
@@ -601,6 +858,103 @@ export class WYTerminalApp extends Application {
         hidden: t.hidden || false,
       };
     }).filter(t => !t.hidden); // Don't show hidden tokens to players
+  }
+
+  /**
+   * Schedule a debounced token position update.
+   * Coalesces multiple rapid calls (from hook + socket retries) into a single DOM update.
+   * If precomputed token data is provided (from the GM socket payload), it is used directly
+   * instead of reading from local scene documents (which may have stale data on remote clients).
+   * @param {Array|null} payloadTokens - Pre-computed token array from socket, or null to read locally.
+   */
+  scheduleTokenUpdate(payloadTokens = null) {
+    // If we receive authoritative data from the GM, prefer it over local reads
+    if (payloadTokens) this._pendingTokenPayload = payloadTokens;
+    clearTimeout(this._tokenUpdateDebounce);
+    this._tokenUpdateDebounce = setTimeout(() => {
+      const tokens = this._pendingTokenPayload;
+      this._pendingTokenPayload = null;
+      if (tokens) {
+        this._applyTokenPositions(tokens);
+      } else {
+        this._updateTokensFromScene();
+      }
+    }, 80);
+  }
+
+  /**
+   * Apply pre-computed token positions to the DOM.
+   * Used when the GM sends authoritative positions via socket so the player
+   * doesn't need to read from potentially-stale local scene documents.
+   * @param {Array} freshTokens - Token data array with id, x, y, etc.
+   */
+  _applyTokenPositions(freshTokens) {
+    if (this.activeView !== 'scenes' || !this.activeSceneId) return;
+
+    const el = this.element?.[0] ?? this.element;
+    const tokenLayer = el?.querySelector('#wy-token-layer');
+    const img = el?.querySelector('#wy-scene-img');
+    if (!tokenLayer) return;
+
+    const existingEls = tokenLayer.querySelectorAll('.wy-token');
+    const existingIds = new Set();
+    existingEls.forEach(te => existingIds.add(te.dataset.tokenId));
+    const freshIds = new Set(freshTokens.map(t => t.id));
+
+    // Token set changed (add/remove) — need full re-render
+    if (existingIds.size !== freshIds.size ||
+        [...existingIds].some(id => !freshIds.has(id)) ||
+        [...freshIds].some(id => !existingIds.has(id))) {
+      console.log('WY-Terminal | Token set changed — scheduling full re-render');
+      if (this._sceneZoom) {
+        this._savedZoomState = {
+          scale: this._sceneZoom.scale,
+          panX: this._sceneZoom.panX,
+          panY: this._sceneZoom.panY,
+        };
+      }
+      // Delay re-render briefly to let local doc sync catch up
+      setTimeout(() => {
+        if (this.rendered && this.activeView === 'scenes') {
+          this._renderView('scenes');
+        }
+      }, 300);
+      return;
+    }
+
+    // Update positions in-place
+    freshTokens.forEach(t => {
+      const tokenEl = tokenLayer.querySelector(`[data-token-id="${t.id}"]`);
+      if (tokenEl) {
+        tokenEl.style.left = `${t.x}%`;
+        tokenEl.style.top = `${t.y}%`;
+      }
+    });
+
+    if (img) this._fitTokenLayer(img, tokenLayer);
+  }
+
+  /**
+   * Read token positions from local scene documents and update the DOM.
+   * Used as fallback when no socket payload is available (e.g. GM's own terminal).
+   * Preserves zoom/pan state. Falls back to full re-render if token set changed.
+   */
+  _updateTokensFromScene() {
+    if (this.activeView !== 'scenes' || !this.activeSceneId) return;
+
+    const scene = game.scenes?.get(this.activeSceneId);
+    if (!scene) return;
+
+    const freshTokens = this._getSceneTokens(scene);
+    this._applyTokenPositions(freshTokens);
+  }
+
+  /**
+   * Legacy wrapper — immediate update from local scene data.
+   * Prefer scheduleTokenUpdate() for debounced updates.
+   */
+  updateTokensInPlace() {
+    this._updateTokensFromScene();
   }
 
   /* ── Maps data ── */
@@ -1501,22 +1855,346 @@ export class WYTerminalApp extends Application {
 
   /* ── Scene View Setup ── */
   _setupScenesView(contentEl) {
-    contentEl.querySelectorAll('[data-scene-id]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const sceneId = e.currentTarget.dataset.sceneId;
+
+    // ── Ship Selection Page (deck dropdown + ship cards) ──
+    const shipSelectEl = contentEl.querySelector('#wy-ship-select');
+    if (shipSelectEl) {
+      shipSelectEl.querySelectorAll('.wy-deck-select').forEach(sel => {
+        sel.addEventListener('change', (e) => {
+          const sceneId = e.target.value;
+          if (!sceneId) return;
+          TerminalSFX.play('beep');
+          this.activeSceneId = sceneId;
+          this._renderView('scenes');
+        });
+      });
+      return; // Ship select page has no zoom / tokens / scene buttons
+    }
+
+    // ── Back button (player returning to ship selection) ──
+    const backBtn = contentEl.querySelector('#wy-scene-back');
+    if (backBtn) {
+      backBtn.addEventListener('click', () => {
+        TerminalSFX.play('beep');
+        this.activeSceneId = null;
+        this._renderView('scenes');
+      });
+    }
+
+    // ── Deck/scene dropdown selector ──
+    const dropdown = contentEl.querySelector('#wy-scene-dropdown');
+    if (dropdown) {
+      dropdown.addEventListener('change', (e) => {
+        const sceneId = e.target.value;
+        if (!sceneId) return;
+        TerminalSFX.play('beep');
         this.activeSceneId = sceneId;
         this._renderView('scenes');
       });
-    });
-
-    // Setup pinch-zoom on scene canvas
-    const canvas = contentEl.querySelector('#wy-scene-canvas');
-    const img = contentEl.querySelector('#wy-scene-img');
-    if (canvas && img) {
-      const sceneZoom = new PinchZoomHandler(canvas, img);
-      // Store for cleanup
-      this._sceneZoom = sceneZoom;
     }
+
+    // ── Push scene to players button (GM only) ──
+    const pushBtn = contentEl.querySelector('#wy-scene-push');
+    if (pushBtn) {
+      pushBtn.addEventListener('click', () => {
+        if (!this.activeSceneId) {
+          ui.notifications.warn('Select a deck/scene first before pushing to players.');
+          return;
+        }
+        TerminalSFX.play('beep');
+        // Force all player terminals to switch to this scene
+        this._broadcastSocket('sceneChange', { sceneId: this.activeSceneId });
+        const scene = game.scenes?.get(this.activeSceneId);
+        const name = scene?.name || this.activeSceneId;
+        ui.notifications.info(`Pushed "${name}" to all Player-Terminals.`);
+        console.log(`WY-Terminal | GM pushed scene ${name} to all player terminals`);
+      });
+    }
+
+    // ── Sync tokens button (GM only) ──
+    const refreshBtn = contentEl.querySelector('#wy-scene-refresh');
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', () => {
+        TerminalSFX.play('beep');
+        // Re-render own scenes view to pick up latest tokens
+        this._renderView('scenes');
+        // Tell all player terminals to refresh their scenes view too
+        this._broadcastSocket('refreshView', { view: 'scenes' });
+        console.log('WY-Terminal | GM forced token sync on all terminals');
+      });
+    }
+
+    // Clean up previous scene zoom handler (e.g. from token-update re-render)
+    if (this._sceneZoom) {
+      this._sceneZoom.destroy();
+      this._sceneZoom = null;
+    }
+    if (this._sceneResizeObserver) {
+      this._sceneResizeObserver.disconnect();
+      this._sceneResizeObserver = null;
+    }
+
+    // Setup pinch-zoom on scene canvas — target the VIEWPORT so image + tokens zoom together
+    const canvas = contentEl.querySelector('#wy-scene-canvas');
+    const viewport = contentEl.querySelector('#wy-scene-viewport');
+    const img = contentEl.querySelector('#wy-scene-img');
+    const tokenLayer = contentEl.querySelector('#wy-token-layer');
+
+    if (canvas && viewport && img) {
+      const sceneZoom = new PinchZoomHandler(canvas, viewport);
+      this._sceneZoom = sceneZoom;
+
+      // Restore zoom state if we saved it before a re-render (e.g. token add/remove)
+      if (this._savedZoomState) {
+        sceneZoom.scale = this._savedZoomState.scale;
+        sceneZoom.panX = this._savedZoomState.panX;
+        sceneZoom.panY = this._savedZoomState.panY;
+        sceneZoom._applyTransform();
+        this._savedZoomState = null;
+      }
+
+      // Fit the token layer to the actual rendered image area (accounting for object-fit: contain)
+      const fitTokens = () => this._fitTokenLayer(img, tokenLayer);
+
+      if (img.complete && img.naturalWidth > 0) {
+        fitTokens();
+      } else {
+        img.addEventListener('load', fitTokens);
+      }
+
+      // Refit token layer on container resize (viewport letterboxing changes)
+      this._sceneResizeObserver = new ResizeObserver(fitTokens);
+      this._sceneResizeObserver.observe(canvas);
+    }
+
+    // Setup token drag-to-move on the schematic
+    this._setupTokenDrag(contentEl);
+  }
+
+  /* ── Token Drag-to-Move ── */
+
+  /**
+   * Set up mouse and touch drag handlers on tokens so users can reposition
+   * them directly on the schematic. Coordinates are converted back to
+   * Foundry scene pixel space and the token document is updated, which
+   * syncs the move to all clients (including the FoundryVTT canvas).
+   */
+  _setupTokenDrag(contentEl) {
+    const tokenLayer = contentEl.querySelector('#wy-token-layer');
+    if (!tokenLayer) return;
+
+    const tokenEls = tokenLayer.querySelectorAll('.wy-token');
+    tokenEls.forEach(tokenEl => {
+      const tokenId = tokenEl.dataset.tokenId;
+      if (!tokenId) return;
+
+      // Check if this user is allowed to move this token
+      if (!this._canMoveToken(tokenId)) {
+        tokenEl.classList.add('wy-drag-disabled');
+        return;
+      }
+
+      // --- Mouse drag ---
+      tokenEl.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        e.stopPropagation(); // Prevent PinchZoomHandler pan
+        this._startTokenDrag(tokenEl, tokenId, e.clientX, e.clientY);
+      });
+
+      // --- Touch drag ---
+      tokenEl.addEventListener('touchstart', (e) => {
+        if (e.touches.length !== 1) return;
+        e.stopPropagation(); // Prevent PinchZoomHandler pan
+        const touch = e.touches[0];
+        this._startTokenDrag(tokenEl, tokenId, touch.clientX, touch.clientY);
+      }, { passive: true });
+    });
+  }
+
+  /**
+   * Check whether the current user is allowed to move a given token.
+   * GM can move any token; players can move tokens they own.
+   */
+  _canMoveToken(tokenId) {
+    if (game.user.isGM) return true;
+    const scene = game.scenes?.get(this.activeSceneId);
+    if (!scene) return false;
+    const tokenDoc = scene.tokens?.get(tokenId);
+    if (!tokenDoc) return false;
+    // Player owns the token's actor, or the token itself
+    return tokenDoc.isOwner;
+  }
+
+  /**
+   * Begin dragging a token. Attaches move/end listeners to the window
+   * so dragging works even when the cursor leaves the token element.
+   */
+  _startTokenDrag(tokenEl, tokenId, startClientX, startClientY) {
+    // Suppress PinchZoomHandler panning while dragging
+    if (this._sceneZoom) this._sceneZoom.enabled = false;
+
+    tokenEl.classList.add('wy-dragging');
+    const tokenLayer = tokenEl.closest('#wy-token-layer');
+    if (!tokenLayer) return;
+
+    // Current position as percentage
+    let currentPctX = parseFloat(tokenEl.style.left);
+    let currentPctY = parseFloat(tokenEl.style.top);
+    const layerW = tokenLayer.offsetWidth;
+    const layerH = tokenLayer.offsetHeight;
+
+    // Account for current zoom scale so pixel deltas map correctly
+    const scale = this._sceneZoom?.scale || 1;
+
+    let lastClientX = startClientX;
+    let lastClientY = startClientY;
+
+    const onMove = (clientX, clientY) => {
+      const dx = (clientX - lastClientX) / scale;
+      const dy = (clientY - lastClientY) / scale;
+      lastClientX = clientX;
+      lastClientY = clientY;
+
+      // Convert pixel delta to percentage delta relative to token layer
+      currentPctX += (dx / layerW) * 100;
+      currentPctY += (dy / layerH) * 100;
+
+      tokenEl.style.left = `${currentPctX}%`;
+      tokenEl.style.top = `${currentPctY}%`;
+    };
+
+    const onMouseMove = (e) => onMove(e.clientX, e.clientY);
+    const onTouchMove = (e) => {
+      if (e.touches.length === 1) {
+        e.preventDefault(); // Prevent scroll
+        onMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    };
+
+    const onEnd = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onEnd);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onEnd);
+      window.removeEventListener('touchcancel', onEnd);
+
+      tokenEl.classList.remove('wy-dragging');
+
+      // Re-enable PinchZoomHandler panning
+      if (this._sceneZoom) this._sceneZoom.enabled = true;
+
+      // Convert final percentage position back to Foundry scene pixel coords and update
+      this._commitTokenMove(tokenId, currentPctX, currentPctY);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onEnd);
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', onEnd);
+    window.addEventListener('touchcancel', onEnd);
+  }
+
+  /**
+   * Convert a percentage position on the token layer back to Foundry scene
+   * pixel coordinates and update the token document. The update propagates
+   * to all clients via Foundry's normal document sync + our refreshTokens hook.
+   */
+  async _commitTokenMove(tokenId, pctX, pctY) {
+    const scene = game.scenes?.get(this.activeSceneId);
+    if (!scene) return;
+
+    // Determine scene-image dimensions and padding offset (same logic as _getSceneTokens)
+    let padX = 0, padY = 0, imgW, imgH;
+    try {
+      const dims = scene.dimensions;
+      if (dims?.sceneWidth > 0 && dims?.sceneHeight > 0) {
+        padX = dims.sceneX || 0;
+        padY = dims.sceneY || 0;
+        imgW = dims.sceneWidth;
+        imgH = dims.sceneHeight;
+      }
+    } catch { /* dimensions unavailable */ }
+
+    if (!imgW || !imgH) {
+      imgW = scene.width || 1;
+      imgH = scene.height || 1;
+      const padding = scene.padding ?? 0;
+      padX = imgW * padding;
+      padY = imgH * padding;
+    }
+
+    // Reverse the percentage conversion:  pct = ((px - pad) / imgDim) * 100
+    //   =>  px = (pct / 100) * imgDim + pad
+    const newX = (pctX / 100) * imgW + padX;
+    const newY = (pctY / 100) * imgH + padY;
+
+    const tokenDoc = scene.tokens?.get(tokenId);
+    if (!tokenDoc) return;
+
+    try {
+      // GM can update directly; player updates go through normal Foundry permissions
+      await tokenDoc.update({ x: Math.round(newX), y: Math.round(newY) });
+      console.log(`WY-Terminal | Token ${tokenId} moved to (${Math.round(newX)}, ${Math.round(newY)})`);
+    } catch (err) {
+      // If direct update fails (permission denied), ask GM to move it via socket
+      if (!game.user.isGM) {
+        console.log('WY-Terminal | Direct update denied, requesting GM to move token');
+        game.socket.emit('module.wy-terminal', {
+          type: 'moveToken',
+          payload: {
+            sceneId: this.activeSceneId,
+            tokenId,
+            x: Math.round(newX),
+            y: Math.round(newY),
+          },
+        });
+      } else {
+        console.error('WY-Terminal | Failed to move token:', err);
+        ui.notifications?.warn('UNABLE TO RELOCATE CREW MEMBER.');
+      }
+      // Revert to server position until the update round-trips back
+      this.scheduleTokenUpdate(null);
+    }
+  }
+
+  /**
+   * Position and size the token overlay layer to exactly match the rendered image area
+   * within the viewport. Accounts for object-fit: contain letterboxing so that
+   * percentage-based token coordinates line up with the actual image pixels.
+   */
+  _fitTokenLayer(img, tokenLayer) {
+    if (!img || !tokenLayer) return;
+    const natW = img.naturalWidth;
+    const natH = img.naturalHeight;
+    if (!natW || !natH) return;
+
+    const boxW = img.clientWidth;
+    const boxH = img.clientHeight;
+    if (!boxW || !boxH) return;
+
+    const imgAspect = natW / natH;
+    const boxAspect = boxW / boxH;
+
+    let renderW, renderH, offsetX, offsetY;
+    if (imgAspect > boxAspect) {
+      // Image wider than box — full width, letterboxed vertically
+      renderW = boxW;
+      renderH = boxW / imgAspect;
+      offsetX = 0;
+      offsetY = (boxH - renderH) / 2;
+    } else {
+      // Image taller than box — full height, letterboxed horizontally
+      renderH = boxH;
+      renderW = boxH * imgAspect;
+      offsetX = (boxW - renderW) / 2;
+      offsetY = 0;
+    }
+
+    tokenLayer.style.left = `${offsetX}px`;
+    tokenLayer.style.top = `${offsetY}px`;
+    tokenLayer.style.width = `${renderW}px`;
+    tokenLayer.style.height = `${renderH}px`;
   }
 
   /* ── Maps View Setup ── */
@@ -1675,37 +2353,53 @@ export class WYTerminalApp extends Application {
     // GM: Save crew member edits (status & location)
     contentEl.querySelector('[data-action="save-crew-edit"]')?.addEventListener('click', async () => {
       if (!game.user.isGM || pendingCrewIndex == null) return;
+      const member = this._currentCrew[pendingCrewIndex];
+      if (!member) return;
 
       const newStatus = contentEl.querySelector('#wy-crew-edit-status')?.value || 'ACTIVE';
       const newLocation = contentEl.querySelector('#wy-crew-edit-location')?.value?.trim().toUpperCase() || 'UNKNOWN';
+      const newShip = contentEl.querySelector('#wy-crew-edit-ship')?.value || '';
 
-      // Load current roster (or copy defaults)
-      let crew = this._loadSetting('crewRoster');
-      if (!crew.length) {
-        const profile = this._getShipProfile();
-        crew = [...profile.defaultCrew];
+      // Write ship assignment directly to the actor flag (source of truth)
+      if (member.actorId) {
+        const actor = game.actors.get(member.actorId);
+        if (actor) {
+          if (newShip) {
+            await actor.setFlag('wy-terminal', 'shipAssignment', newShip);
+          } else {
+            await actor.unsetFlag('wy-terminal', 'shipAssignment');
+          }
+        }
       }
 
-      if (!crew[pendingCrewIndex]) return;
+      // Load overrides array, find or create entry for this crew member by name
+      let overrides = this._loadSetting('crewRoster');
+      const nameKey = (member.name || '').toUpperCase();
+      let idx = overrides.findIndex(o => (o.name || '').toUpperCase() === nameKey);
+      if (idx < 0) {
+        overrides.push({ name: nameKey });
+        idx = overrides.length - 1;
+      }
 
-      // Determine status class
       const statusClass = this._crewStatusToClass(newStatus);
       const statusTextClass = statusClass === 'online' ? 'wy-text-green' :
         statusClass === 'warning' ? 'wy-text-amber' : 'wy-text-red';
 
-      crew[pendingCrewIndex] = {
-        ...crew[pendingCrewIndex],
+      overrides[idx] = {
+        ...overrides[idx],
+        name: nameKey,
         status: newStatus,
         location: newLocation,
+        shipAssignment: newShip,
         statusClass,
         statusTextClass,
       };
 
-      await game.settings.set('wy-terminal', 'crewRoster', crew);
-      ui.notifications.info(`WY-Terminal: ${crew[pendingCrewIndex].name} updated — ${newStatus} / ${newLocation}`);
+      await game.settings.set('wy-terminal', 'crewRoster', overrides);
+      ui.notifications.info(`WY-Terminal: ${nameKey} updated — ${newStatus} / ${newLocation}`);
 
       // Refresh
-      this._currentCrew = crew;
+      this._currentCrew = this._getCrewData();
       this._broadcastSocket('refreshView', { view: 'crew' });
       this._showCrewDetail(contentEl, pendingCrewIndex);
     });
@@ -1718,7 +2412,7 @@ export class WYTerminalApp extends Application {
     const listView = contentEl.querySelector('#wy-crew-list-view');
     const detailView = contentEl.querySelector('#wy-crew-detail-view');
 
-    // Populate detail
+    // Populate detail header
     const nameEl = contentEl.querySelector('#wy-crew-detail-name');
     const roleEl = contentEl.querySelector('#wy-crew-detail-role');
     const locationEl = contentEl.querySelector('#wy-crew-detail-location');
@@ -1727,16 +2421,27 @@ export class WYTerminalApp extends Application {
     const detailBody = contentEl.querySelector('#wy-crew-detail-body');
 
     if (nameEl) nameEl.textContent = crew.name || 'UNKNOWN';
-    if (roleEl) roleEl.textContent = crew.role || 'UNASSIGNED';
+    if (roleEl) roleEl.textContent = (crew.isSynthetic ? '[ SYNTHETIC ] ' : '') + (crew.role || 'UNASSIGNED');
     if (locationEl) locationEl.textContent = crew.location || 'UNKNOWN';
+
+    // Ship assignment display
+    const shipEl = contentEl.querySelector('#wy-crew-detail-ship');
+    if (shipEl) {
+      if (crew.shipAssignment) {
+        const profile = SHIP_PROFILES[crew.shipAssignment];
+        shipEl.textContent = profile ? profile.name : crew.shipAssignment.toUpperCase();
+      } else {
+        shipEl.textContent = 'UNASSIGNED';
+      }
+    }
     if (statusEl) {
       statusEl.textContent = crew.status || 'UNKNOWN';
       statusEl.className = `wy-crew-det-status-val ${crew.statusTextClass || ''}`;
     }
 
-    // Try to pull portrait from Foundry actor
+    // Portrait — use actor img directly if available
     if (portraitEl) {
-      const actorImg = this._getCrewPortrait(crew.name);
+      const actorImg = crew.img || this._getCrewPortrait(crew.name);
       if (actorImg && actorImg !== 'icons/svg/mystery-man.svg') {
         portraitEl.src = actorImg;
         portraitEl.style.display = 'block';
@@ -1745,12 +2450,86 @@ export class WYTerminalApp extends Application {
       }
     }
 
-    // Additional detail text
+    // ── Vitals (Health / Stress / Radiation) ──
+    const hasActorData = crew.health && crew.health.max > 0;
+
+    const vitalsEl = contentEl.querySelector('#wy-crew-vitals');
+    if (vitalsEl) vitalsEl.style.display = hasActorData ? '' : 'none';
+
+    if (hasActorData) {
+      this._renderVitalBar(contentEl, '#wy-crew-health-bar', '#wy-crew-health-val',
+        crew.health.value, crew.health.max, 'wy-bar-green');
+      this._renderVitalBar(contentEl, '#wy-crew-stress-bar', '#wy-crew-stress-val',
+        crew.stress.value, crew.stress.max, 'wy-bar-amber');
+      this._renderVitalBar(contentEl, '#wy-crew-rad-bar', '#wy-crew-rad-val',
+        crew.radiation.value, crew.radiation.max, 'wy-bar-red');
+    }
+
+    // ── Conditions (rendered as individual tags) ──
+    const condEl = contentEl.querySelector('#wy-crew-conditions');
+    const condList = contentEl.querySelector('#wy-crew-conditions-list');
+    if (condEl && condList) {
+      if (crew.conditions && crew.conditions.length > 0) {
+        condList.innerHTML = crew.conditions.map(c =>
+          `<span class="wy-cond-tag">${c}</span>`
+        ).join('');
+        condEl.style.display = '';
+      } else {
+        condEl.style.display = 'none';
+      }
+    }
+
+    // ── Attributes ──
+    const statsEl = contentEl.querySelector('#wy-crew-stats');
+    if (statsEl) statsEl.style.display = hasActorData ? '' : 'none';
+    if (hasActorData && crew.attributes) {
+      const set = (id, v) => { const el = contentEl.querySelector(id); if (el) el.textContent = v; };
+      set('#wy-crew-attr-str', crew.attributes.str);
+      set('#wy-crew-attr-agl', crew.attributes.agl);
+      set('#wy-crew-attr-wit', crew.attributes.wit);
+      set('#wy-crew-attr-emp', crew.attributes.emp);
+    }
+
+    // ── Skills ──
+    const skillsEl = contentEl.querySelector('#wy-crew-skills');
+    if (skillsEl) skillsEl.style.display = hasActorData ? '' : 'none';
+    if (hasActorData && crew.skills) {
+      const set = (id, v) => { const el = contentEl.querySelector(id); if (el) el.textContent = v; };
+      set('#wy-crew-sk-heavyMach', crew.skills.heavyMach);
+      set('#wy-crew-sk-closeCbt', crew.skills.closeCbt);
+      set('#wy-crew-sk-stamina', crew.skills.stamina);
+      set('#wy-crew-sk-rangedCbt', crew.skills.rangedCbt);
+      set('#wy-crew-sk-mobility', crew.skills.mobility);
+      set('#wy-crew-sk-piloting', crew.skills.piloting);
+      set('#wy-crew-sk-command', crew.skills.command);
+      set('#wy-crew-sk-manipulation', crew.skills.manipulation);
+      set('#wy-crew-sk-medicalAid', crew.skills.medicalAid);
+      set('#wy-crew-sk-observation', crew.skills.observation);
+      set('#wy-crew-sk-survival', crew.skills.survival);
+      set('#wy-crew-sk-comtech', crew.skills.comtech);
+    }
+
+    // ── Personnel file text (appearance, agenda, relationships, notes) ──
     if (detailBody) {
       const lines = [];
-      if (crew.bio) lines.push(crew.bio);
-      if (crew.notes) lines.push(`\nNOTES:\n${crew.notes}`);
+      if (crew.appearance) lines.push(`PROFILE:\n${crew.appearance}`);
+      if (crew.agenda) lines.push(`\nPERSONAL AGENDA:\n${crew.agenda}`);
+      if (crew.buddy) lines.push(`\nBUDDY: ${crew.buddy}`);
+      if (crew.rival) lines.push(`RIVAL: ${crew.rival}`);
+      if (crew.sigItem) lines.push(`\nSIGNATURE ITEM: ${crew.sigItem}`);
+      if (crew.armor > 0) lines.push(`ARMOR RATING: ${crew.armor}`);
       if (crew.specialization) lines.push(`SPECIALIZATION: ${crew.specialization}`);
+      if (crew.bio) lines.push(`\n${crew.bio}`);
+      // Notes — strip HTML tags if present (actor notes can contain HTML)
+      if (crew.notes) {
+        let notesText = crew.notes;
+        if (notesText.includes('<')) {
+          const tmp = document.createElement('div');
+          tmp.innerHTML = notesText;
+          notesText = tmp.textContent || tmp.innerText || '';
+        }
+        if (notesText.trim()) lines.push(`\nNOTES:\n${notesText.trim()}`);
+      }
       detailBody.textContent = lines.join('\n') || 'NO ADDITIONAL PERSONNEL DATA ON FILE.';
     }
 
@@ -1758,15 +2537,32 @@ export class WYTerminalApp extends Application {
     if (game.user.isGM) {
       const editStatus = contentEl.querySelector('#wy-crew-edit-status');
       const editLocation = contentEl.querySelector('#wy-crew-edit-location');
+      const editShip = contentEl.querySelector('#wy-crew-edit-ship');
       if (editStatus) editStatus.value = crew.status || 'ACTIVE';
       if (editLocation) {
         this._populateLocationDropdown(editLocation);
         editLocation.value = crew.location || 'UNKNOWN';
       }
+      if (editShip) {
+        editShip.value = crew.shipAssignment || '';
+      }
     }
 
     listView?.classList.add('wy-hidden');
     detailView?.classList.remove('wy-hidden');
+  }
+
+  /**
+   * Render a vital bar (health/stress/radiation).
+   */
+  _renderVitalBar(contentEl, barSelector, valSelector, current, max, colorClass) {
+    const barEl = contentEl.querySelector(barSelector);
+    const valEl = contentEl.querySelector(valSelector);
+    if (valEl) valEl.textContent = `${current} / ${max}`;
+    if (barEl) {
+      const pct = max > 0 ? Math.round((current / max) * 100) : 0;
+      barEl.innerHTML = `<span class="wy-bar-fill ${colorClass}" style="width: ${pct}%"></span>`;
+    }
   }
 
   _getCrewPortrait(crewName) {
@@ -3172,6 +3968,19 @@ export class WYTerminalApp extends Application {
       ui.notifications.info('WY-Terminal: Navigation data saved.');
       // Broadcast refresh so player terminals update
       this._broadcastSocket('refreshView', { view: 'nav' });
+    });
+
+    // Save ship access controls (which ships players can see)
+    contentEl.querySelector('[data-action="save-ship-access"]')?.addEventListener('click', async () => {
+      const checkboxes = contentEl.querySelectorAll('[data-ship-access]');
+      const enabled = [];
+      checkboxes.forEach(cb => {
+        if (cb.checked) enabled.push(cb.dataset.shipAccess);
+      });
+      await game.settings.set('wy-terminal', 'enabledShips', enabled);
+      ui.notifications.info(`WY-Terminal: Player ship access updated. ${enabled.length} ship(s) enabled.`);
+      // Broadcast to players so their schematic selector updates immediately
+      this._broadcastSocket('refreshView', { view: 'scenes' });
     });
   }
 

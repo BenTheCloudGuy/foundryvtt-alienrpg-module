@@ -1,14 +1,57 @@
 <div class="wy-view-scene">
-  <div class="wy-scene-select" id="wy-scene-select">
-    {{#each scenes}}
-    <button class="wy-scene-btn {{#if this.active}}active{{/if}}" data-scene-id="{{this.id}}">
-      {{this.name}}
-    </button>
-    {{/each}}
-    {{#unless scenes}}
-    <span class="wy-text-dim" style="padding: 4px; letter-spacing: 2px;">NO SCENES AVAILABLE</span>
+
+  {{!-- ── Ship & Deck Selection (Player only, no scene active) ── --}}
+  {{#if showShipSelect}}
+  <div class="wy-ship-select" id="wy-ship-select">
+    <div class="wy-ship-select-header">SHIP SCHEMATIC ACCESS</div>
+    <div class="wy-ship-cards">
+      {{#each ships}}
+      <div class="wy-ship-card" data-ship-id="{{this.id}}">
+        <div class="wy-ship-info">
+          <div class="wy-ship-name">{{this.name}}</div>
+          <div class="wy-ship-class">{{this.shipClass}}</div>
+          <div class="wy-ship-registry">{{this.registry}}</div>
+        </div>
+        <div class="wy-ship-img-wrap">
+          <img src="{{this.image}}" alt="{{this.name}}" class="wy-ship-img" />
+        </div>
+        <div class="wy-deck-selector">
+          <label class="wy-deck-label">SELECT DECK ▼</label>
+          <select class="wy-deck-select" data-ship-id="{{this.id}}">
+            <option value="">— DECK —</option>
+            {{#each this.decks}}
+            <option value="{{this.sceneId}}">{{this.deckName}}</option>
+            {{/each}}
+          </select>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+    {{#unless ships.length}}
+    <span class="wy-text-dim" style="padding: 12px; letter-spacing: 2px;">NO SHIP SCHEMATICS AVAILABLE</span>
     {{/unless}}
   </div>
+
+  {{else}}
+
+  {{!-- ── Scene toolbar: back button + deck dropdown (outside zoom area) ── --}}
+  <div class="wy-scene-toolbar" id="wy-scene-toolbar">
+    {{#unless isGM}}
+    <button class="wy-scene-back-btn" id="wy-scene-back">◄ SHIPS</button>
+    {{/unless}}
+    <select class="wy-scene-dropdown" id="wy-scene-dropdown">
+      <option value="">— SELECT DECK —</option>
+      {{#each scenes}}
+      <option value="{{this.id}}" {{#if this.active}}selected{{/if}}>{{this.name}}</option>
+      {{/each}}
+    </select>
+    {{#if isGM}}
+    <button class="wy-scene-push-btn" id="wy-scene-push" title="Force all Player-Terminals to this schematic">▶ PUSH TO PLAYERS</button>
+    <button class="wy-scene-refresh-btn" id="wy-scene-refresh" title="Refresh tokens on all terminals">⟳ SYNC TOKENS</button>
+    {{/if}}
+  </div>
+
+  {{!-- ── Scene canvas (zoom / scroll area) ── --}}
   <div class="wy-scene-canvas" id="wy-scene-canvas">
     {{#if activeSceneImg}}
     <div class="wy-scene-viewport" id="wy-scene-viewport">
@@ -17,6 +60,7 @@
       <div class="wy-token-layer" id="wy-token-layer">
         {{#each tokens}}
         <div class="wy-token {{this.disposition}}" 
+             data-token-id="{{this.id}}"
              style="left: {{this.x}}%; top: {{this.y}}%; width: {{this.size}}px; height: {{this.size}}px;"
              title="{{this.name}}">
           {{#if this.img}}
@@ -48,4 +92,6 @@
     </div>
     {{/if}}
   </div>
+
+  {{/if}}
 </div>

@@ -256,4 +256,13 @@ export function registerSettings() {
     type: Array,
     default: [],
   });
+
+  // Internal: which ships are enabled for the Player-Terminal schematic selector
+  // Stored as an array of profile ids, e.g. ['montero']. Empty = ALL ships visible.
+  game.settings.register('wy-terminal', 'enabledShips', {
+    scope: 'world',
+    config: false,
+    type: Array,
+    default: [],
+  });
 }

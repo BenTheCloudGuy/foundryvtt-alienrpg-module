@@ -2,7 +2,7 @@
   "id": "wy-terminal",
   "title": "Weyland-Yutani Ship Terminal",
   "description": "An interactive green-screen terminal interface for AlienRPG in FoundryVTT. Features MU/TH/UR AI integration, digital maps with pinch-zoom, ship status monitoring, and Foundry scene display — all wrapped in an authentic Weyland-Yutani computer aesthetic.",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "compatibility": {
     "minimum": "13",
     "verified": "13",
