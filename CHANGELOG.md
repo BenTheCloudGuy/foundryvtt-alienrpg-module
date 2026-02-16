@@ -2,6 +2,17 @@
 
 
 
+## v1.0.5 — 2026-02-16
+
+### Bug Fixes
+
+- Fixed black screen on GM login caused by compendium auto-import throwing an unhandled Promise rejection.
+- Wrapped auto-import in error-safe `.catch()` so failures log to console instead of blocking the terminal.
+- Added `pack.getIndex()` call before accessing pack folders to ensure the compendium index is loaded in FoundryVTT v13.
+- Resolved OneDrive file locking error (`EPERM: operation not permitted, rmdir images`) by removing stale empty directory.
+
+---
+
 ## v1.0.4 — 2026-02-16
 
 ### Compendium Packs

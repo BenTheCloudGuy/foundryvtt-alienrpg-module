@@ -88,8 +88,11 @@ Hooks.once('ready', () => {
   }
 
   // Auto-import compendium packs (GM only, runs once per pack per world)
+  // Fire-and-forget with error catching so it never blocks the terminal
   if (game.user.isGM) {
-    _autoImportCompendiums();
+    _autoImportCompendiums().catch(err => {
+      console.error('WY-Terminal | Compendium auto-import failed:', err);
+    });
   }
 
   // Auto-open the terminal
@@ -123,6 +126,9 @@ async function _autoImportCompendiums() {
     console.log(`WY-Terminal | Auto-importing compendium '${packDef.name}'...`);
 
     try {
+      // Ensure the pack index is loaded before accessing folders/documents
+      await pack.getIndex();
+
       // Import folder structure first
       const packFolders = pack.folders;
       const folderMap = new Map(); // old folder ID -> new folder ID
