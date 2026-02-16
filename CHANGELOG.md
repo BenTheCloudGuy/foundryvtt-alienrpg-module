@@ -2,6 +2,16 @@
 
 
 
+## v1.0.6 — 2026-02-16
+
+### Bug Fixes
+
+- Fixed compendium folder IDs causing `DataModelValidationError` on load. Foundry v13 requires 16-character alphanumeric document IDs; replaced custom short IDs (e.g. `WYTcogMontero01`) with valid random IDs.
+- Removed compendium auto-import on module load. The auto-import feature introduced in v1.0.4 was causing black screens and validation errors. Actors from `WYT-COG-ACTORS` compendium can be imported manually via the Compendium sidebar.
+- Removed `compendiumImported` setting (no longer needed).
+
+---
+
 ## v1.0.5 — 2026-02-16
 
 ### Bug Fixes

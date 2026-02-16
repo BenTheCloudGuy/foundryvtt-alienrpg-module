@@ -266,13 +266,4 @@ export function registerSettings() {
     default: [],
   });
 
-  // Internal: tracks which compendium packs have been auto-imported into this world.
-  // Value is an object keyed by pack name with the count of imported documents.
-  // e.g. { 'wyt-cog-actors': 24 }
-  game.settings.register('wy-terminal', 'compendiumImported', {
-    scope: 'world',
-    config: false,
-    type: Object,
-    default: {},
-  });
 }

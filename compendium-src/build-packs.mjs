@@ -44,10 +44,10 @@ const PACKS = [
     name: 'wyt-cog-actors',
     type: 'Actor',
     folders: {
-      montero:   { label: 'USCSS MONTERO', id: 'WYTcogMontero01', sort: 100000, color: '#00ff00' },
-      cronus:    { label: 'USCSS CRONUS',  id: 'WYTcogCronus001', sort: 200000, color: '#00ff00' },
-      sotillo:   { label: 'SOTILLO',       id: 'WYTcogSotillo01', sort: 300000, color: '#00ff00' },
-      creatures: { label: 'CREATURES',     id: 'WYTcogCreature1', sort: 400000, color: '#ff4400' },
+      montero:   { label: 'USCSS MONTERO', id: 'sMyiKZWcTYqqv9Vs', sort: 100000, color: '#00ff00' },
+      cronus:    { label: 'USCSS CRONUS',  id: '4gEPubn02pdPtghw', sort: 200000, color: '#00ff00' },
+      sotillo:   { label: 'SOTILLO',       id: 'B098wS4t8U2vOhdX', sort: 300000, color: '#00ff00' },
+      creatures: { label: 'CREATURES',     id: 'GN4j3th5iYZLSwbd', sort: 400000, color: '#ff4400' },
     },
   },
   // Add more packs here as needed, e.g.:
