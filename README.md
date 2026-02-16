@@ -131,7 +131,18 @@ game.wyTerminal.sendGmCommand({ type: 'switch_plugin', plugin: 'cronus_life_supp
 - Add support for speech-to-text so players can converse with MU/TH/UR via voice
 - Create a custom agent for gameplay and use it for MU/TH/UR interactions, plus allow the GM to query the scenario and AlienRPG via Foundry chat -- should improve performance and reduce token costs
 
+## Acknowledgments
+
+Huge thanks to **ecattell** for creating [muthurGPT](https://github.com/ecattell/muthurGPT), which gave me the foundation and inspiration for this project. The MU/TH/UR terminal in this module is built on his work. I ported it from Python to JavaScript so it could run natively inside FoundryVTT, but the core idea and prompt architecture came from his project.
+
+If you are running AlienRPG you should absolutely check it out. Even outside of FoundryVTT it makes a fantastic standalone prop. It runs perfectly on a Raspberry Pi 4 or newer.
+
+<p align="center">
+  <img src="images/retro_pc_01.jpg" alt="MU/TH/UR prop terminal" width="50%">
+</p>
+
 ## License
 
-This module is designed for personal use with the Alien RPG tabletop roleplaying game by Free League Publishing.
-Alien RPG is (c) Free League Publishing. Weyland-Yutani is a fictional corporation from the Alien franchise.
+This is an unofficial fan-made module and is not affiliated with, endorsed by, or associated with Free League Publishing or 20th Century Studios in any way. It was built by a fan for personal use while playing the Alien RPG tabletop roleplaying game.
+
+Alien RPG is (c) Free League Publishing. The Alien franchise and Weyland-Yutani are properties of 20th Century Studios.
