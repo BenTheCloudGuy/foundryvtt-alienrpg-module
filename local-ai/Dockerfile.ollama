@@ -1,0 +1,42 @@
+###############################################################################
+# Dockerfile.ollama — Ubuntu 22.04 + Ollama
+#
+# Builds a container with Ollama pre-installed on Ubuntu 22.04 LTS.
+# On first start, the entrypoint script pulls the default model.
+#
+# Ollama distributes Linux binaries as .tar.zst archives, so we install
+# zstd to extract the release, then clean up build deps.
+###############################################################################
+FROM ubuntu:22.04
+
+LABEL maintainer="benthebuilder"
+LABEL description="Ubuntu 22.04 + Ollama LLM inference server for WY-Terminal"
+
+# Prevent interactive prompts during apt installs
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install runtime + build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
+    zstd \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Ollama from the official tar.zst release archive
+RUN curl -fsSL "https://github.com/ollama/ollama/releases/latest/download/ollama-linux-amd64.tar.zst" -o /tmp/ollama.tar.zst \
+    && mkdir -p /tmp/ollama-extract \
+    && tar --use-compress-program=unzstd -xf /tmp/ollama.tar.zst -C /usr/local \
+    && rm -rf /tmp/ollama.tar.zst /tmp/ollama-extract \
+    && ollama --version
+
+# Ollama stores models in /root/.ollama (volume-mounted in compose)
+VOLUME /root/.ollama
+
+# Ollama listens on 11434
+EXPOSE 11434
+
+# Copy entrypoint script that starts Ollama and pulls default model
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

@@ -1,6 +1,6 @@
 # Weyland-Yutani Ship Terminal
 
-![WY-Terminal](image.png)
+![WY-Terminal](images/image.png)
 
 A FoundryVTT module that turns a second screen, tablet, or touch monitor into a fully interactive shipboard computer terminal for the Alien RPG. Built for in-person games where you want to put a real Weyland-Yutani interface in front of your players and let them interact with the ship directly. Green phosphor CRT display, scanlines, flicker, the works.
 
@@ -8,7 +8,7 @@ This was built for running Chariot of the Gods but the architecture supports oth
 
 https://github.com/user-attachments/assets/GM-Terminal-Demo.mp4
 
-<video controls src="GM-Terminal-Demo.mp4" title="Terminal Demo"></video>
+<video controls src="images/GM-Terminal-Demo.mp4" title="Terminal Demo"></video>
 
 ---
 
@@ -65,7 +65,9 @@ https://raw.githubusercontent.com/BenTheCloudGuy/foundryvtt-alienrpg-module/main
 
 - FoundryVTT v13 or later
 - AlienRPG (Alien Evolved) game system v4.0.0 or later
-- An OpenAI API key if you want the MU/TH/UR AI chat to work (optional, the terminal works fine without it)
+- An OpenAI-compatible API for MU/TH/UR AI chat (optional -- the terminal works fine without it):
+  - **OpenAI** -- Requires an API key and uses cloud-based models
+  - **Local Ollama** -- Free, offline, runs on your own hardware. See [Local AI Setup](local-ai/README.md)
 
 ---
 
@@ -80,12 +82,33 @@ The intended setup is two screens: one for the GM running FoundryVTT normally, a
 
 ### MU/TH/UR AI Setup
 
-1. Open the terminal and click **GM CONTROLS**.
-2. Enter your OpenAI API key.
-3. Select a scenario plugin (montero, cronus, etc.).
-4. Players can now ask the ship's computer questions through the MU/TH/UR button and get scenario-aware AI responses.
+MU/TH/UR works with any OpenAI-compatible API. You can use OpenAI's cloud service or run a local LLM for free with no API key required.
 
-If you do not have an API key, MU/TH/UR falls back to GM Relay mode where player questions pop up on the GM screen and the GM types responses manually.
+#### Option A -- OpenAI (Cloud)
+
+1. Get an API key from [platform.openai.com](https://platform.openai.com).
+2. Open the terminal and click **GM CONTROLS**.
+3. Set **API Base URL** to `https://api.openai.com/v1`.
+4. Enter your API key.
+5. Set **AI Model** to `gpt-4o-mini` (recommended) or `gpt-4o`.
+6. Select a scenario plugin (montero, cronus, etc.).
+
+#### Option B -- Local Ollama (Free / Offline)
+
+Run a local LLM on your own machine. No API key, no cloud calls, no per-token costs.
+
+1. Install [Ollama](https://ollama.com) and pull a model: `ollama pull llama3.1:8b`
+2. Open the terminal and click **GM CONTROLS**.
+3. Set **API Base URL** to `http://localhost:11434/v1`.
+4. Leave **API Key** blank (Ollama needs no auth).
+5. Set **AI Model** to `llama3.1:8b` (or whichever model you pulled).
+6. Select a scenario plugin (montero, cronus, etc.).
+
+For a Docker-based setup with GPU acceleration and Whisper speech-to-text, see the full guide: **[Local AI Setup](local-ai/README.md)**
+
+#### No AI Configured
+
+If no API endpoint is configured, MU/TH/UR falls back to **GM Relay** mode where player questions pop up on the GM screen and the GM types responses manually. The rest of the terminal works normally.
 
 ---
 

@@ -40,6 +40,13 @@
       ATMOSPHERE PURGE — DECK SELECT
     </button>
     {{/unless}}
+
+    {{!-- UNKNOWN BIOLOGICAL ORGANISM --}}
+    {{#unless bioalertActive}}
+    <button class="wy-emergency-btn" data-emergency="bioalert">
+      UNKNOWN BIOLOGICAL ORGANISM DETECTED
+    </button>
+    {{/unless}}
   </div>
 
   {{!-- ══ ACTIVE EMERGENCY STATUS PANELS ══ --}}
@@ -138,6 +145,22 @@
     {{#if isGM}}
     <button class="wy-emergency-btn" data-emergency="cancel-purge" style="margin-top: 12px;">
       CANCEL PURGE
+    </button>
+    {{/if}}
+  </div>
+  {{/if}}
+
+  {{#if bioalertActive}}
+  <div class="wy-border-box wy-emergency-active-box">
+    <div class="wy-text-red wy-text-blink" style="font-size: 16px; letter-spacing: 3px; margin: 12px 0;">
+      ⚠ UNKNOWN BIOLOGICAL ORGANISM DETECTED ⚠
+    </div>
+    {{#if bioalertTarget}}
+    <div class="wy-text-red" style="font-size: 12px; letter-spacing: 2px;">LOCATION: {{bioalertTarget}}</div>
+    {{/if}}
+    {{#if isGM}}
+    <button class="wy-emergency-btn" data-emergency="cancel-bioalert" style="margin-top: 12px;">
+      CANCEL ALERT
     </button>
     {{/if}}
   </div>

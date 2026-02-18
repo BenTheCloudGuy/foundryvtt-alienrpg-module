@@ -2367,22 +2367,6 @@
   letter-spacing: 2px;
 }
 
-/* CMD CODE nav button accent */
-.wy-nav-btn-cmdcode {
-  color: var(--wy-amber) !important;
-  border-color: var(--wy-amber-dim) !important;
-}
-.wy-nav-btn-cmdcode:hover {
-  background: rgba(255, 183, 77, 0.1);
-  border-color: var(--wy-amber) !important;
-}
-.wy-nav-btn-cmdcode.active {
-  background: rgba(255, 183, 77, 0.15);
-  border-color: var(--wy-amber) !important;
-  box-shadow: inset 0 0 15px rgba(255, 183, 77, 0.1),
-              0 0 8px rgba(255, 183, 77, 0.15);
-}
-
 /* New-log flash on LOGS nav button */
 .wy-nav-btn.wy-nav-flash {
   animation: navLogFlash 0.8s ease-in-out infinite;

@@ -137,6 +137,9 @@ export class MuthurEngine {
     const model = game.settings.get('wy-terminal', 'openaiModel');
     if (model) this.config.openai_model = model;
 
+    const baseUrl = game.settings.get('wy-terminal', 'openaiBaseUrl');
+    if (baseUrl) this.config.openai_base_url = baseUrl;
+
     // Build the system prompt
     await this._buildSystemPrompt();
 
@@ -258,7 +261,8 @@ export class MuthurEngine {
         requestBody.temperature = 0.7;
       }
 
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const baseUrl = (this.config.openai_base_url || 'https://api.openai.com/v1').replace(/\/+$/, '');
+      const response = await fetch(`${baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

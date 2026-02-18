@@ -367,7 +367,10 @@ export class WYTerminalApp extends Application {
           purgeActive: !!eStatus.purgeActive,
           purgeTriggeredBy: eStatus.purgeTriggeredBy || '',
           purgeTarget: eStatus.purgeTarget || '',
-          hasActiveEmergency: sdActive || !!eStatus.evacuationActive || !!eStatus.lockdownActive || !!eStatus.distressActive || !!eStatus.purgeActive,
+          bioalertActive: !!eStatus.bioalertActive,
+          bioalertTriggeredBy: eStatus.bioalertTriggeredBy || '',
+          bioalertTarget: eStatus.bioalertTarget || '',
+          hasActiveEmergency: sdActive || !!eStatus.evacuationActive || !!eStatus.lockdownActive || !!eStatus.distressActive || !!eStatus.purgeActive || !!eStatus.bioalertActive,
           isGM: game.user.isGM,
         };
       }
@@ -431,6 +434,7 @@ export class WYTerminalApp extends Application {
           scanlines: game.settings.get('wy-terminal', 'scanlines'),
           crtFlicker: game.settings.get('wy-terminal', 'crtFlicker'),
           soundEnabled: game.settings.get('wy-terminal', 'soundEnabled'),
+          openaiBaseUrl: game.settings.get('wy-terminal', 'openaiBaseUrl'),
           openaiApiKey: game.settings.get('wy-terminal', 'openaiApiKey') ? '••••••••' : '',
           openaiModel: game.settings.get('wy-terminal', 'openaiModel'),
           muthurPlugin: game.settings.get('wy-terminal', 'muthurPlugin'),
@@ -980,6 +984,9 @@ export class WYTerminalApp extends Application {
       purgeActive: !!status.purgeActive,
       purgeTriggeredBy: status.purgeTriggeredBy || '',
       purgeTarget: status.purgeTarget || '',
+      bioalertActive: !!status.bioalertActive,
+      bioalertTriggeredBy: status.bioalertTriggeredBy || '',
+      bioalertTarget: status.bioalertTarget || '',
       isGM: game.user.isGM,
     };
   }
@@ -3385,6 +3392,16 @@ export class WYTerminalApp extends Application {
       case 'cancel-purge':
         if (game.user.isGM) this._cancelEmergency('purge');
         break;
+      case 'bioalert':
+        if (game.user.isGM) {
+          this._showBioalertDialog();
+        } else {
+          ui.notifications.warn('AUTHORIZATION REQUIRED — GM ACCESS ONLY');
+        }
+        break;
+      case 'cancel-bioalert':
+        if (game.user.isGM) this._cancelEmergency('bioalert');
+        break;
     }
   }
 
@@ -3507,10 +3524,14 @@ export class WYTerminalApp extends Application {
     // Check if any emergencies remain active
     const updatedStatus = this.shipStatus?.getStatus() ?? {};
     const anyRemaining = updatedStatus.evacuationActive || updatedStatus.lockdownActive ||
-      updatedStatus.distressActive || updatedStatus.purgeActive;
+      updatedStatus.distressActive || updatedStatus.purgeActive || updatedStatus.bioalertActive;
     if (!anyRemaining) this.hideAlert();
 
     this._broadcastSocket('emergencyCancelled', { protocol: 'self-destruct', anyRemaining });
+
+    // Speak abort announcement on the GM client (players get it via socket)
+    this._speakWarning('ATTENTION. SELF-DESTRUCT SEQUENCE HAS BEEN ABORTED. RESUME NORMAL OPERATIONS.', { force: true });
+
     this._broadcastSocket('refreshView', { view: 'status' });
     this._broadcastSocket('refreshView', { view: 'emergency' });
     this._broadcastSocket('newLogAlert', {});
@@ -3602,6 +3623,18 @@ export class WYTerminalApp extends Application {
       triggeredByKey: 'purgeTriggeredBy',
       targetKey: 'purgeTarget',
       icon: 'fa-wind',
+    },
+    bioalert: {
+      label: 'UNKNOWN BIOLOGICAL ORGANISM',
+      sender: 'SCIENCE',
+      logArm: 'UNKNOWN BIOLOGICAL ORGANISM DETECTED',
+      logCancel: 'BIOLOGICAL ALERT CANCELLED — AREA CLEARED',
+      alertMessage: 'UNKNOWN BIOLOGICAL ORGANISM DETECTED',
+      level: 'critical',
+      activeKey: 'bioalertActive',
+      triggeredByKey: 'bioalertTriggeredBy',
+      targetKey: 'bioalertTarget',
+      icon: 'fa-biohazard',
     },
   };
 
@@ -3727,7 +3760,7 @@ export class WYTerminalApp extends Application {
     // Check if any emergencies remain active
     const updatedStatus = this.shipStatus?.getStatus() ?? {};
     const anyRemaining = updatedStatus.selfDestructActive || updatedStatus.evacuationActive ||
-      updatedStatus.lockdownActive || updatedStatus.distressActive || updatedStatus.purgeActive;
+      updatedStatus.lockdownActive || updatedStatus.distressActive || updatedStatus.purgeActive || updatedStatus.bioalertActive;
     if (!anyRemaining) this.hideAlert();
 
     this._broadcastSocket('emergencyCancelled', { protocol: protocolKey, anyRemaining });
@@ -3799,6 +3832,53 @@ export class WYTerminalApp extends Application {
   }
 
   /**
+   * Show the UNKNOWN BIOLOGICAL ORGANISM DETECTED dialog.
+   * GM selects crew member, deck, and enters a free-text location/section.
+   */
+  _showBioalertDialog() {
+    const content = `
+      <form style="display: flex; flex-direction: column; gap: 12px;">
+        <div>
+          <label style="font-weight: bold;">DECK:</label>
+          <input type="text" name="bioalertDeck" placeholder="e.g. DECK A, UPPER DECK, MAIN DECK"
+            style="width: 100%; margin-top: 4px; text-transform: uppercase;" />
+        </div>
+        <div>
+          <label style="font-weight: bold;">SECTION / LOCATION:</label>
+          <input type="text" name="bioalertLocation" placeholder="e.g. CARGO BAY, MED-LAB, CORRIDOR 4"
+            style="width: 100%; margin-top: 4px; text-transform: uppercase;" />
+        </div>
+      </form>
+    `;
+
+    new Dialog({
+      title: '⚠ UNKNOWN BIOLOGICAL ORGANISM DETECTED',
+      content,
+      buttons: {
+        activate: {
+          label: 'CONFIRM DETECTION',
+          icon: '<i class="fas fa-biohazard"></i>',
+          callback: (html) => {
+            const deck = (html.find('[name="bioalertDeck"]').val() || '').toUpperCase().trim();
+            const location = (html.find('[name="bioalertLocation"]').val() || '').toUpperCase().trim();
+            let target = '';
+            if (deck && location) target = `${deck}, ${location}`;
+            else if (deck) target = deck;
+            else if (location) target = location;
+            else target = 'UNKNOWN';
+            this._activateEmergency('bioalert', 'SENSOR ARRAY', target);
+          },
+        },
+        cancel: {
+          label: 'ABORT',
+          icon: '<i class="fas fa-times"></i>',
+        },
+      },
+      default: 'cancel',
+    }).render(true);
+  }
+
+  /**
    * Flash the STATUS nav button on player terminals until clicked.
    * Called via socket from GM when emergency is activated.
    */
@@ -3852,11 +3932,59 @@ export class WYTerminalApp extends Application {
   }
 
   /**
+   * Start repeating voice warnings for a generic emergency protocol.
+   * Speaks immediately, then every 60 real seconds on player clients.
+   * @param {string} protocol — e.g. 'evacuate', 'lockdown', 'distress', 'purge', 'bioalert'
+   * @param {string} message — The spoken warning text
+   */
+  _startEmergencyVoice(protocol, message) {
+    if (game.user?.isGM) return;
+    this._clearEmergencyVoice(protocol);
+
+    // Immediate first warning
+    this._speakWarning(message);
+
+    // Initialize interval storage
+    if (!this._emergencyVoiceIntervals) this._emergencyVoiceIntervals = {};
+
+    // Repeat every 60 real seconds
+    this._emergencyVoiceIntervals[protocol] = setInterval(() => {
+      this._speakWarning(message);
+    }, 60000);
+  }
+
+  /**
+   * Stop voice warnings for a specific emergency protocol.
+   * @param {string} protocol — Protocol key to stop
+   */
+  _clearEmergencyVoice(protocol) {
+    if (this._emergencyVoiceIntervals?.[protocol]) {
+      clearInterval(this._emergencyVoiceIntervals[protocol]);
+      delete this._emergencyVoiceIntervals[protocol];
+    }
+  }
+
+  /**
+   * Stop all emergency voice warning intervals.
+   */
+  _clearAllEmergencyVoices() {
+    this._clearSelfDestructVoice();
+    if (!this._emergencyVoiceIntervals) return;
+    for (const key of Object.keys(this._emergencyVoiceIntervals)) {
+      clearInterval(this._emergencyVoiceIntervals[key]);
+    }
+    this._emergencyVoiceIntervals = {};
+  }
+
+  /**
    * Speak a warning using the Web Speech API.
    * Uses a robotic/low pitch voice for computer effect.
+   * @param {string} text — The text to speak
+   * @param {object} [opts] — Options
+   * @param {boolean} [opts.force=false] — If true, speak even on the GM client
    */
-  _speakWarning(text) {
-    if (game.user?.isGM) return;
+  _speakWarning(text, { force = false } = {}) {
+    if (!force && game.user?.isGM) return;
     try {
       if (!game.settings.get('wy-terminal', 'soundEnabled')) return;
     } catch { /* default enabled */ }
@@ -3897,12 +4025,51 @@ export class WYTerminalApp extends Application {
       ui.notifications.info('WY-Terminal: Chat log cleared.');
     });
 
+    // Reset game clock to default epoch (2183-06-12 06:00 UTC)
+    contentEl.querySelector('[data-action="reset-gameclock"]')?.addEventListener('click', async () => {
+      await game.settings.set('wy-terminal', 'gameClockEpoch', Date.UTC(2183, 5, 12, 6, 0, 0));
+      await game.settings.set('wy-terminal', 'gameClockRealAnchor', Date.now());
+      ui.notifications.info('WY-Terminal: Game clock reset to 2183-06-12 06:00.');
+      this.refreshCurrentView();
+    });
+
     // Reset logs to defaults — clears all runtime/player-generated log entries
     contentEl.querySelector('[data-action="reset-logs"]')?.addEventListener('click', async () => {
       await game.settings.set('wy-terminal', 'logEntries', []);
-      // Reload file logs to refresh the default flag cache
       await this._loadFileLogEntries();
-      ui.notifications.info('WY-Terminal: Logs reset to defaults. All player/runtime entries removed.');
+      ui.notifications.info('WY-Terminal: Logs reset to defaults.');
+      this.refreshCurrentView();
+    });
+
+    // Reset crew roster to empty (will rebuild from Actor sheets)
+    contentEl.querySelector('[data-action="reset-crew"]')?.addEventListener('click', async () => {
+      await game.settings.set('wy-terminal', 'crewRoster', []);
+      ui.notifications.info('WY-Terminal: Crew roster reset. Will rebuild from Actor sheets.');
+      this.refreshCurrentView();
+    });
+
+    // Reset ship status — clears systems, cargo, and status data back to defaults
+    contentEl.querySelector('[data-action="reset-shipstatus"]')?.addEventListener('click', async () => {
+      await game.settings.set('wy-terminal', 'shipStatusData', {});
+      await game.settings.set('wy-terminal', 'shipSystems', []);
+      await game.settings.set('wy-terminal', 'cargoManifest', []);
+      this.shipStatus?.reload();
+      ui.notifications.info('WY-Terminal: Ship status, systems, and cargo reset to defaults.');
+      this.refreshCurrentView();
+    });
+
+    // Reset ALL game settings at once
+    contentEl.querySelector('[data-action="reset-all"]')?.addEventListener('click', async () => {
+      await game.settings.set('wy-terminal', 'gameClockEpoch', Date.UTC(2183, 5, 12, 6, 0, 0));
+      await game.settings.set('wy-terminal', 'gameClockRealAnchor', Date.now());
+      await game.settings.set('wy-terminal', 'logEntries', []);
+      await this._loadFileLogEntries();
+      await game.settings.set('wy-terminal', 'crewRoster', []);
+      await game.settings.set('wy-terminal', 'shipStatusData', {});
+      await game.settings.set('wy-terminal', 'shipSystems', []);
+      await game.settings.set('wy-terminal', 'cargoManifest', []);
+      this.shipStatus?.reload();
+      ui.notifications.info('WY-Terminal: All game settings reset to defaults.');
       this.refreshCurrentView();
     });
 

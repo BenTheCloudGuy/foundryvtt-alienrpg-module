@@ -62,13 +62,39 @@
   {{#if isGM}}
   <div class="wy-section-title" style="margin-top: 16px;">MU/TH/UR AI ENGINE</div>
 
+  <div class="wy-border-box" style="margin-bottom: 12px; border-color: var(--wy-green-dim);">
+    <div style="color: var(--wy-green); font-size: 11px; letter-spacing: 2px; margin-bottom: 8px;">▶ AI PROVIDER SETUP</div>
+    <div style="color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px; line-height: 1.6;">
+      MU/TH/UR REQUIRES AN OPENAI-COMPATIBLE API ENDPOINT. TWO OPTIONS:<br><br>
+      <span style="color: var(--wy-green);">OPTION A — OPENAI (CLOUD)</span><br>
+      &nbsp; API BASE URL: <span style="color: var(--wy-amber);">https://api.openai.com/v1</span><br>
+      &nbsp; API KEY: YOUR OPENAI KEY (sk-...)<br>
+      &nbsp; MODEL: gpt-4o-mini, gpt-4.1-nano, OR gpt-4o<br><br>
+      <span style="color: var(--wy-green);">OPTION B — LOCAL OLLAMA (FREE / OFFLINE)</span><br>
+      &nbsp; 1. INSTALL OLLAMA: <span style="color: var(--wy-amber);">https://ollama.com</span><br>
+      &nbsp; 2. PULL A MODEL: <span style="color: var(--wy-amber);">ollama pull llama3.1:8b</span><br>
+      &nbsp; 3. SET FIELDS BELOW:<br>
+      &nbsp; API BASE URL: <span style="color: var(--wy-amber);">http://localhost:11434/v1</span><br>
+      &nbsp; API KEY: LEAVE BLANK (NO AUTH REQUIRED)<br>
+      &nbsp; MODEL: llama3.1:8b, mistral:7b, OR phi3:mini<br>
+    </div>
+  </div>
+
   <div class="wy-border-box">
     <div class="wy-setting-row">
-      <span class="wy-setting-label">OPENAI API KEY</span>
+      <span class="wy-setting-label">API BASE URL</span>
+      <input class="wy-setting-input" type="text"
+             data-setting="openaiBaseUrl"
+             value="{{openaiBaseUrl}}"
+             placeholder="https://api.openai.com/v1" />
+    </div>
+
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">API KEY</span>
       <input class="wy-setting-input" type="password"
              data-setting="openaiApiKey"
              value="{{openaiApiKey}}"
-             placeholder="sk-..." />
+             placeholder="sk-... (BLANK FOR OLLAMA)" />
     </div>
 
     <div class="wy-setting-row">
@@ -111,8 +137,22 @@
   </div>
 
   {{#if isGM}}
-  <div style="margin-top: 12px; display: flex; gap: 8px;">
-    <button class="wy-muthur-send" data-action="reset-logs" style="flex:1; border-color: var(--wy-amber-dim); color: var(--wy-amber);">⟲ RESET LOGS TO DEFAULTS</button>
+  <div class="wy-section-title" style="margin-top: 16px; color: var(--wy-amber);">RESET GAME SETTINGS</div>
+  <div class="wy-border-box" style="border-color: var(--wy-amber-dim);">
+    <div style="color: var(--wy-amber-dim); font-size: 10px; letter-spacing: 1px; margin-bottom: 8px;">
+      WARNING: THESE ACTIONS CANNOT BE UNDONE. EACH BUTTON RESETS THE SELECTED DATA TO DEFAULTS.
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <button class="wy-muthur-send" data-action="reset-gameclock" style="flex:1; min-width: 140px; border-color: var(--wy-amber-dim); color: var(--wy-amber);">&#x27F2; RESET GAME CLOCK</button>
+      <button class="wy-muthur-send" data-action="reset-logs" style="flex:1; min-width: 140px; border-color: var(--wy-amber-dim); color: var(--wy-amber);">&#x27F2; RESET LOGS</button>
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+      <button class="wy-muthur-send" data-action="reset-crew" style="flex:1; min-width: 140px; border-color: var(--wy-amber-dim); color: var(--wy-amber);">&#x27F2; RESET CREW</button>
+      <button class="wy-muthur-send" data-action="reset-shipstatus" style="flex:1; min-width: 140px; border-color: var(--wy-amber-dim); color: var(--wy-amber);">&#x27F2; RESET SHIP STATUS</button>
+    </div>
+    <div style="margin-top: 8px;">
+      <button class="wy-muthur-send" data-action="reset-all" style="width: 100%; border-color: var(--wy-amber); color: var(--wy-amber); font-weight: bold;">&#x26A0; RESET ALL GAME SETTINGS</button>
+    </div>
   </div>
 
   <div class="wy-section-title" style="margin-top: 16px;">PLAYER SCHEMATIC ACCESS</div>

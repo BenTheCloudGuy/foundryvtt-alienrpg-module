@@ -1,0 +1,72 @@
+###############################################################################
+# LocalAI Stack — Ollama + Whisper STT
+#
+# Provides a local AI stack for WY-Terminal's MU/TH/UR engine.
+#   - Ollama:   LLM inference (chat completions)
+#   - Whisper:  Speech-to-Text (players speak queries to MU/TH/UR)
+#
+# Usage:
+#   docker compose up -d --build
+#   docker compose down
+#
+# GPU support:
+#   Requires NVIDIA Container Toolkit installed on the host.
+#   If no GPU, remove the 'deploy' block from the ollama service and
+#   set OLLAMA_NUM_GPU=0 — models will run on CPU (slower but works).
+###############################################################################
+
+services:
+
+  # ── Ollama — LLM inference server ──────────────────────────────
+  ollama:
+    build:
+      context: .
+      dockerfile: Dockerfile.ollama
+    container_name: localai-ollama
+    hostname: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:11434/api/tags || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ── Whisper STT — Local speech-to-text ─────────────────────────
+  # OpenAI-compatible /v1/audio/transcriptions endpoint
+  whisper:
+    build:
+      context: .
+      dockerfile: Dockerfile.whisper
+    container_name: localai-whisper
+    hostname: whisper
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    volumes:
+      - whisper-data:/app/models
+    environment:
+      - WHISPER_MODEL=base.en
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  ollama-data:
+  whisper-data:

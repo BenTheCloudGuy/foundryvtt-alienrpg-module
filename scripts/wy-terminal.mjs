@@ -413,10 +413,16 @@ Hooks.once('ready', () => {
         // Flash the STATUS nav button
         terminalApp._flashStatusButton();
 
-        // Self-destruct: start computer voice warnings every real minute
+        // Start computer voice warnings — repeating every 60 real seconds
         if (protocol === 'self-destruct') {
+          // Self-destruct uses its own countdown-aware voice system
           terminalApp._startSelfDestructVoice();
+        } else {
+          // All other protocols: build spoken warning from alert message
+          const voiceText = `WARNING. ${message}. ALL PERSONNEL RESPOND ACCORDINGLY.`;
+          terminalApp._startEmergencyVoice(protocol, voiceText);
         }
+
         // Evacuation: also play alarm
         if (protocol === 'evacuate') {
           TerminalSFX.play('alert');
@@ -433,13 +439,18 @@ Hooks.once('ready', () => {
       console.log(`WY-Terminal | Emergency cancelled: ${protocol}, anyRemaining: ${anyRemaining}`);
 
       if (!game.user.isGM) {
-        // Stop voice warnings if self-destruct cancelled
+        // Stop voice warnings for the cancelled protocol
         if (protocol === 'self-destruct') {
           terminalApp._clearSelfDestructVoice();
+          // Announce abort via voice
+          terminalApp._speakWarning('ATTENTION. SELF-DESTRUCT SEQUENCE HAS BEEN ABORTED. RESUME NORMAL OPERATIONS.');
+        } else {
+          terminalApp._clearEmergencyVoice(protocol);
         }
 
         // Use GM-authoritative flag — local shipStatus may be stale
         if (!anyRemaining) {
+          terminalApp._clearAllEmergencyVoices();
           const el = terminalApp.element?.[0] ?? terminalApp.element;
           el?.querySelector('[data-view="status"]')?.classList.remove('wy-nav-flash-red');
           terminalApp.hideAlert();

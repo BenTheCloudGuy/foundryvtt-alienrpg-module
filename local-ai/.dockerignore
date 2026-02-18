@@ -1,0 +1,5 @@
+# Ollama model data
+ollama-data/
+
+# Open WebUI persistent data
+webui-data/

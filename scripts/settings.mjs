@@ -189,9 +189,18 @@ export function registerSettings() {
      MU/TH/UR ENGINE SETTINGS
      ════════════════════════════════════════════════════════════════ */
 
+  game.settings.register('wy-terminal', 'openaiBaseUrl', {
+    name: 'API Base URL',
+    hint: 'OpenAI-compatible API base URL. OpenAI: https://api.openai.com/v1 — Local Ollama: http://localhost:11434/v1',
+    scope: 'world',
+    config: true,
+    type: String,
+    default: 'https://api.openai.com/v1',
+  });
+
   game.settings.register('wy-terminal', 'openaiApiKey', {
-    name: 'OpenAI API Key',
-    hint: 'Your OpenAI API key for MU/TH/UR AI responses. Stored per-world. Leave blank to disable AI.',
+    name: 'API Key',
+    hint: 'API key for MU/TH/UR AI responses. Required for OpenAI. Leave blank for local Ollama (no auth needed).',
     scope: 'world',
     config: true,
     type: String,
@@ -199,8 +208,8 @@ export function registerSettings() {
   });
 
   game.settings.register('wy-terminal', 'openaiModel', {
-    name: 'OpenAI Model',
-    hint: 'The OpenAI model to use (e.g. gpt-4o-mini, gpt-4o, gpt-4.1-nano).',
+    name: 'AI Model',
+    hint: 'Model name to use (e.g. gpt-4o-mini, gpt-4.1-nano, llama3.1:8b, mistral:7b).',
     scope: 'world',
     config: true,
     type: String,

@@ -2,6 +2,54 @@
 
 
 
+## v1.0.7 — 2026-02-17
+
+### GM Controls — AI Provider Setup
+
+- Added AI PROVIDER SETUP info box to the in-terminal GM Settings view with Option A (OpenAI cloud) and Option B (Local Ollama) instructions.
+- Added API Base URL field to the in-terminal GM Controls so the GM can configure the endpoint without leaving the terminal.
+- Updated hint text for API Base URL and API Key settings to reference Ollama.
+
+### Local AI Container
+
+- Setup LocalAI Docker solution in the module directory `local-ai/`.
+- Final stack: Ollama (:11434) + Whisper STT (:9000), 2 services.
+
+### Documentation
+
+- Updated README.md Requirements section to list both OpenAI and Ollama as AI provider options.
+- Expanded MU/TH/UR AI Setup section with Option A (OpenAI), Option B (Ollama), and No AI Configured (GM Relay) paths.
+- Updated `local-ai/README.md` Quick Start path from `cd LocalAIContainer` to `cd local-ai`.
+
+### GM Controls — Reset Game Settings
+
+- Replaced single "Reset Logs to Defaults" button with a RESET GAME SETTINGS section containing 4 individual buttons: Reset Game Clock, Reset Logs, Reset Crew, Reset Ship Status.
+- Added a full-width RESET ALL GAME SETTINGS button below the grid that resets all 4 categories at once.
+
+### Emergency Protocols — Unknown Biological Organism
+
+- Added new emergency protocol: UNKNOWN BIOLOGICAL ORGANISM DETECTED.
+- GM dialog provides free-text DECK and SECTION/LOCATION fields.
+- Detection is always attributed to SENSOR ARRAY (no crew selector).
+- Active status panel shows blinking alert with location on all terminals.
+- Alert message format: "UNKNOWN BIOLOGICAL ORGANISM DETECTED — [DECK], [SECTION]".
+- Added `bioalert` entry to EMERGENCY_PROTOCOLS config with sender SCIENCE and icon fa-biohazard.
+- Wired into all hasActiveEmergency and anyRemaining checks.
+
+### Emergency Protocols — Spoken Voice Warnings
+
+- All emergency protocols (evacuate, lockdown, distress, purge, bioalert) now trigger repeating spoken computer voice warnings on player terminals, using the same Web Speech API voice and settings as self-destruct.
+- Added `_startEmergencyVoice(protocol, message)` for generic repeating warnings (every 60 seconds).
+- Added `_clearEmergencyVoice(protocol)` and `_clearAllEmergencyVoices()` for clean shutdown on cancel.
+- Self-destruct abort now plays a spoken announcement: "ATTENTION. SELF-DESTRUCT SEQUENCE HAS BEEN ABORTED. RESUME NORMAL OPERATIONS." on both GM and player clients.
+- Added `{ force }` option to `_speakWarning()` to allow one-shot announcements on the GM client.
+
+### Bug Fixes
+
+- Fixed CMD CODE navigation button using amber color instead of matching the default green of all other nav buttons.
+
+---
+
 ## v1.0.6 — 2026-02-16
 
 ### Bug Fixes

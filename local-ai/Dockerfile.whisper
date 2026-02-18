@@ -1,0 +1,25 @@
+###############################################################################
+# Dockerfile.whisper — Faster-Whisper STT with OpenAI-compatible API
+#
+# Runs faster-whisper speech-to-text behind a lightweight Flask server
+# that exposes an OpenAI-compatible /v1/audio/transcriptions endpoint.
+###############################################################################
+FROM python:3.11-slim
+
+LABEL maintainer="benthebuilder"
+LABEL description="Faster-Whisper STT with OpenAI-compatible API for WY-Terminal"
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir faster-whisper flask
+
+VOLUME /app/models
+
+COPY whisper-server.py /app/whisper-server.py
+
+EXPOSE 9000
+
+CMD ["python", "/app/whisper-server.py"]
