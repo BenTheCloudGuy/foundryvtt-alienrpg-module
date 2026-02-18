@@ -37,7 +37,7 @@ Hooks.once('init', () => {
     'modules/wy-terminal/templates/views/logs.hbs',
     'modules/wy-terminal/templates/views/muthur.hbs',
     'modules/wy-terminal/templates/views/scenes.hbs',
-    'modules/wy-terminal/templates/views/maps.hbs',
+    'modules/wy-terminal/templates/views/starsystems.hbs',
     'modules/wy-terminal/templates/views/emergency.hbs',
     'modules/wy-terminal/templates/views/nav.hbs',
     'modules/wy-terminal/templates/views/comms.hbs',

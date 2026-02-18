@@ -99,8 +99,10 @@ export class WYTerminalApp extends Application {
     const profile = this._getShipProfile();
     const shipName = game.settings.get('wy-terminal', 'shipName');
     const shipClass = game.settings.get('wy-terminal', 'shipClass');
-    const scanlines = game.settings.get('wy-terminal', 'scanlines');
-    const crtFlicker = game.settings.get('wy-terminal', 'crtFlicker');
+    // CRT effects are player-only — GM terminal stays clean
+    const isGM = game.user.isGM;
+    const scanlines = isGM ? false : game.settings.get('wy-terminal', 'scanlines');
+    const crtFlicker = isGM ? false : game.settings.get('wy-terminal', 'crtFlicker');
     const status = this.shipStatus?.getStatus() ?? {};
 
     const systemStatus = status.alert ? 'WARNING' : 'NOMINAL';
@@ -174,6 +176,9 @@ export class WYTerminalApp extends Application {
       this.zoomHandler.enabled = false; // Only enabled for Ship Schematics view
     }
 
+    // Preload star systems database
+    this._loadStarSystemsData();
+
     // Render initial view
     this._renderView(this.activeView);
   }
@@ -211,6 +216,11 @@ export class WYTerminalApp extends Application {
     this._clearClockInterval();
     // Clean up self-destruct countdown interval when leaving status view
     this._clearSelfDestructInterval();
+    // Clean up audio playback when leaving logs view
+    if (this._activeAudioCleanup) {
+      this._activeAudioCleanup();
+      this._activeAudioCleanup = null;
+    }
 
     // Clear new-log flash when navigating to logs
     if (viewName === 'logs') {
@@ -390,8 +400,8 @@ export class WYTerminalApp extends Application {
       case 'scenes':
         return { ...base, ...this._getScenesData() };
 
-      case 'maps':
-        return { ...base, ...this._getMapsData() };
+      case 'starsystems':
+        return { ...base, ...this._getStarSystemsData() };
 
       case 'emergency':
         return { ...base, ...this._getEmergencyData() };
@@ -961,9 +971,54 @@ export class WYTerminalApp extends Application {
     this._updateTokensFromScene();
   }
 
-  /* ── Maps data ── */
-  _getMapsData() {
-    return {};
+  /* ── Star Systems data ── */
+  _getStarSystemsData() {
+    const data = this._starSystemsCache ?? { systems: [] };
+    const clearance = this._getActiveClearance();
+    const systems = (data.systems || []).map(s => {
+      const classified = !this._canAccessClassification(s.classification, clearance);
+      const statusClass = this._starSystemStatusToClass(s.status);
+      const statusTextClass = statusClass === 'online' ? 'wy-text-green' :
+        statusClass === 'warning' ? 'wy-text-amber' :
+        statusClass === 'critical' ? 'wy-text-red' : 'wy-text-dim';
+      return { ...s, classified, statusClass, statusTextClass };
+    });
+    return { systems, isGM: game.user.isGM };
+  }
+
+  _starSystemStatusToClass(status) {
+    if (!status) return 'offline';
+    const s = status.toUpperCase();
+    if (['ACTIVE', 'REBUILDING', 'RECONTACTED'].includes(s)) return 'online';
+    if (['SURVEYED', 'SURVEY', 'UNKNOWN', 'UNEXPLORED'].includes(s)) return 'warning';
+    if (['QUARANTINE', 'ABANDONED', 'DECOMMISSIONED', 'CLASSIFIED'].includes(s)) return 'critical';
+    return 'offline';
+  }
+
+  async _loadStarSystemsData() {
+    try {
+      const resp = await fetch(`modules/wy-terminal/muthur/starsystems.json`);
+      const base = await resp.json();
+      // Merge GM overrides from world settings
+      const overrides = game.settings.get('wy-terminal', 'starSystemsData') ?? { added: [], modified: {}, deleted: [] };
+      let systems = (base.systems || []).slice();
+      // Apply deletions
+      if (overrides.deleted?.length) {
+        systems = systems.filter(s => !overrides.deleted.includes(s.id));
+      }
+      // Apply modifications
+      if (overrides.modified && Object.keys(overrides.modified).length) {
+        systems = systems.map(s => overrides.modified[s.id] ? { ...s, ...overrides.modified[s.id] } : s);
+      }
+      // Append added systems
+      if (overrides.added?.length) {
+        systems = systems.concat(overrides.added);
+      }
+      this._starSystemsCache = { ...base, systems };
+    } catch (err) {
+      console.error('WY-Terminal | Failed to load star systems database:', err);
+      this._starSystemsCache = { systems: [] };
+    }
   }
 
   /* ── Emergency data ── */
@@ -1209,8 +1264,8 @@ export class WYTerminalApp extends Application {
       case 'scenes':
         this._setupScenesView(contentEl);
         break;
-      case 'maps':
-        this._setupMapsView(contentEl);
+      case 'starsystems':
+        this._setupStarSystemsView(contentEl);
         break;
       case 'systems':
         this._setupSystemsView(contentEl);
@@ -1300,6 +1355,8 @@ export class WYTerminalApp extends Application {
             video.controls = true;
             video.autoplay = false;
             bodyEl.appendChild(video);
+          } else if (log.mediaType === 'audio' && log.mediaUrl) {
+            this._buildAudioWaveformPlayer(bodyEl, log.mediaUrl);
           }
 
           // Always show detail text if present
@@ -2204,29 +2261,453 @@ export class WYTerminalApp extends Application {
     tokenLayer.style.height = `${renderH}px`;
   }
 
-  /* ── Maps View Setup ── */
-  _setupMapsView(contentEl) {
-    const viewport = contentEl.querySelector('#wy-map-viewport');
-    const img = contentEl.querySelector('#wy-map-img');
-    if (!viewport || !img) return;
+  /* ── Star Systems View Setup ── */
+  _setupStarSystemsView(contentEl) {
+    const listView = contentEl.querySelector('#wy-ss-list-view');
+    const detailView = contentEl.querySelector('#wy-ss-detail-view');
+    const formEl = contentEl.querySelector('#wy-ss-form');
+    if (!listView) return;
 
-    // Setup pinch-zoom on map viewport
-    const mapZoom = new PinchZoomHandler(viewport, img);
-    this._mapZoom = mapZoom;
+    const data = this._starSystemsCache ?? { systems: [] };
+    const allSystems = data.systems || [];
 
-    // Zoom / reset buttons
-    contentEl.querySelectorAll('[data-map-zoom]').forEach(btn => {
+    // Populate filter dropdowns
+    const territorySelect = contentEl.querySelector('#wy-ss-filter-territory');
+    const sectorSelect = contentEl.querySelector('#wy-ss-filter-sector');
+    const statusSelect = contentEl.querySelector('#wy-ss-filter-status');
+    if (territorySelect) {
+      const territories = [...new Set(allSystems.map(s => s.territory))].sort();
+      territories.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t.toUpperCase();
+        territorySelect.appendChild(opt);
+      });
+    }
+    if (sectorSelect) {
+      const sectors = [...new Set(allSystems.map(s => s.sector).filter(Boolean))].sort();
+      sectors.forEach(sec => {
+        const opt = document.createElement('option');
+        opt.value = sec;
+        opt.textContent = sec.toUpperCase();
+        sectorSelect.appendChild(opt);
+      });
+    }
+    if (statusSelect) {
+      const statuses = [...new Set(allSystems.map(s => s.status))].sort();
+      statuses.forEach(st => {
+        const opt = document.createElement('option');
+        opt.value = st;
+        opt.textContent = st.toUpperCase();
+        statusSelect.appendChild(opt);
+      });
+    }
+
+    // Populate datalists for territory/sector autocomplete in the form
+    const territoryDL = contentEl.querySelector('#wy-ss-territory-list');
+    const sectorDL = contentEl.querySelector('#wy-ss-sector-list');
+    if (territoryDL) {
+      [...new Set(allSystems.map(s => s.territory).filter(Boolean))].sort().forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        territoryDL.appendChild(opt);
+      });
+    }
+    if (sectorDL) {
+      [...new Set(allSystems.map(s => s.sector).filter(Boolean))].sort().forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        sectorDL.appendChild(opt);
+      });
+    }
+
+    // Filter logic
+    const applyFilter = () => {
+      const tf = territorySelect?.value || 'ALL';
+      const secf = sectorSelect?.value || 'ALL';
+      const sf = statusSelect?.value || 'ALL';
+      let visible = 0;
+      contentEl.querySelectorAll('.wy-ss-row:not(.wy-ss-row-header)').forEach(row => {
+        const matchT = tf === 'ALL' || row.dataset.ssTerritory === tf;
+        const matchSec = secf === 'ALL' || row.dataset.ssSector === secf;
+        const matchS = sf === 'ALL' || row.dataset.ssStatus === sf;
+        const show = matchT && matchSec && matchS;
+        row.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+      const countEl = contentEl.querySelector('#wy-ss-count');
+      if (countEl) countEl.textContent = visible;
+    };
+    territorySelect?.addEventListener('change', applyFilter);
+    sectorSelect?.addEventListener('change', applyFilter);
+    statusSelect?.addEventListener('change', applyFilter);
+
+    // Access / view buttons
+    contentEl.querySelectorAll('[data-action="view-starsystem"]').forEach(btn => {
       btn.addEventListener('click', () => {
-        const action = btn.dataset.mapZoom;
-        if (action === 'reset') {
-          mapZoom.reset();
-        } else if (action === 'in') {
-          mapZoom.zoomIn();
-        } else if (action === 'out') {
-          mapZoom.zoomOut();
-        }
+        const id = btn.dataset.ssId;
+        this._showStarSystemDetail(contentEl, id);
       });
     });
+
+    // Back button
+    contentEl.querySelector('[data-action="ss-back"]')?.addEventListener('click', () => {
+      TerminalSFX.play('beep');
+      if (listView) listView.style.display = '';
+      listView.classList.remove('wy-hidden');
+      if (detailView) detailView.style.display = 'none';
+      if (formEl) formEl.classList.add('wy-hidden');
+    });
+
+    /* ── GM CRUD ── */
+    if (!game.user.isGM || !formEl) return;
+
+    // Inline EDIT from list rows
+    contentEl.querySelectorAll('[data-action="ss-row-edit"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const sysId = btn.dataset.ssId;
+        const sys = allSystems.find(s => s.id === sysId);
+        if (!sys) return;
+        TerminalSFX.play('beep');
+        this._ssEditingId = sysId;
+        this._ssPopulateForm(contentEl, sys);
+        const title = contentEl.querySelector('#wy-ss-form-title');
+        if (title) title.textContent = 'EDIT STAR SYSTEM';
+        formEl.classList.remove('wy-hidden');
+        listView.classList.add('wy-hidden');
+        if (detailView) detailView.style.display = 'none';
+      });
+    });
+
+    // Inline DELETE from list rows
+    contentEl.querySelectorAll('[data-action="ss-row-delete"]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const sysId = btn.dataset.ssId;
+        const sys = allSystems.find(s => s.id === sysId);
+        if (!sys) return;
+        const confirmed = await Dialog.confirm({
+          title: 'DELETE STAR SYSTEM',
+          content: `<p style="color: var(--wy-green); font-family: var(--wy-font, monospace); letter-spacing: 1px;">
+            CONFIRM DELETION OF: <strong>${sys.name}</strong><br/>
+            THIS ACTION CANNOT BE UNDONE.</p>`,
+        });
+        if (!confirmed) return;
+        TerminalSFX.play('beep');
+        await this._ssDeleteSystem(sysId);
+        ui.notifications.info(`WY-Terminal: System "${sys.name}" deleted.`);
+      });
+    });
+
+    // Track which system is being edited (null = create mode)
+    this._ssEditingId = null;
+
+    // CREATE button — show blank form
+    contentEl.querySelector('[data-action="ss-create"]')?.addEventListener('click', () => {
+      TerminalSFX.play('beep');
+      this._ssEditingId = null;
+      this._ssResetForm(contentEl);
+      const title = contentEl.querySelector('#wy-ss-form-title');
+      if (title) title.textContent = 'CREATE NEW STAR SYSTEM';
+      formEl.classList.remove('wy-hidden');
+      listView.classList.add('wy-hidden');
+      if (detailView) detailView.style.display = 'none';
+      formEl.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // EDIT button — populate form with current system
+    contentEl.querySelector('[data-action="ss-edit"]')?.addEventListener('click', () => {
+      const sysId = this._ssCurrentDetailId;
+      if (!sysId) return;
+      const sys = allSystems.find(s => s.id === sysId);
+      if (!sys) return;
+      TerminalSFX.play('beep');
+      this._ssEditingId = sysId;
+      this._ssPopulateForm(contentEl, sys);
+      const title = contentEl.querySelector('#wy-ss-form-title');
+      if (title) title.textContent = 'EDIT STAR SYSTEM';
+      formEl.classList.remove('wy-hidden');
+      listView.classList.add('wy-hidden');
+      detailView.style.display = 'none';
+    });
+
+    // DELETE button
+    contentEl.querySelector('[data-action="ss-delete"]')?.addEventListener('click', async () => {
+      const sysId = this._ssCurrentDetailId;
+      if (!sysId) return;
+      const sys = allSystems.find(s => s.id === sysId);
+      if (!sys) return;
+
+      const confirmed = await Dialog.confirm({
+        title: 'DELETE STAR SYSTEM',
+        content: `<p style="color: var(--wy-green); font-family: var(--wy-font, monospace); letter-spacing: 1px;">
+          CONFIRM DELETION OF: <strong>${sys.name}</strong><br/>
+          THIS ACTION CANNOT BE UNDONE.</p>`,
+      });
+      if (!confirmed) return;
+
+      TerminalSFX.play('beep');
+      await this._ssDeleteSystem(sysId);
+      ui.notifications.info(`WY-Terminal: System "${sys.name}" deleted.`);
+    });
+
+    // Add body row
+    contentEl.querySelector('[data-action="ss-add-body"]')?.addEventListener('click', () => {
+      this._ssAddBodyRow(contentEl);
+    });
+
+    // Cancel form
+    contentEl.querySelector('[data-action="ss-form-cancel"]')?.addEventListener('click', () => {
+      TerminalSFX.play('beep');
+      formEl.classList.add('wy-hidden');
+      listView.classList.remove('wy-hidden');
+    });
+
+    // Submit form (create or update)
+    contentEl.querySelector('[data-action="ss-form-submit"]')?.addEventListener('click', async () => {
+      const name = contentEl.querySelector('#wy-ss-form-name')?.value?.trim();
+      if (!name) {
+        ui.notifications.warn('WY-Terminal: System designation is required.');
+        return;
+      }
+
+      const systemData = {
+        name,
+        type: contentEl.querySelector('#wy-ss-form-type')?.value || 'system',
+        territory: contentEl.querySelector('#wy-ss-form-territory')?.value?.trim() || '',
+        sector: contentEl.querySelector('#wy-ss-form-sector')?.value?.trim() || '',
+        coordinates: contentEl.querySelector('#wy-ss-form-coordinates')?.value?.trim() || '',
+        affiliation: contentEl.querySelector('#wy-ss-form-affiliation')?.value?.trim() || '',
+        classification: contentEl.querySelector('#wy-ss-form-classification')?.value || 'NONE',
+        status: contentEl.querySelector('#wy-ss-form-status')?.value || 'ACTIVE',
+        description: contentEl.querySelector('#wy-ss-form-description')?.value?.trim() || '',
+        bodies: this._ssCollectBodies(contentEl),
+      };
+
+      TerminalSFX.play('beep');
+
+      if (this._ssEditingId) {
+        await this._ssUpdateSystem(this._ssEditingId, systemData);
+        ui.notifications.info(`WY-Terminal: System "${name}" updated.`);
+      } else {
+        const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/(^_|_$)/g, '') + '_' + Date.now().toString(36);
+        await this._ssCreateSystem({ ...systemData, id });
+        ui.notifications.info(`WY-Terminal: System "${name}" created.`);
+      }
+    });
+  }
+
+  /* ── Star System Form Helpers ── */
+  _ssResetForm(contentEl) {
+    contentEl.querySelector('#wy-ss-form-name').value = '';
+    contentEl.querySelector('#wy-ss-form-type').value = 'system';
+    contentEl.querySelector('#wy-ss-form-territory').value = '';
+    contentEl.querySelector('#wy-ss-form-sector').value = '';
+    contentEl.querySelector('#wy-ss-form-coordinates').value = '';
+    contentEl.querySelector('#wy-ss-form-affiliation').value = '';
+    contentEl.querySelector('#wy-ss-form-classification').value = 'NONE';
+    contentEl.querySelector('#wy-ss-form-status').value = 'ACTIVE';
+    contentEl.querySelector('#wy-ss-form-description').value = '';
+    const bodiesEl = contentEl.querySelector('#wy-ss-form-bodies');
+    if (bodiesEl) bodiesEl.innerHTML = '';
+  }
+
+  _ssPopulateForm(contentEl, sys) {
+    contentEl.querySelector('#wy-ss-form-name').value = sys.name || '';
+    contentEl.querySelector('#wy-ss-form-type').value = sys.type || 'system';
+    contentEl.querySelector('#wy-ss-form-territory').value = sys.territory || '';
+    contentEl.querySelector('#wy-ss-form-sector').value = sys.sector || '';
+    contentEl.querySelector('#wy-ss-form-coordinates').value = sys.coordinates || '';
+    contentEl.querySelector('#wy-ss-form-affiliation').value = sys.affiliation || '';
+    contentEl.querySelector('#wy-ss-form-classification').value = sys.classification || 'NONE';
+    contentEl.querySelector('#wy-ss-form-status').value = sys.status || 'ACTIVE';
+    contentEl.querySelector('#wy-ss-form-description').value = sys.description || '';
+    const bodiesEl = contentEl.querySelector('#wy-ss-form-bodies');
+    if (bodiesEl) {
+      bodiesEl.innerHTML = '';
+      (sys.bodies || []).forEach(b => this._ssAddBodyRow(contentEl, b));
+    }
+  }
+
+  _ssAddBodyRow(contentEl, body = {}) {
+    const container = contentEl.querySelector('#wy-ss-form-bodies');
+    if (!container) return;
+    const row = document.createElement('div');
+    row.className = 'wy-ss-form-body-row';
+    row.innerHTML = `
+      <input type="text" class="wy-setting-input wy-ss-body-input-name" placeholder="Body name" value="${(body.name || '').replace(/"/g, '&quot;')}" />
+      <select class="wy-setting-input wy-ss-body-input-type">
+        <option value="planet" ${body.type === 'planet' ? 'selected' : ''}>PLANET</option>
+        <option value="moon" ${body.type === 'moon' ? 'selected' : ''}>MOON</option>
+        <option value="star" ${body.type === 'star' ? 'selected' : ''}>STAR</option>
+        <option value="asteroid" ${body.type === 'asteroid' ? 'selected' : ''}>ASTEROID</option>
+        <option value="station" ${body.type === 'station' ? 'selected' : ''}>STATION</option>
+        <option value="gas giant" ${body.type === 'gas giant' ? 'selected' : ''}>GAS GIANT</option>
+        <option value="dwarf" ${body.type === 'dwarf' ? 'selected' : ''}>DWARF</option>
+        <option value="ring" ${body.type === 'ring' ? 'selected' : ''}>RING</option>
+        <option value="other" ${body.type === 'other' ? 'selected' : ''}>OTHER</option>
+      </select>
+      <input type="text" class="wy-setting-input wy-ss-body-input-detail" placeholder="Details..." value="${(body.detail || '').replace(/"/g, '&quot;')}" />
+      <button class="wy-scene-btn wy-ss-body-remove-btn" title="Remove body">&times;</button>
+    `;
+    row.querySelector('.wy-ss-body-remove-btn')?.addEventListener('click', () => row.remove());
+    container.appendChild(row);
+  }
+
+  _ssCollectBodies(contentEl) {
+    const bodies = [];
+    contentEl.querySelectorAll('.wy-ss-form-body-row').forEach(row => {
+      const name = row.querySelector('.wy-ss-body-input-name')?.value?.trim();
+      if (!name) return;
+      bodies.push({
+        name,
+        type: row.querySelector('.wy-ss-body-input-type')?.value || 'planet',
+        detail: row.querySelector('.wy-ss-body-input-detail')?.value?.trim() || '',
+      });
+    });
+    return bodies;
+  }
+
+  /* ── Star System Persistence ── */
+  async _ssCreateSystem(system) {
+    const overrides = foundry.utils.deepClone(game.settings.get('wy-terminal', 'starSystemsData') ?? { added: [], modified: {}, deleted: [] });
+    if (!overrides.added) overrides.added = [];
+    overrides.added.push(system);
+    await game.settings.set('wy-terminal', 'starSystemsData', overrides);
+    await this._loadStarSystemsData();
+    this._broadcastSocket('refreshView', { view: 'starsystems' });
+    this._renderView('starsystems');
+  }
+
+  async _ssUpdateSystem(systemId, fields) {
+    const overrides = foundry.utils.deepClone(game.settings.get('wy-terminal', 'starSystemsData') ?? { added: [], modified: {}, deleted: [] });
+    if (!overrides.modified) overrides.modified = {};
+    if (!overrides.added) overrides.added = [];
+
+    // Check if this was a GM-added system
+    const addedIdx = overrides.added.findIndex(s => s.id === systemId);
+    if (addedIdx !== -1) {
+      overrides.added[addedIdx] = { ...overrides.added[addedIdx], ...fields };
+    } else {
+      overrides.modified[systemId] = { ...(overrides.modified[systemId] || {}), ...fields };
+    }
+
+    await game.settings.set('wy-terminal', 'starSystemsData', overrides);
+    await this._loadStarSystemsData();
+    this._broadcastSocket('refreshView', { view: 'starsystems' });
+    this._renderView('starsystems');
+  }
+
+  async _ssDeleteSystem(systemId) {
+    const overrides = foundry.utils.deepClone(game.settings.get('wy-terminal', 'starSystemsData') ?? { added: [], modified: {}, deleted: [] });
+    if (!overrides.added) overrides.added = [];
+    if (!overrides.deleted) overrides.deleted = [];
+    if (!overrides.modified) overrides.modified = {};
+
+    // Check if this was a GM-added system
+    const addedIdx = overrides.added.findIndex(s => s.id === systemId);
+    if (addedIdx !== -1) {
+      overrides.added.splice(addedIdx, 1);
+    } else {
+      // It's a base system — mark as deleted
+      if (!overrides.deleted.includes(systemId)) overrides.deleted.push(systemId);
+      delete overrides.modified[systemId];
+    }
+
+    await game.settings.set('wy-terminal', 'starSystemsData', overrides);
+    await this._loadStarSystemsData();
+    this._broadcastSocket('refreshView', { view: 'starsystems' });
+    this._renderView('starsystems');
+  }
+
+  _showStarSystemDetail(contentEl, systemId) {
+    const data = this._starSystemsCache ?? { systems: [] };
+    const sys = (data.systems || []).find(s => s.id === systemId);
+    if (!sys) return;
+
+    // Track for GM edit/delete buttons
+    this._ssCurrentDetailId = systemId;
+
+    const clearance = this._getActiveClearance();
+    const classified = !this._canAccessClassification(sys.classification, clearance);
+
+    const listView = contentEl.querySelector('#wy-ss-list-view');
+    const detailView = contentEl.querySelector('#wy-ss-detail-view');
+    const headerEl = contentEl.querySelector('#wy-ss-detail-header');
+    const bodyEl = contentEl.querySelector('#wy-ss-detail-body');
+    if (!listView || !detailView || !headerEl || !bodyEl) return;
+
+    TerminalSFX.play('beep');
+
+    if (classified) {
+      TerminalSFX.play('buzz');
+      const required = this._requiredClearanceFor(sys.classification);
+      headerEl.innerHTML = `<div class="wy-ss-detail-title wy-text-red">ACCESS DENIED</div>`;
+      bodyEl.innerHTML = `
+        <div class="wy-ss-classified-block">
+          <div class="wy-ss-classified-icon">&#x26A0;</div>
+          <div class="wy-ss-classified-msg">
+            CLASSIFICATION: <span class="wy-text-red">${sys.classification}</span><br/>
+            REQUIRED CLEARANCE: <span class="wy-text-red">${required}</span><br/><br/>
+            THIS RECORD IS SEALED UNDER ICC DIRECTIVE.<br/>
+            ENTER VALID COMMAND CODE TO ELEVATE CLEARANCE.
+          </div>
+        </div>`;
+      listView.style.display = 'none';
+      detailView.style.display = '';
+      const formElC = contentEl.querySelector('#wy-ss-form');
+      if (formElC) formElC.classList.add('wy-hidden');
+      return;
+    }
+
+    // Accessible — render full detail
+    const statusClass = this._starSystemStatusToClass(sys.status);
+    const statusColor = statusClass === 'online' ? 'wy-text-green' :
+      statusClass === 'warning' ? 'wy-text-amber' :
+      statusClass === 'critical' ? 'wy-text-red' : 'wy-text-dim';
+
+    headerEl.innerHTML = `<div class="wy-ss-detail-title">${sys.name}</div>`;
+
+    let bodiesHtml = '';
+    if (sys.bodies && sys.bodies.length) {
+      bodiesHtml = `
+        <div class="wy-ss-detail-section-title">CELESTIAL BODIES</div>
+        <div class="wy-ss-bodies-list">
+          ${sys.bodies.map(b => `
+            <div class="wy-ss-body-item">
+              <span class="wy-ss-body-name">${b.name}</span>
+              <span class="wy-ss-body-type">${(b.type || '').toUpperCase()}</span>
+              <div class="wy-ss-body-detail">${b.detail || '—'}</div>
+            </div>
+          `).join('')}
+        </div>`;
+    }
+
+    bodyEl.innerHTML = `
+      <table class="wy-data-table wy-ss-detail-table">
+        <tbody>
+          <tr><td class="wy-ss-label">DESIGNATION</td><td>${sys.name}</td></tr>
+          <tr><td class="wy-ss-label">TYPE</td><td>${(sys.type || '').toUpperCase()}</td></tr>
+          <tr><td class="wy-ss-label">TERRITORY</td><td>${sys.territory || '—'}</td></tr>
+          <tr><td class="wy-ss-label">SECTOR</td><td>${sys.sector || '—'}</td></tr>
+          <tr><td class="wy-ss-label">COORDINATES</td><td>${sys.coordinates || '—'}</td></tr>
+          <tr><td class="wy-ss-label">AFFILIATION</td><td>${sys.affiliation || '—'}</td></tr>
+          <tr><td class="wy-ss-label">STATUS</td><td class="${statusColor}">${sys.status || '—'}</td></tr>
+        </tbody>
+      </table>
+
+      <div class="wy-ss-detail-section-title">DESCRIPTION</div>
+      <div class="wy-ss-description">${(sys.description || '—').replace(/\n/g, '<br/>')}</div>
+
+      ${bodiesHtml}
+    `;
+
+    listView.style.display = 'none';
+    detailView.style.display = '';
+    // Hide editor form if open
+    const formEl = contentEl.querySelector('#wy-ss-form');
+    if (formEl) formEl.classList.add('wy-hidden');
   }
 
   /* ── Nav View Setup — star map canvas overlay ── */
@@ -4257,7 +4738,7 @@ export class WYTerminalApp extends Application {
       logs: 'SHIP LOG',
       muthur: 'MU/TH/UR INTERFACE',
       scenes: 'SHIP SCHEMATICS',
-      maps: 'DIGITAL MAPS',
+      starsystems: 'STELLAR CARTOGRAPHY',
       emergency: 'EMERGENCY PROTOCOLS',
       nav: 'NAVIGATION',
       comms: 'COMMUNICATIONS',
@@ -4269,6 +4750,297 @@ export class WYTerminalApp extends Application {
       gameclock: 'GAME CLOCK',
     };
     return titles[this.activeView] || 'TERMINAL';
+  }
+
+  /* ── Audio Waveform Player ── */
+
+  /**
+   * Build a fully themed audio waveform player in the given container.
+   * Uses Web Audio API to decode the file and draw a waveform on a <canvas>.
+   * Playback position is shown as a moving highlight over the waveform.
+   * @param {HTMLElement} container — Parent element to inject the player into
+   * @param {string} url — Path to the MP3/WAV file (relative or absolute)
+   */
+  _buildAudioWaveformPlayer(container, url) {
+    // Wrapper
+    const wrapper = document.createElement('div');
+    wrapper.className = 'wy-audio-player';
+
+    // Status label
+    const statusLabel = document.createElement('div');
+    statusLabel.className = 'wy-audio-status';
+    statusLabel.textContent = 'DECODING AUDIO SIGNAL...';
+    wrapper.appendChild(statusLabel);
+
+    // Canvas for waveform
+    const canvas = document.createElement('canvas');
+    canvas.className = 'wy-audio-canvas';
+    canvas.width = 600;
+    canvas.height = 120;
+    wrapper.appendChild(canvas);
+
+    // Time display
+    const timeDisplay = document.createElement('div');
+    timeDisplay.className = 'wy-audio-time';
+    timeDisplay.textContent = '00:00 / 00:00';
+    wrapper.appendChild(timeDisplay);
+
+    // Controls row
+    const controls = document.createElement('div');
+    controls.className = 'wy-audio-controls';
+
+    const playBtn = document.createElement('button');
+    playBtn.className = 'wy-scene-btn wy-audio-btn';
+    playBtn.textContent = '▶ PLAY';
+    controls.appendChild(playBtn);
+
+    const stopBtn = document.createElement('button');
+    stopBtn.className = 'wy-scene-btn wy-audio-btn';
+    stopBtn.textContent = '■ STOP';
+    controls.appendChild(stopBtn);
+
+    wrapper.appendChild(controls);
+    container.appendChild(wrapper);
+
+    const ctx = canvas.getContext('2d');
+    let audioBuffer = null;
+    let audioSource = null;
+    let audioCtx = null;
+    let isPlaying = false;
+    let startTime = 0;
+    let pausedAt = 0;
+    let animFrame = null;
+    let waveformData = null;
+
+    // Decode audio and draw static waveform
+    const resolvedUrl = url.startsWith('http') ? url : `${window.location.origin}/${url}`;
+    fetch(resolvedUrl)
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.arrayBuffer();
+      })
+      .then(buf => {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        return audioCtx.decodeAudioData(buf);
+      })
+      .then(decoded => {
+        audioBuffer = decoded;
+        waveformData = this._extractWaveformData(audioBuffer, canvas.width);
+        this._drawWaveform(ctx, canvas, waveformData, 0);
+        statusLabel.textContent = `AUDIO SIGNAL LOADED — ${this._fmtAudioTime(audioBuffer.duration)}`;
+        timeDisplay.textContent = `00:00 / ${this._fmtAudioTime(audioBuffer.duration)}`;
+      })
+      .catch(err => {
+        console.error('WY-Terminal | Audio decode failed:', err);
+        statusLabel.textContent = 'ERROR: UNABLE TO DECODE AUDIO SIGNAL';
+        statusLabel.style.color = 'var(--wy-red, #ff4444)';
+      });
+
+    // Play handler
+    playBtn.addEventListener('click', () => {
+      if (!audioBuffer || !audioCtx) return;
+      if (isPlaying) {
+        // Pause
+        pausedAt = audioCtx.currentTime - startTime;
+        audioSource?.stop();
+        isPlaying = false;
+        playBtn.textContent = '▶ PLAY';
+        if (animFrame) cancelAnimationFrame(animFrame);
+        return;
+      }
+
+      // Resume / start
+      audioSource = audioCtx.createBufferSource();
+      audioSource.buffer = audioBuffer;
+      audioSource.connect(audioCtx.destination);
+      audioSource.onended = () => {
+        if (isPlaying) {
+          isPlaying = false;
+          pausedAt = 0;
+          playBtn.textContent = '▶ PLAY';
+          if (animFrame) cancelAnimationFrame(animFrame);
+          this._drawWaveform(ctx, canvas, waveformData, 0);
+          timeDisplay.textContent = `00:00 / ${this._fmtAudioTime(audioBuffer.duration)}`;
+          statusLabel.textContent = 'PLAYBACK COMPLETE';
+        }
+      };
+
+      startTime = audioCtx.currentTime - pausedAt;
+      audioSource.start(0, pausedAt);
+      isPlaying = true;
+      playBtn.textContent = '❚❚ PAUSE';
+      statusLabel.textContent = 'PLAYING AUDIO SIGNAL...';
+
+      // Animate waveform position
+      const animate = () => {
+        if (!isPlaying) return;
+        const elapsed = audioCtx.currentTime - startTime;
+        const progress = Math.min(elapsed / audioBuffer.duration, 1);
+        this._drawWaveform(ctx, canvas, waveformData, progress);
+        timeDisplay.textContent = `${this._fmtAudioTime(elapsed)} / ${this._fmtAudioTime(audioBuffer.duration)}`;
+        animFrame = requestAnimationFrame(animate);
+      };
+      animate();
+    });
+
+    // Stop handler
+    stopBtn.addEventListener('click', () => {
+      if (audioSource && isPlaying) {
+        audioSource.stop();
+      }
+      isPlaying = false;
+      pausedAt = 0;
+      playBtn.textContent = '▶ PLAY';
+      if (animFrame) cancelAnimationFrame(animFrame);
+      if (waveformData) {
+        this._drawWaveform(ctx, canvas, waveformData, 0);
+      }
+      if (audioBuffer) {
+        timeDisplay.textContent = `00:00 / ${this._fmtAudioTime(audioBuffer.duration)}`;
+        statusLabel.textContent = `AUDIO SIGNAL LOADED — ${this._fmtAudioTime(audioBuffer.duration)}`;
+      }
+    });
+
+    // Seek by clicking on canvas
+    canvas.addEventListener('click', (e) => {
+      if (!audioBuffer) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const seekRatio = x / rect.width;
+      const seekTime = seekRatio * audioBuffer.duration;
+
+      if (isPlaying && audioSource) {
+        audioSource.stop();
+        audioSource = audioCtx.createBufferSource();
+        audioSource.buffer = audioBuffer;
+        audioSource.connect(audioCtx.destination);
+        audioSource.onended = () => {
+          if (isPlaying) {
+            isPlaying = false;
+            pausedAt = 0;
+            playBtn.textContent = '▶ PLAY';
+            if (animFrame) cancelAnimationFrame(animFrame);
+            this._drawWaveform(ctx, canvas, waveformData, 0);
+            timeDisplay.textContent = `00:00 / ${this._fmtAudioTime(audioBuffer.duration)}`;
+            statusLabel.textContent = 'PLAYBACK COMPLETE';
+          }
+        };
+        startTime = audioCtx.currentTime - seekTime;
+        audioSource.start(0, seekTime);
+      } else {
+        pausedAt = seekTime;
+        this._drawWaveform(ctx, canvas, waveformData, seekRatio);
+        timeDisplay.textContent = `${this._fmtAudioTime(seekTime)} / ${this._fmtAudioTime(audioBuffer.duration)}`;
+      }
+    });
+
+    // Store cleanup ref so switching views stops playback
+    this._activeAudioCleanup = () => {
+      if (isPlaying && audioSource) {
+        try { audioSource.stop(); } catch { /* */ }
+      }
+      if (animFrame) cancelAnimationFrame(animFrame);
+      if (audioCtx && audioCtx.state !== 'closed') {
+        audioCtx.close().catch(() => {});
+      }
+    };
+  }
+
+  /**
+   * Extract downsampled waveform peak data from an AudioBuffer.
+   * Returns an array of normalized peak values (0..1) — one per canvas pixel.
+   */
+  _extractWaveformData(audioBuffer, width) {
+    const rawData = audioBuffer.getChannelData(0); // mono or left channel
+    const samples = rawData.length;
+    const blockSize = Math.floor(samples / width);
+    const peaks = [];
+    for (let i = 0; i < width; i++) {
+      let max = 0;
+      const start = i * blockSize;
+      for (let j = 0; j < blockSize; j++) {
+        const abs = Math.abs(rawData[start + j] || 0);
+        if (abs > max) max = abs;
+      }
+      peaks.push(max);
+    }
+    return peaks;
+  }
+
+  /**
+   * Draw the waveform on a canvas with a playback progress highlight.
+   * Played portion is bright green, remaining is dim green.
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {HTMLCanvasElement} canvas
+   * @param {number[]} peaks — Normalized peak array
+   * @param {number} progress — 0..1 playback position
+   */
+  _drawWaveform(ctx, canvas, peaks, progress) {
+    if (!peaks) return;
+    const w = canvas.width;
+    const h = canvas.height;
+    const mid = h / 2;
+    const progressX = Math.floor(progress * w);
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Draw center line
+    ctx.strokeStyle = 'rgba(127, 255, 0, 0.15)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, mid);
+    ctx.lineTo(w, mid);
+    ctx.stroke();
+
+    // Draw waveform bars
+    for (let i = 0; i < peaks.length; i++) {
+      const barH = peaks[i] * mid * 0.9;
+      if (i < progressX) {
+        // Played — bright green with glow
+        ctx.fillStyle = 'rgba(127, 255, 0, 0.9)';
+        ctx.shadowColor = 'rgba(127, 255, 0, 0.5)';
+        ctx.shadowBlur = 3;
+      } else {
+        // Unplayed — dim green
+        ctx.fillStyle = 'rgba(127, 255, 0, 0.3)';
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+      }
+      ctx.fillRect(i, mid - barH, 1, barH * 2);
+    }
+
+    // Reset shadow
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+
+    // Draw playhead line
+    if (progress > 0 && progress < 1) {
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(progressX, 0);
+      ctx.lineTo(progressX, h);
+      ctx.stroke();
+    }
+
+    // Scanline grid overlay
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
+    ctx.lineWidth = 1;
+    for (let y = 0; y < h; y += 3) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(w, y);
+      ctx.stroke();
+    }
+  }
+
+  /**
+   * Format seconds into MM:SS display string.
+   */
+  _fmtAudioTime(secs) {
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   }
 
   _loadSetting(key) {

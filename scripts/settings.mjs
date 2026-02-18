@@ -120,6 +120,14 @@ export function registerSettings() {
     default: {},
   });
 
+  // Internal: GM star systems overrides (added/edited/deleted entries)
+  game.settings.register('wy-terminal', 'starSystemsData', {
+    scope: 'world',
+    config: false,
+    type: Object,
+    default: { added: [], modified: {}, deleted: [] },
+  });
+
   // Internal: ship maps configuration
   game.settings.register('wy-terminal', 'maps', {
     scope: 'world',

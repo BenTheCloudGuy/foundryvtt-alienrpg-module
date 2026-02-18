@@ -1,0 +1,974 @@
+{
+  "version": "1.0",
+  "label": "STELLAR CARTOGRAPHY DATABASE",
+  "systems": [
+    {
+      "id": "sol",
+      "name": "Sol System",
+      "type": "system",
+      "territory": "Core Systems",
+      "sector": "Sol Sector",
+      "coordinates": "0.0 / 0.0",
+      "affiliation": "United Americas / Three World Empire",
+      "classification": "NONE",
+      "description": "Origin system of the human species. Seat of the United Americas and Three World Empire governments. Most densely populated system in the ICC.",
+      "bodies": [
+        { "name": "Earth", "type": "planet", "detail": "Homeworld of humanity. Population 7.7 billion." },
+        { "name": "Luna", "type": "moon", "detail": "Sea of Tranquility Colony. Major orbital shipyards." },
+        { "name": "Mars", "type": "planet", "detail": "Valles Colony. Extensive terraforming operations." },
+        { "name": "Phobos", "type": "moon", "detail": "Weyland-Yutani research and training facility." },
+        { "name": "Jupiter", "type": "planet", "detail": "Gas giant. Fuel trawling operations." },
+        { "name": "Io", "type": "moon", "detail": "Volcanic moon. Mining operations." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "ag4550",
+      "name": "AG-4550 System",
+      "type": "system",
+      "territory": "Core Systems",
+      "sector": "New Eden Sector",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "ICC",
+      "classification": "NONE",
+      "description": "Core system in the New Eden Sector. Home to Alexandria Colony on AG-4550.02.",
+      "bodies": [
+        { "name": "AG-4550.02", "type": "planet", "detail": "Alexandria Colony. Major research and commercial hub." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "heske337",
+      "name": "Heske 337 System",
+      "type": "system",
+      "territory": "Core Systems",
+      "sector": "New Eden Sector",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "ICC",
+      "classification": "NONE",
+      "description": "Core system in the New Eden Sector containing the volcanic world Volcus.",
+      "bodies": [
+        { "name": "Volcus", "type": "planet", "detail": "Settlement: Etna. Volcanic geology, mineral extraction." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "third_base",
+      "name": "[CLASSIFIED]",
+      "type": "station",
+      "territory": "Core Systems",
+      "sector": "CLASSIFIED",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "CLASSIFIED",
+      "classification": "CORPORATE",
+      "description": "CLASSIFIED INSTALLATION. ACCESS RESTRICTED TO CORPORATE CLEARANCE AND ABOVE.\n\nDesignation: Third Base. All records sealed by order of Weyland-Yutani Special Projects Division.",
+      "bodies": [],
+      "status": "CLASSIFIED"
+    },
+    {
+      "id": "jpg770",
+      "name": "JPG-770 System",
+      "type": "system",
+      "territory": "Outer Veil",
+      "sector": "Sector 3847",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "ICC",
+      "classification": "NONE",
+      "description": "Outer Veil system in Sector 3847. Contains Gorham's Folly on JPG-770.03.",
+      "bodies": [
+        { "name": "JPG-770.03", "type": "planet", "detail": "Gorham's Folly. Remote settlement." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "pol5362",
+      "name": "POL-5362 System",
+      "type": "system",
+      "territory": "Outer Veil",
+      "sector": "Neroid Sector",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "ICC",
+      "classification": "NONE",
+      "description": "Outer Veil system in the Neroid Sector. Location of Aires Outpost.",
+      "bodies": [
+        { "name": "POL-5362.01", "type": "planet", "detail": "Aires Outpost. Frontier commerce station." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "fiori16",
+      "name": "Fiori 16 System",
+      "type": "system",
+      "territory": "Outer Veil",
+      "sector": "Neroid Sector",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "Weyland-Yutani",
+      "classification": "NONE",
+      "description": "Outer Veil system containing Fiorina 161. Former penal colony and lead foundry. Facility closed following incident in 2179.",
+      "bodies": [
+        { "name": "Fiorina 161 (Fury)", "type": "planet", "detail": "Class C prison/industrial facility. Lead works and mineral refinery. CLOSED." }
+      ],
+      "status": "DECOMMISSIONED"
+    },
+    {
+      "id": "17pheiphei",
+      "name": "17 Phei Phei System",
+      "type": "system",
+      "territory": "Outer Veil",
+      "sector": "Bao Sau Sector",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "UPP",
+      "classification": "NONE",
+      "description": "Outer Veil system in the Bao Sau Sector. UPP-controlled territory.",
+      "bodies": [
+        { "name": "17 Phei Phei E", "type": "planet", "detail": "Znoy Outpost. UPP frontier installation." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "requist",
+      "name": "Requist System",
+      "type": "system",
+      "territory": "Outer Rim",
+      "sector": "Borodino Sector",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "ICC",
+      "classification": "NONE",
+      "description": "Outer Rim system in the Borodino Sector.",
+      "bodies": [
+        { "name": "DP-27", "type": "planet", "detail": "Uncolonized world. Mineral survey pending." }
+      ],
+      "status": "SURVEYED"
+    },
+    {
+      "id": "gliese326",
+      "name": "Gliese 326-3827 System",
+      "type": "system",
+      "territory": "Outer Rim",
+      "sector": "Borodino Sector",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "ICC",
+      "classification": "NONE",
+      "description": "Outer Rim system in the Borodino Sector. Home to Bracken's World on Gliese 326-3827b.",
+      "bodies": [
+        { "name": "Gliese 326-3827b", "type": "planet", "detail": "Bracken's World. Independent colony settlement." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "8etabootis",
+      "name": "8 Eta Bootis System",
+      "type": "system",
+      "territory": "Outer Rim",
+      "sector": "Undesignated",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "ICC",
+      "classification": "NONE",
+      "description": "Outer Rim star system. Location of Tientsin Colony on 8 Eta Bootis A.",
+      "bodies": [
+        { "name": "8 Eta Bootis A", "type": "planet", "detail": "Tientsin Colony. Commerce and transit hub." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "crestus",
+      "name": "Crestus System",
+      "type": "system",
+      "territory": "Outer Rim",
+      "sector": "Undesignated",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "CLASSIFIED",
+      "classification": "CORPORATE",
+      "description": "CLASSIFIED SYSTEM. ACCESS RESTRICTED.\n\nMulti-body system comprising Crestus Prime, Alpha, Beta, Gamma, and Delta. All operational details sealed under corporate directive.",
+      "bodies": [
+        { "name": "Crestus Prime", "type": "planet", "detail": "[CLASSIFIED]" },
+        { "name": "Crestus Alpha", "type": "planet", "detail": "[CLASSIFIED]" },
+        { "name": "Crestus Beta", "type": "planet", "detail": "[CLASSIFIED]" },
+        { "name": "Crestus Gamma", "type": "planet", "detail": "[CLASSIFIED]" },
+        { "name": "Crestus Delta", "type": "planet", "detail": "[CLASSIFIED]" }
+      ],
+      "status": "CLASSIFIED"
+    },
+    {
+      "id": "alphalinna",
+      "name": "Alpha Linna System",
+      "type": "system",
+      "territory": "Outer Rim",
+      "sector": "Tartarus Sector",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "ICC",
+      "classification": "NONE",
+      "description": "Outer Rim system in the Tartarus Sector.",
+      "bodies": [
+        { "name": "Linna 349", "type": "planet", "detail": "Frontier world. Limited settlement data." }
+      ],
+      "status": "SURVEYED"
+    },
+    {
+      "id": "gj229torin",
+      "name": "GJ-229 Torin System",
+      "type": "system",
+      "territory": "Outer Rim",
+      "sector": "Tartarus Sector",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "United Americas",
+      "classification": "NONE",
+      "description": "Outer Rim system notable for the 2106 Torin Prime Uprising. Site of significant USCM military operations.",
+      "bodies": [
+        { "name": "Torin Prime", "type": "planet", "detail": "Contested world. Civil War site (2106 uprising). USCM garrison." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "gj1105",
+      "name": "GJ1105 System",
+      "type": "system",
+      "territory": "Outer Rim",
+      "sector": "Sector 949",
+      "coordinates": "-6.8 Rimward / 0.2 Spinward",
+      "affiliation": "Formerly UA / Bionational",
+      "classification": "NONE",
+      "description": "Outer Rim system containing the terrestrial planet GJ1105BC, designation 'Rim'. Terraformed world with a history of catastrophic Xenomorph outbreak at Pype's Dream colony (2179). Replacement colony Pype's Line currently under construction.",
+      "bodies": [
+        { "name": "GJ1105BC (Rim)", "type": "planet", "detail": "Terrestrial, terraformed. Rainy climate, 0 deg C mean temp. Barren wasteland terrain. Resources: crude oil, neodymium. Former pop: 211." }
+      ],
+      "status": "REBUILDING"
+    },
+    {
+      "id": "omniceti",
+      "name": "Omni Ceti System",
+      "type": "system",
+      "territory": "Outer Rim",
+      "sector": "Sector 949",
+      "coordinates": "-5.9 Rimward / 1.2 Spinward",
+      "affiliation": "Unaffiliated",
+      "classification": "NONE",
+      "description": "Outer Rim system containing Mira Ceti IV. Partially terraformed planetoid with abandoned colony following mass hysteria event and possible extraterrestrial contact.",
+      "bodies": [
+        { "name": "Mira Ceti IV", "type": "planet", "detail": "Terrestrial planetoid, partially terraformed. Breathable but stale atmosphere. 8 deg C mean temp. Terrain: barren mountains, super canyons, quarries. Former pop: 532. Resources: yttrium, dysprosium. COLONY ABANDONED." }
+      ],
+      "status": "ABANDONED"
+    },
+    {
+      "id": "gl268",
+      "name": "GL268 System",
+      "type": "system",
+      "territory": "Outer Rim",
+      "sector": "Sector 949",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "ICC",
+      "classification": "NONE",
+      "description": "Outer Rim system housing DS Service Terminal Station 949. Deep space transit and refueling waypoint.",
+      "bodies": [
+        { "name": "DS Service Terminal Station 949", "type": "station", "detail": "Deep space transit station. Refueling and resupply for Sector 949 traffic." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "268cet",
+      "name": "268.CET System",
+      "type": "system",
+      "territory": "Outer Rim",
+      "sector": "Sector 949",
+      "coordinates": "-6.8 Rimward / 2.0 Spinward",
+      "affiliation": "Kelland / Omni-Tech",
+      "classification": "NONE",
+      "description": "Outer Rim system containing Traon. Corporate mining world operated by Kelland Mining and Omni-Tech consortium.",
+      "bodies": [
+        { "name": "Traon", "type": "planet", "detail": "Terrestrial, terraformed. Chilly climate, thin but breathable atmo. 16 deg C mean temp. Terrain: fault block mountains, cavernous mines. Pop: 300 miners. Resources: diatomite, kaolin, bentonite, barite." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "khadaji",
+      "name": "Khadaji System",
+      "type": "system",
+      "territory": "Frontier",
+      "sector": "Undesignated",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "ICC",
+      "classification": "NONE",
+      "description": "Frontier system containing KJ-331b, designated Lebanon II.",
+      "bodies": [
+        { "name": "KJ-331b (Lebanon II)", "type": "planet", "detail": "Frontier world. Limited colonial infrastructure." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "gammaleporis",
+      "name": "Gamma Leporis System",
+      "type": "system",
+      "territory": "Frontier",
+      "sector": "Undesignated",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "ICC",
+      "classification": "NONE",
+      "description": "Frontier system. Active terraforming operations on Gamma Leporis A3.",
+      "bodies": [
+        { "name": "Gamma Leporis A3", "type": "planet", "detail": "Terraform 3. Active atmospheric processing." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "zetareticuli",
+      "name": "Zeta Reticuli System",
+      "type": "system",
+      "territory": "Frontier",
+      "sector": "Undesignated",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "Weyland-Yutani / United Americas",
+      "classification": "CORPORATE",
+      "description": "RESTRICTED SYSTEM. CORPORATE CLEARANCE REQUIRED.\n\nBinary star system containing multiple surveyed bodies. Site of the Prometheus expedition to LV-223 (2093) and the Hadley's Hope colony disaster on LV-426 (2179). All traffic to this system suspended by ICC directive pending Weyland-Yutani threat assessment.",
+      "bodies": [
+        { "name": "Zeta1 Reticuli", "type": "star", "detail": "Primary star. G-class." },
+        { "name": "Zeta2 Reticuli", "type": "star", "detail": "Secondary star. G-class." },
+        { "name": "KG-348", "type": "planet", "detail": "Rocky body. Uncolonized." },
+        { "name": "Calpamos", "type": "planet", "detail": "Gas giant. Orbital survey complete." },
+        { "name": "LV-223", "type": "moon", "detail": "Site of Prometheus expedition (2093). Engineer installation. QUARANTINE IN EFFECT." },
+        { "name": "LV-426 (Acheron)", "type": "moon", "detail": "Former Hadley's Hope colony. DESTROYED (2179). Xenomorph infestation confirmed. Thermonuclear sterilization by atmospheric processor meltdown. NO APPROACH." }
+      ],
+      "status": "QUARANTINE"
+    },
+    {
+      "id": "ppelops",
+      "name": "P Pelops System",
+      "type": "system",
+      "territory": "Frontier",
+      "sector": "Weyland Isles",
+      "coordinates": "0.4 Coreward / 10.0 Spinward",
+      "affiliation": "UNISC",
+      "classification": "NONE",
+      "description": "Frontier system in the Weyland Isles. Home to the gas giant Pylos and its orbital ATOL Sphacteria fuel depot. Strategic refueling point for deep space operations.",
+      "bodies": [
+        { "name": "Pylos", "type": "planet", "detail": "Gas giant. Toxic atmosphere. Hydrogen/helium extraction operations." },
+        { "name": "ATOL Sphacteria", "type": "station", "detail": "Orbital fuel depot and freeport. Pop: 48 workers + 40 UNISC troops. Recycled atmosphere. 20 deg C. Resources: hydrogen, helium, nickel-iron." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "betacanumven",
+      "name": "Beta Canum Venaticorum System",
+      "type": "system",
+      "territory": "Frontier",
+      "sector": "Weyland Isles",
+      "coordinates": "-6.2 Rimward / 5.8 Spinward",
+      "affiliation": "NAPRO (formerly 3WE)",
+      "classification": "NONE",
+      "description": "Frontier system in the Weyland Isles containing Chara IV (LV-187). Colony quarantined following Border Bomber biological attack.",
+      "bodies": [
+        { "name": "Chara IV / LV-187", "type": "planet", "detail": "Terrestrial, terraformed. Breathable atmosphere, intense thunderstorms. 12 deg C mean temp. Terrain: barren rock, muddy lowlands. Pop: 200 colonists (presumed dead). Resources: crude oil. QUARANTINE IN EFFECT." }
+      ],
+      "status": "QUARANTINE"
+    },
+    {
+      "id": "deltatrianguli",
+      "name": "Delta Trianguli System",
+      "type": "system",
+      "territory": "Frontier",
+      "sector": "Weyland Isles",
+      "coordinates": "-7.9 Rimward / 6.1 Spinward",
+      "affiliation": "NAPRO (formerly 3WE)",
+      "classification": "NONE",
+      "description": "Frontier system in the Weyland Isles. Home to New Albion, which declared independence from the Three World Empire ('3WExit'). Temperate world with growing population.",
+      "bodies": [
+        { "name": "New Albion", "type": "planet", "detail": "Terrestrial, terraformed. Temperate, seasonal climate. 22 deg C mean temp. Forested valleys and rivers. Pop: 50,000+. Resources: platinum, palladium. Independent governance." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "iotapersei",
+      "name": "Iota Persei System",
+      "type": "system",
+      "territory": "Frontier",
+      "sector": "Weyland Isles",
+      "coordinates": "-8.8 Rimward / 6.1 Spinward",
+      "affiliation": "NAPRO",
+      "classification": "CORPORATE",
+      "description": "CLASSIFIED SYSTEM. CORPORATE CLEARANCE REQUIRED.\n\nFrontier system containing Iota Persei III, an uncolonized jungle world with confirmed xenoarchaeological ruins of unknown origin. Massive stone structures predate human colonization by millennia. Weyland-Yutani Science Division maintains active survey teams.",
+      "bodies": [
+        { "name": "Iota Persei III", "type": "planet", "detail": "Terrestrial, not terraformed. Thick atmosphere, hot and humid. 50 deg C mean temp. Terrain: steamy jungle, yellow/amber alien vegetation. Resources: gadolinium, monazite, bastnaesite. ARCHAEOLOGICAL RUINS — STONE HEADS IN JUNGLE. Origin unknown." }
+      ],
+      "status": "SURVEY"
+    },
+    {
+      "id": "szursamajoris",
+      "name": "SZ Ursae Majoris System",
+      "type": "system",
+      "territory": "Frontier",
+      "sector": "Weyland Isles",
+      "coordinates": "-7.4 Rimward / 6.2 Spinward",
+      "affiliation": "ICC",
+      "classification": "NONE",
+      "description": "Frontier system in the Weyland Isles containing a flare star, super earth Suzie 2 (scorched, uninhabitable), and its moon Selene. Selene marked for future colonization.",
+      "bodies": [
+        { "name": "Suzie 2", "type": "planet", "detail": "Super earth. Scorched by flare star activity. Uninhabitable." },
+        { "name": "Selene", "type": "moon", "detail": "Terrestrial planetoid. Thin atmosphere (rebreathers needed). 0 deg C mean temp. Ragged rock formations, fissures. Resources: azurite, chalcanthite, copper. Blue crystalline atmospheric particles flash during flare events. Marked for colonization." }
+      ],
+      "status": "SURVEYED"
+    },
+    {
+      "id": "gj1187",
+      "name": "GJ1187 System",
+      "type": "system",
+      "territory": "Frontier",
+      "sector": "Weyland Isles",
+      "coordinates": "-0.4 Rimward / 10.8 Spinward",
+      "affiliation": "UPP / Jutou Combine",
+      "classification": "CORPORATE",
+      "description": "CLASSIFIED SYSTEM. CORPORATE CLEARANCE REQUIRED.\n\nFrontier system containing Shanmen (GJ1187.03). All colonies destroyed by Border Bomber biological attack deploying weaponized black pathogen. Massive ecological contamination. Giant mutated macrofauna (flying insects, predatory cats, sauropods). QUARANTINE IN EFFECT — NO APPROACH AUTHORIZED.",
+      "bodies": [
+        { "name": "Shanmen (GJ1187.03)", "type": "planet", "detail": "Terrestrial. Tropical to temperate. 20 deg C. Lush jungle, rainforest, fungi clumps. Former colonies: Suenos Grandes, New Luhansk, Romashka Outpost. Former pop: 20,000+. Resources: eitr, macrofauna research. ALL COLONIES DESTROYED. Black pathogen contamination. Giant mutated fauna." }
+      ],
+      "status": "QUARANTINE"
+    },
+    {
+      "id": "thetapersei",
+      "name": "Theta Persei System",
+      "type": "system",
+      "territory": "Frontier",
+      "sector": "Weyland Isles",
+      "coordinates": "-8.7 Rimward / 7.0 Spinward",
+      "affiliation": "Unaffiliated",
+      "classification": "NONE",
+      "description": "Frontier system in the Weyland Isles. Contains LV-139, a terrestrial moon unexplored for nearly a century.",
+      "bodies": [
+        { "name": "LV-139", "type": "moon", "detail": "Terrestrial moon. Breathable atmosphere, electric storms. 38 deg C mean temp. Terrain: red sand deserts, jutting spires. Resources: dysprosium, terbium. Unexplored for ~100 years." }
+      ],
+      "status": "UNEXPLORED"
+    },
+    {
+      "id": "jpg973",
+      "name": "JPG-973 System",
+      "type": "system",
+      "territory": "Frontier",
+      "sector": "Weyland Isles",
+      "coordinates": "-4.2 Rimward / 8.9 Spinward",
+      "affiliation": "Three World Empire",
+      "classification": "CORPORATE",
+      "description": "CLASSIFIED SYSTEM. CORPORATE CLEARANCE REQUIRED.\n\nFrontier system containing JPG-973C and the Tark-Weyland research station. Classified medical research facility conducting anti-cancer and anti-black-pathogen studies. All project data sealed.",
+      "bodies": [
+        { "name": "JPG-973C", "type": "planet", "detail": "Humid world, 35 deg C. Wetland terrain with swamp gas." },
+        { "name": "Tark-Weyland Station", "type": "station", "detail": "Research facility. Pop: 230 researchers. Anti-cancer and anti-black-pathogen medical research. [CLASSIFIED]" }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "pol6362",
+      "name": "Pol-6362 System",
+      "type": "system",
+      "territory": "Frontier",
+      "sector": "Weyland Isles",
+      "coordinates": "-1.9 Rimward / 10.2 Spinward",
+      "affiliation": "Unaffiliated",
+      "classification": "NONE",
+      "description": "Frontier system containing Jacob-Tellis, an aquatic world with poisonous atmospheric gases.",
+      "bodies": [
+        { "name": "Jacob-Tellis", "type": "planet", "detail": "Aquatic planet. Harmful aerosols, poisonous gases (rebreathers required). 28 deg C mean temp. Terrain: green seas and volcanic islands. Pop: rotating expeditions (6-48). Resources: microfauna research." }
+      ],
+      "status": "SURVEY"
+    },
+    {
+      "id": "gl537",
+      "name": "GL537 System",
+      "type": "system",
+      "territory": "Frontier",
+      "sector": "Weyland Isles",
+      "coordinates": "-0.2 Rimward / 12.0 Spinward",
+      "affiliation": "Weyland-Yutani",
+      "classification": "NONE",
+      "description": "Frontier system containing Delos (GL537A). Key Weyland-Yutani shipping and distribution hub on the Delos-Earth trade route.",
+      "bodies": [
+        { "name": "Delos (GL537A)", "type": "planet", "detail": "Terrestrial, terraformed. Thin atmosphere. -6 deg C mean temp. Frost-covered ice world with thermal springs. Pop: 2,000. Major frontier distribution and logistics hub." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "gj1227",
+      "name": "GJ1227 System",
+      "type": "system",
+      "territory": "Frontier",
+      "sector": "Weyland Isles",
+      "coordinates": "-0.4 Rimward / 8.5 Spinward",
+      "affiliation": "UPP / Norcomm / Hyperdyne",
+      "classification": "NONE",
+      "description": "Frontier system containing Kawlang. UPP-controlled industrial world with weapons and parts fabrication facilities. Heavy corporate presence from Norcomm and Hyperdyne Systems.",
+      "bodies": [
+        { "name": "Kawlang", "type": "moon", "detail": "Over-industrialized wasteland. Smog and sulfuric rains (acid splash hazard). 0 deg C mean temp. Strip mines. Pop: 487. Resources: weapons and parts fabrication." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "iotapiscium",
+      "name": "Iota Piscium System",
+      "type": "system",
+      "territory": "Frontier",
+      "sector": "Weyland Isles",
+      "coordinates": "-1.2 Rimward / 12.3 Spinward",
+      "affiliation": "ICSC",
+      "classification": "CORPORATE",
+      "description": "CLASSIFIED SYSTEM. CORPORATE CLEARANCE REQUIRED.\n\nFrontier system containing Ockham's Asteroid. Deep mining operations have reportedly unearthed anomalous artifacts at extreme depth. All further data sealed under ICSC Directive 7741.",
+      "bodies": [
+        { "name": "Ockham's Asteroid", "type": "asteroid", "detail": "Pockmarked metamorphic rock. Cold, thin atmosphere. Pop: 2,000 miners + 250 support personnel. 2km-deep mine shafts. Resources: promethium. RUMORS OF ANOMALOUS Discovery AT DEPTH — [CLASSIFIED]." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "lhs1140",
+      "name": "LHS-1140 System",
+      "type": "system",
+      "territory": "Frontier",
+      "sector": "Weyland Isles",
+      "coordinates": "-5.3 Rimward / 10.9 Spinward",
+      "affiliation": "Unaffiliated",
+      "classification": "NONE",
+      "description": "Frontier system containing LHS-1140b, a super earth with twice standard gravity. Subterranean seas and unique lichen forests.",
+      "bodies": [
+        { "name": "LHS-1140b", "type": "planet", "detail": "Terrestrial super earth (2G gravity). Moist, thick atmosphere. 25 deg C mean temp. Shallow valleys, subterranean seas, lichen forests. Resources: mercury, cerium." }
+      ],
+      "status": "SURVEYED"
+    },
+    {
+      "id": "upsilonandr",
+      "name": "Upsilon Andromedae System",
+      "type": "system",
+      "territory": "Frontier",
+      "sector": "Weyland Isles",
+      "coordinates": "-8.8 Rimward / 9.7 Spinward",
+      "affiliation": "Weyland-Yutani",
+      "classification": "NONE",
+      "description": "Frontier system containing three gas giants (Saffar, Samh, Majriti) with Working Joe automated trawling platforms, and the terrestrial world Dybbuk.",
+      "bodies": [
+        { "name": "Saffar", "type": "planet", "detail": "Gas giant. DSMO Joe One trawling platform." },
+        { "name": "Samh", "type": "planet", "detail": "Gas giant. DSMO Joe Two trawling platform." },
+        { "name": "Majriti", "type": "planet", "detail": "Gas giant. DSMO Joe Three trawling platform." },
+        { "name": "Dybbuk", "type": "planet", "detail": "Terrestrial. Howling ionized winds (weak radiation). 44 deg C mean temp. Fold mountains, rolling hills. Unpopulated." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "alphacaeli",
+      "name": "Alpha Caeli System",
+      "type": "system",
+      "territory": "Far Reach",
+      "sector": "Undesignated",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "ICC",
+      "classification": "NONE",
+      "description": "Far Reach system. Home to The Solomons, a chain of settled bodies orbiting Alpha Caeli V.",
+      "bodies": [
+        { "name": "Alpha Caeli V b", "type": "planet", "detail": "Part of The Solomons chain." },
+        { "name": "Alpha Caeli V c", "type": "planet", "detail": "Part of The Solomons chain." },
+        { "name": "Alpha Caeli V d", "type": "planet", "detail": "Part of The Solomons chain." },
+        { "name": "Alpha Caeli V e", "type": "planet", "detail": "Part of The Solomons chain." },
+        { "name": "Alpha Caeli V f", "type": "planet", "detail": "Part of The Solomons chain." },
+        { "name": "Alpha Caeli V g", "type": "planet", "detail": "Part of The Solomons chain." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "epsilonreticuli",
+      "name": "Epsilon Reticuli System",
+      "type": "system",
+      "territory": "Far Reach",
+      "sector": "Undesignated",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "ICC",
+      "classification": "NONE",
+      "description": "Far Reach system containing Thedus. Remote colonial world.",
+      "bodies": [
+        { "name": "Thedus", "type": "planet", "detail": "Remote colony world. Known transit stop en route to the Outer Rim." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "tanaka",
+      "name": "Tanaka System",
+      "type": "system",
+      "territory": "Far Reach",
+      "sector": "Undesignated",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "ICC",
+      "classification": "NONE",
+      "description": "Far Reach system. Remote frontier world Tanaka 5.",
+      "bodies": [
+        { "name": "Tanaka 5", "type": "planet", "detail": "Distant frontier world. Limited survey data." }
+      ],
+      "status": "SURVEYED"
+    },
+    {
+      "id": "achilles",
+      "name": "Achilles System",
+      "type": "system",
+      "territory": "Unclaimed Space",
+      "sector": "Sector 117",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "None (Unclaimed)",
+      "classification": "CORPORATE",
+      "description": "RESTRICTED SYSTEM. EXTREME HAZARD. CORPORATE CLEARANCE REQUIRED.\n\nUnclaimed system in Sector 117 containing G-435, a confirmed Xenomorph hiveworld. NO APPROACH AUTHORIZED. Quarantine buoys deployed. Any vessel entering this system is subject to immediate ICC interdiction.",
+      "bodies": [
+        { "name": "G-435", "type": "planet", "detail": "CONFIRMED XENOMORPH HIVEWORLD. Extreme biological hazard. All survey teams lost. No surviving colonial infrastructure. QUARANTINE — NO LANDING AUTHORIZED." }
+      ],
+      "status": "QUARANTINE"
+    },
+    {
+      "id": "26draconis",
+      "name": "26 Draconis System",
+      "type": "system",
+      "territory": "Restricted",
+      "sector": "Undesignated",
+      "coordinates": "+14.0 Spinward / 0.0 Coreward",
+      "affiliation": "Weyland-Yutani",
+      "classification": "CORPORATE",
+      "description": "RESTRICTED SYSTEM. EXTREME HAZARD. CORPORATE CLEARANCE REQUIRED.\n\nFormerly a trinary star system (two orange giants and one red dwarf). The red dwarf collapsed approximately 75 years ago forming the Ablassen Black Hole. The remaining two stars are being consumed by the singularity. Site of the USCSS Cronus mission (2111) and Erebos Station. All records sealed by Weyland-Yutani Special Projects.",
+      "bodies": [
+        { "name": "Ablassen Black Hole", "type": "singularity", "detail": "Collapsed red dwarf. Active singularity consuming the remaining two stars." },
+        { "name": "LV-1113", "type": "planetoid", "detail": "Small habitable planetoid in debris belt. Site of USCSS Cronus landing (2111). Engineer ruins and artifacts. Crew infected by mutagenic pathogen (26 Draconis Strain). DESTROYED/FRAGMENTED." },
+        { "name": "Asteroid 1113B", "type": "asteroid", "detail": "Fragment of LV-1113. Status unknown." },
+        { "name": "Erebos Station", "type": "station", "detail": "Resurrection Class plasma trawling platform, recharge station, and correctional facility. Length: 1100m. Pop: 12 admins, 12 corrections officers, 99 prisoners, 36 synthetics, 1 cat. Decks A-J. Covert project: Ironfish intelligence operation. COMPROMISED — Proto-Hive infection." }
+      ],
+      "status": "QUARANTINE"
+    },
+    {
+      "id": "hr2429",
+      "name": "HR-2429 System",
+      "type": "system",
+      "territory": "Frontier",
+      "sector": "Undesignated",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "ICC",
+      "classification": "NONE",
+      "description": "Frontier system referenced as a waypoint on the Anchorpoint-Sutter's World trade route (The Gauntlet).",
+      "bodies": [],
+      "status": "SURVEYED"
+    },
+    {
+      "id": "koi610",
+      "name": "KOI-610 System",
+      "type": "system",
+      "territory": "Far Spinward Colonies",
+      "sector": "Beyond 20 Parsec Limit",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "Formerly 3WE / CANC",
+      "classification": "NONE",
+      "description": "Far Spinward colony system. May Outpost on KOI-610.01. Former 3WE Royal Marine base, now under CANC control. Population approximately one million before The Isolation.",
+      "bodies": [
+        { "name": "KOI-610.01", "type": "planet", "detail": "May Outpost. Former 3WE Royal Marine garrison, now CANC-controlled. Pop: ~1 million (pre-Isolation). Colony map and Three Lions Pub on file." }
+      ],
+      "status": "RECONTACTED"
+    },
+    {
+      "id": "koi784",
+      "name": "KOI-784 System",
+      "type": "system",
+      "territory": "Far Spinward Colonies",
+      "sector": "Beyond 20 Parsec Limit",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "Unaffiliated",
+      "classification": "NONE",
+      "description": "Far Spinward colony system. Dylan City on KOI-784.01. Collapsed colony split between cliff-dwellers and feral surface population. Corporate authoritarianism. Children of Two Divines cult present.",
+      "bodies": [
+        { "name": "KOI-784.01", "type": "planet", "detail": "Dylan City. Pop: 40,000 (collapsed civilization). Cliff-dwellers vs ferals. Atmosphere Processor operational. Children of Two Divines cult." }
+      ],
+      "status": "RECONTACTED"
+    },
+    {
+      "id": "koi2650",
+      "name": "KOI-2650 System",
+      "type": "system",
+      "territory": "Far Spinward Colonies",
+      "sector": "Beyond 20 Parsec Limit",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "Unaffiliated",
+      "classification": "NONE",
+      "description": "Far Spinward colony system. Former mining colony Gorham's Colony on KOI-2650.01. Population: 1 million pre-Isolation, now 8 survivors. Sandstorms and hostile fauna.",
+      "bodies": [
+        { "name": "KOI-2650.01", "type": "planet", "detail": "Gorham's Colony. Mining colony. Former pop: 1 million, now 8 survivors. Tontas Ravine settlement. Sandstorms. Deadly hostile creatures." }
+      ],
+      "status": "RECONTACTED"
+    },
+    {
+      "id": "koi1966",
+      "name": "KOI-1966 System",
+      "type": "system",
+      "territory": "Far Spinward Colonies",
+      "sector": "Beyond 20 Parsec Limit",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "None",
+      "classification": "CORPORATE",
+      "description": "CLASSIFIED SYSTEM. CORPORATE CLEARANCE REQUIRED.\n\nFar Spinward system containing KOI-1966.03, designation 'Aljanna'. Pristine planet harboring confirmed Engineer city ruins and hibernating Xenomorph specimens. Extreme xenoarchaeological and biological hazard. All data sealed under UNISC Special Directive.",
+      "bodies": [
+        { "name": "KOI-1966.03 (Aljanna)", "type": "planet", "detail": "Pristine terrestrial world. Engineer city ruins confirmed. HIBERNATING XENOMORPH SPECIMENS PRESENT. Extreme hazard. [CLASSIFIED]" }
+      ],
+      "status": "QUARANTINE"
+    },
+    {
+      "id": "koi2702",
+      "name": "KOI-2702 System",
+      "type": "system",
+      "territory": "Far Spinward Colonies",
+      "sector": "Beyond 20 Parsec Limit",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "None",
+      "classification": "CORPORATE",
+      "description": "CLASSIFIED SYSTEM. CORPORATE CLEARANCE REQUIRED.\n\nFar Spinward system containing the gas giant Palmyra (KOI-2702.07) and its moons Azizo and Arzu. Derelict Engineer Juggernaut vessel located in-system. Perfected entities confirmed. UNCSS Typhoon (survey vessel) declared missing in this system.",
+      "bodies": [
+        { "name": "Palmyra (KOI-2702.07)", "type": "planet", "detail": "Gas giant with moons Azizo and Arzu." },
+        { "name": "Azizo", "type": "moon", "detail": "Moon of Palmyra. Survey data [CLASSIFIED]." },
+        { "name": "Arzu", "type": "moon", "detail": "Moon of Palmyra. Survey data [CLASSIFIED]." }
+      ],
+      "status": "QUARANTINE"
+    },
+    {
+      "id": "koi947",
+      "name": "KOI-947 System",
+      "type": "system",
+      "territory": "Far Spinward Colonies",
+      "sector": "Beyond 20 Parsec Limit",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "Unaffiliated",
+      "classification": "CORPORATE",
+      "description": "CLASSIFIED SYSTEM. CORPORATE CLEARANCE REQUIRED.\n\nFar Spinward system. Pelican Colony on KOI-947.01, formerly known as 'the breadbasket of the frontier'. Population of millions now dead following massive irradiation event. Engineer Guardian vessel discovered in Skritio Caves. Perfected entities and Gorham's Marauders reported.",
+      "bodies": [
+        { "name": "KOI-947.01", "type": "planet", "detail": "Pelican Colony. Former 'breadbasket of the frontier'. Pop: millions (ALL DEAD — irradiation event). Engineer Guardian ship in Skritio Caves. Perfected entities. Gorham's Marauders present." }
+      ],
+      "status": "QUARANTINE"
+    },
+    {
+      "id": "koi1938",
+      "name": "KOI-1938 System",
+      "type": "system",
+      "territory": "Far Spinward Colonies",
+      "sector": "Beyond 20 Parsec Limit",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "None",
+      "classification": "CORPORATE",
+      "description": "CLASSIFIED SYSTEM. CORPORATE CLEARANCE REQUIRED.\n\nFar Spinward system. Sanchez Outpost on KOI-1938.01. Site of the Engineer Lychgate structure and the Battle of the Iyanlá. BBW campaign finale location. All data sealed.",
+      "bodies": [
+        { "name": "KOI-1938.01", "type": "planet", "detail": "Sanchez Outpost." },
+        { "name": "Ojo", "type": "planet", "detail": "Super gas giant. The Engineer Lychgate located here. [CLASSIFIED]" }
+      ],
+      "status": "CLASSIFIED"
+    },
+    {
+      "id": "koi1430",
+      "name": "KOI-1430 System",
+      "type": "system",
+      "territory": "Far Spinward Colonies",
+      "sector": "Beyond 20 Parsec Limit",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "Unaffiliated",
+      "classification": "NONE",
+      "description": "Far Spinward colony system. Ute Colony on KOI-1430.03. Limited data available post-Isolation.",
+      "bodies": [
+        { "name": "KOI-1430.03", "type": "planet", "detail": "Ute Colony. Status unknown." }
+      ],
+      "status": "UNKNOWN"
+    },
+    {
+      "id": "koi2770",
+      "name": "KOI-2770 System",
+      "type": "system",
+      "territory": "Far Spinward Colonies",
+      "sector": "Beyond 20 Parsec Limit",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "Unaffiliated",
+      "classification": "NONE",
+      "description": "Far Spinward colony system. Izvinite Outpost on KOI-2770.01.",
+      "bodies": [
+        { "name": "KOI-2770.01", "type": "planet", "detail": "Izvinite Outpost. Status unknown." }
+      ],
+      "status": "UNKNOWN"
+    },
+    {
+      "id": "koi723",
+      "name": "KOI-723 System",
+      "type": "system",
+      "territory": "Far Spinward Colonies",
+      "sector": "Beyond 20 Parsec Limit",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "Unaffiliated",
+      "classification": "NONE",
+      "description": "Far Spinward colony system. Kareti on KOI-723.06.",
+      "bodies": [
+        { "name": "KOI-723.06", "type": "planet", "detail": "Kareti. Status unknown." }
+      ],
+      "status": "UNKNOWN"
+    },
+    {
+      "id": "koi1739",
+      "name": "KOI-1739 System",
+      "type": "system",
+      "territory": "Far Spinward Colonies",
+      "sector": "Beyond 20 Parsec Limit",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "Unaffiliated",
+      "classification": "NONE",
+      "description": "Far Spinward colony system. July Outpost on KOI-1739.01.",
+      "bodies": [
+        { "name": "KOI-1739.01", "type": "planet", "detail": "July Outpost. Status unknown." }
+      ],
+      "status": "UNKNOWN"
+    },
+    {
+      "id": "koi2469",
+      "name": "KOI-2469 System",
+      "type": "system",
+      "territory": "Far Spinward Colonies",
+      "sector": "Beyond 20 Parsec Limit",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "Unaffiliated",
+      "classification": "NONE",
+      "description": "Far Spinward colony system. October Outpost on KOI-2469.01.",
+      "bodies": [
+        { "name": "KOI-2469.01", "type": "planet", "detail": "October Outpost. Status unknown." }
+      ],
+      "status": "UNKNOWN"
+    },
+    {
+      "id": "koi1404",
+      "name": "KOI-1404 System",
+      "type": "system",
+      "territory": "Far Spinward Colonies",
+      "sector": "Beyond 20 Parsec Limit",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "Unaffiliated",
+      "classification": "NONE",
+      "description": "Far Spinward colony system. Archimedes on KOI-1404.01.",
+      "bodies": [
+        { "name": "KOI-1404.01", "type": "planet", "detail": "Archimedes. Status unknown." }
+      ],
+      "status": "UNKNOWN"
+    },
+    {
+      "id": "koi2290",
+      "name": "KOI-2290 System",
+      "type": "system",
+      "territory": "Far Spinward Colonies",
+      "sector": "Beyond 20 Parsec Limit",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "Unaffiliated",
+      "classification": "NONE",
+      "description": "Far Spinward colony system. Capelli Colony on KOI-2290.01.",
+      "bodies": [
+        { "name": "KOI-2290.01", "type": "planet", "detail": "Capelli Colony. Status unknown." }
+      ],
+      "status": "UNKNOWN"
+    },
+    {
+      "id": "koi1686",
+      "name": "KOI-1686 System",
+      "type": "system",
+      "territory": "Far Spinward Colonies",
+      "sector": "Beyond 20 Parsec Limit",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "Unaffiliated",
+      "classification": "NONE",
+      "description": "Far Spinward colony system. Nightingale Colony on KOI-1686.01.",
+      "bodies": [
+        { "name": "KOI-1686.01", "type": "planet", "detail": "Nightingale Colony. Status unknown." }
+      ],
+      "status": "UNKNOWN"
+    },
+    {
+      "id": "koi1361",
+      "name": "KOI-1361 System",
+      "type": "system",
+      "territory": "Far Spinward Colonies",
+      "sector": "Beyond 20 Parsec Limit",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "Unaffiliated",
+      "classification": "NONE",
+      "description": "Far Spinward colony system. BlueJay Colony on KOI-1361.01.",
+      "bodies": [
+        { "name": "KOI-1361.01", "type": "planet", "detail": "BlueJay Colony. Status unknown." }
+      ],
+      "status": "UNKNOWN"
+    },
+    {
+      "id": "koi323",
+      "name": "KOI-323 System",
+      "type": "system",
+      "territory": "Far Spinward Colonies",
+      "sector": "Beyond 20 Parsec Limit",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "Unaffiliated",
+      "classification": "NONE",
+      "description": "Far Spinward colony system. Platte on KOI-323.08.",
+      "bodies": [
+        { "name": "KOI-323.08", "type": "planet", "detail": "Platte. Status unknown." }
+      ],
+      "status": "UNKNOWN"
+    },
+    {
+      "id": "koi2418",
+      "name": "KOI-2418 System",
+      "type": "system",
+      "territory": "Far Spinward Colonies",
+      "sector": "Beyond 20 Parsec Limit",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "Unaffiliated",
+      "classification": "NONE",
+      "description": "Far Spinward colony system. Curzic Outpost on KOI-2418.01.",
+      "bodies": [
+        { "name": "KOI-2418.01", "type": "planet", "detail": "Curzic Outpost. Status unknown." }
+      ],
+      "status": "UNKNOWN"
+    },
+    {
+      "id": "koi817",
+      "name": "KOI-817 System",
+      "type": "system",
+      "territory": "Far Spinward Colonies",
+      "sector": "Beyond 20 Parsec Limit",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "Unaffiliated",
+      "classification": "NONE",
+      "description": "Far Spinward colony system. Brahms Outpost on KOI-817.01.",
+      "bodies": [
+        { "name": "KOI-817.01", "type": "planet", "detail": "Brahms Outpost. Status unknown." }
+      ],
+      "status": "UNKNOWN"
+    },
+    {
+      "id": "anchorpoint",
+      "name": "Anchorpoint Station",
+      "type": "station",
+      "territory": "Frontier",
+      "sector": "Undesignated",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "ICC / United Americas",
+      "classification": "NONE",
+      "description": "Major staging hub and transit station on the Frontier. Terminus of 'The Gauntlet' trade route running between Anchorpoint and Sutter's World. Military and commercial operations.",
+      "bodies": [],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "suttersworld",
+      "name": "Sutter's World",
+      "type": "system",
+      "territory": "Frontier",
+      "sector": "Undesignated",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "ICC",
+      "classification": "NONE",
+      "description": "Newly established Frontier colony. Terminus of 'The Gauntlet' trade route from Anchorpoint Station. Destination of the USCSS Montero.",
+      "bodies": [
+        { "name": "Sutter's World", "type": "planet", "detail": "New colony world. Commercial freighter traffic along The Gauntlet." }
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "id": "gateway",
+      "name": "Gateway Station",
+      "type": "station",
+      "territory": "Core Systems",
+      "sector": "Undesignated",
+      "coordinates": "CLASSIFIED",
+      "affiliation": "ICC",
+      "classification": "NONE",
+      "description": "Major orbital station and transit hub. Key waypoint for travel between the Core Systems and the Frontier. Referenced across multiple navigational databases.",
+      "bodies": [],
+      "status": "ACTIVE"
+    }
+  ]
+}

@@ -1,6 +1,42 @@
 # Changelog
 
+## v1.0.8 — 2026-02-18
 
+### Stellar Cartography — New SYSTEMS View
+
+- Replaced the MAPS view with a new SYSTEMS (Stellar Cartography) view displaying a searchable database of 63 known star systems across 8 territories.
+- Each system entry includes designation, type, territory, sector, coordinates, affiliation, status, description, and celestial bodies.
+- 13 systems are gated behind CORPORATE classification, requiring elevated clearance to access.
+- Detail view shows full system profile with celestial bodies list.
+- Classified systems display an ACCESS DENIED screen with required clearance level.
+- GM with MASTER_OVERRIDE clearance can access all systems regardless of classification.
+
+### Stellar Cartography — Filters
+
+- Added TERRITORY, SECTOR, and STATUS filter dropdowns to the systems list.
+- Filters combine and update a visible system count tally in real time.
+
+### Stellar Cartography — GM CRUD Management
+
+- GM can CREATE new star systems via a full editor form with all fields and a dynamic celestial bodies editor.
+- GM can EDIT existing systems (both base and custom) from inline list buttons or the detail view toolbar.
+- GM can DELETE systems with a confirmation dialog from inline list buttons or the detail view toolbar.
+- Classification dropdown includes UNCLASSIFIED, MEDICAL, CONFIDENTIAL, SENSITIVE, RESTRICTED, and CORPORATE options.
+- Status dropdown includes ACTIVE, SURVEYED, UNEXPLORED, UNKNOWN, REBUILDING, RECONTACTED, QUARANTINE, ABANDONED, DECOMMISSIONED, and CLASSIFIED.
+- GM changes persist in world settings as an overlay on the base JSON data (additions, modifications, deletions tracked separately).
+- Changes broadcast to player terminals in real time.
+
+### Navigation Button Updates
+
+- Renamed the ship systems nav button from SYSTEMS to SHIP OPS to avoid confusion with the new Stellar Cartography view.
+
+### UI / CSS Fixes
+
+- Fixed systems list not scrolling by adding proper flex container layout.
+- Added green scrollbar styling to the systems list for all users.
+- Removed color coding from STATUS column and indicator dots on player terminals (green-only rule).
+- Fixed all dropdown menus inside the terminal to use consistent dark backgrounds with green text (eliminates white dropdown backgrounds).
+- Added catch-all select styling to prevent any dropdown from falling back to browser defaults.
 
 ## v1.0.7 — 2026-02-17
 
@@ -43,6 +79,21 @@
 - Added `_clearEmergencyVoice(protocol)` and `_clearAllEmergencyVoices()` for clean shutdown on cancel.
 - Self-destruct abort now plays a spoken announcement: "ATTENTION. SELF-DESTRUCT SEQUENCE HAS BEEN ABORTED. RESUME NORMAL OPERATIONS." on both GM and player clients.
 - Added `{ force }` option to `_speakWarning()` to allow one-shot announcements on the GM client.
+
+### Logs — Audio Waveform Player
+
+- Added AUDIO (MP3/WAV) as a new media type for log entries alongside existing TEXT, IMAGE, and VIDEO options.
+- Audio logs display a full waveform visualization using Web Audio API decoding and Canvas 2D rendering.
+- Waveform player includes PLAY, PAUSE, and STOP controls with elapsed/total time display.
+- Click-to-seek on the waveform canvas.
+- Playback progress highlighted on the waveform in real time.
+- Audio resources are cleaned up when switching views.
+
+### CRT Effects
+
+- Fixed CRT scanlines being invisible: increased opacity from 0.15 to 0.4 on 2px/4px bands.
+- Rewrote CRT flicker as a slow 4-second organic cycle with realistic brightness shifts instead of the previous 0.08s strobe.
+- Updated legacy theme scanlines to 0.55 opacity with amber-tinted flicker keyframes.
 
 ### Bug Fixes
 

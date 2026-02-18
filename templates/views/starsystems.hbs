@@ -1,0 +1,162 @@
+<div class="wy-view-starsystems">
+  <div class="wy-section-title">
+    STELLAR CARTOGRAPHY — KNOWN SYSTEMS
+    {{#if isGM}}
+    <button class="wy-log-add-btn" data-action="ss-create" title="Add New Star System">+ NEW SYSTEM</button>
+    {{/if}}
+  </div>
+
+  {{!-- GM: Star System Editor Form (hidden by default) --}}
+  {{#if isGM}}
+  <div class="wy-ss-form wy-hidden" id="wy-ss-form">
+    <div class="wy-ss-form-title" id="wy-ss-form-title">CREATE NEW STAR SYSTEM</div>
+    <div class="wy-ss-form-grid">
+      <div class="wy-ss-form-row">
+        <label class="wy-ss-form-label">DESIGNATION</label>
+        <input type="text" class="wy-setting-input" id="wy-ss-form-name" placeholder="System Name" />
+      </div>
+      <div class="wy-ss-form-row">
+        <label class="wy-ss-form-label">TYPE</label>
+        <select class="wy-setting-input" id="wy-ss-form-type">
+          <option value="system">SYSTEM</option>
+          <option value="binary">BINARY</option>
+          <option value="trinary">TRINARY</option>
+          <option value="nebula">NEBULA</option>
+          <option value="anomaly">ANOMALY</option>
+        </select>
+      </div>
+      <div class="wy-ss-form-row">
+        <label class="wy-ss-form-label">TERRITORY</label>
+        <input type="text" class="wy-setting-input" id="wy-ss-form-territory" list="wy-ss-territory-list" placeholder="Core Systems" />
+        <datalist id="wy-ss-territory-list"></datalist>
+      </div>
+      <div class="wy-ss-form-row">
+        <label class="wy-ss-form-label">SECTOR</label>
+        <input type="text" class="wy-setting-input" id="wy-ss-form-sector" list="wy-ss-sector-list" placeholder="Sol Sector" />
+        <datalist id="wy-ss-sector-list"></datalist>
+      </div>
+      <div class="wy-ss-form-row">
+        <label class="wy-ss-form-label">COORDINATES</label>
+        <input type="text" class="wy-setting-input" id="wy-ss-form-coordinates" placeholder="0.0 / 0.0" />
+      </div>
+      <div class="wy-ss-form-row">
+        <label class="wy-ss-form-label">AFFILIATION</label>
+        <input type="text" class="wy-setting-input" id="wy-ss-form-affiliation" placeholder="Weyland-Yutani" />
+      </div>
+      <div class="wy-ss-form-row">
+        <label class="wy-ss-form-label">CLASSIFICATION</label>
+        <select class="wy-setting-input" id="wy-ss-form-classification">
+          <option value="NONE">UNCLASSIFIED</option>
+          <option value="MEDICAL">MEDICAL</option>
+          <option value="CONFIDENTIAL">CONFIDENTIAL</option>
+          <option value="SENSITIVE">SENSITIVE</option>
+          <option value="RESTRICTED">RESTRICTED</option>
+          <option value="CORPORATE">CORPORATE</option>
+        </select>
+      </div>
+      <div class="wy-ss-form-row">
+        <label class="wy-ss-form-label">STATUS</label>
+        <select class="wy-setting-input" id="wy-ss-form-status">
+          <option value="ACTIVE">ACTIVE</option>
+          <option value="SURVEYED">SURVEYED</option>
+          <option value="UNEXPLORED">UNEXPLORED</option>
+          <option value="UNKNOWN">UNKNOWN</option>
+          <option value="REBUILDING">REBUILDING</option>
+          <option value="RECONTACTED">RECONTACTED</option>
+          <option value="QUARANTINE">QUARANTINE</option>
+          <option value="ABANDONED">ABANDONED</option>
+          <option value="DECOMMISSIONED">DECOMMISSIONED</option>
+          <option value="CLASSIFIED">CLASSIFIED</option>
+        </select>
+      </div>
+      <div class="wy-ss-form-row wy-ss-form-row-full">
+        <label class="wy-ss-form-label">DESCRIPTION</label>
+        <textarea class="wy-setting-input wy-ss-form-textarea" id="wy-ss-form-description" rows="4" placeholder="System description..."></textarea>
+      </div>
+    </div>
+    <div class="wy-ss-form-section-title">CELESTIAL BODIES</div>
+    <div class="wy-ss-form-bodies" id="wy-ss-form-bodies">
+      {{!-- Populated dynamically --}}
+    </div>
+    <button class="wy-scene-btn wy-ss-form-add-body-btn" data-action="ss-add-body">+ ADD BODY</button>
+    <div class="wy-ss-form-actions">
+      <button class="wy-scene-btn" data-action="ss-form-submit">COMMIT</button>
+      <button class="wy-scene-btn" data-action="ss-form-cancel">CANCEL</button>
+    </div>
+  </div>
+  {{/if}}
+
+  {{!-- List View --}}
+  <div class="wy-ss-list-view" id="wy-ss-list-view">
+
+    <div class="wy-ss-filter-bar">
+      <label class="wy-ss-filter-label">TERRITORY:</label>
+      <select class="wy-terminal-select wy-ss-filter-select" id="wy-ss-filter-territory">
+        <option value="ALL">ALL TERRITORIES</option>
+      </select>
+      <label class="wy-ss-filter-label">SECTOR:</label>
+      <select class="wy-terminal-select wy-ss-filter-select" id="wy-ss-filter-sector">
+        <option value="ALL">ALL SECTORS</option>
+      </select>
+      <label class="wy-ss-filter-label">STATUS:</label>
+      <select class="wy-terminal-select wy-ss-filter-select" id="wy-ss-filter-status">
+        <option value="ALL">ALL</option>
+      </select>
+    </div>
+
+    <div class="wy-border-box wy-ss-list">
+      <div class="wy-ss-row wy-ss-row-header">
+        <span class="wy-ss-col-indicator"></span>
+        <span class="wy-ss-col-name">DESIGNATION</span>
+        <span class="wy-ss-col-territory">TERRITORY</span>
+        <span class="wy-ss-col-sector">SECTOR</span>
+        <span class="wy-ss-col-status">STATUS</span>
+        <span class="wy-ss-col-action"></span>
+      </div>
+
+      {{#each systems}}
+      <div class="wy-ss-row {{#if this.classified}}wy-ss-classified{{/if}}" data-ss-id="{{this.id}}" data-ss-territory="{{this.territory}}" data-ss-sector="{{this.sector}}" data-ss-status="{{this.status}}">
+        <span class="wy-ss-col-indicator"><span class="wy-indicator {{this.statusClass}}"></span></span>
+        <span class="wy-ss-col-name">{{this.name}}</span>
+        <span class="wy-ss-col-territory">{{this.territory}}</span>
+        <span class="wy-ss-col-sector">{{this.sector}}</span>
+        <span class="wy-ss-col-status {{this.statusTextClass}}">{{this.status}}</span>
+        <span class="wy-ss-col-action">
+          {{#if this.classified}}
+          <button class="wy-log-view-btn wy-text-red" data-action="view-starsystem" data-ss-id="{{this.id}}">[LOCKED]</button>
+          {{else}}
+          <button class="wy-log-view-btn" data-action="view-starsystem" data-ss-id="{{this.id}}">[ACCESS]</button>
+          {{/if}}
+          {{#if ../isGM}}
+          <button class="wy-log-view-btn wy-ss-row-edit-btn" data-action="ss-row-edit" data-ss-id="{{this.id}}">[EDIT]</button>
+          <button class="wy-log-view-btn wy-text-red wy-ss-row-del-btn" data-action="ss-row-delete" data-ss-id="{{this.id}}">[DEL]</button>
+          {{/if}}
+        </span>
+      </div>
+      {{/each}}
+    </div>
+
+    <div class="wy-ss-tally">
+      <span id="wy-ss-count">{{systems.length}}</span> SYSTEM(S) IN DATABASE
+    </div>
+  </div>
+
+  {{!-- Detail View (hidden by default, populated dynamically) --}}
+  <div class="wy-ss-detail-view" id="wy-ss-detail-view" style="display: none;">
+    <div class="wy-ss-detail-toolbar">
+      <button class="wy-ss-back-btn" data-action="ss-back">&larr; RETURN TO INDEX</button>
+      {{#if isGM}}
+      <div class="wy-ss-detail-gm-actions">
+        <button class="wy-scene-btn" data-action="ss-edit" title="Edit this system">[EDIT]</button>
+        <button class="wy-scene-btn wy-text-red" data-action="ss-delete" title="Delete this system">[DELETE]</button>
+      </div>
+      {{/if}}
+    </div>
+
+    <div class="wy-ss-detail-header" id="wy-ss-detail-header"></div>
+
+    <div class="wy-border-box wy-ss-detail-body" id="wy-ss-detail-body">
+      {{!-- Dynamically populated --}}
+    </div>
+  </div>
+</div>

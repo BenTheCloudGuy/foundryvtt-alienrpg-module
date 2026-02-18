@@ -41,11 +41,21 @@ export class PinchZoomHandler {
   /** Bound event handlers (for cleanup) */
   _handlers = {};
 
+  /** @type {ResizeObserver|null} */
+  _resizeObserver = null;
+
   constructor(container, content) {
     this.container = container;
     this.content = content;
 
     this._bind();
+
+    // Re-clamp on viewport resize so the image is never clipped
+    this._resizeObserver = new ResizeObserver(() => {
+      this._clampPan();
+      this._applyTransform();
+    });
+    this._resizeObserver.observe(this.container);
   }
 
   /* ──────────────────────────────────────────────────────────────────
@@ -94,6 +104,10 @@ export class PinchZoomHandler {
     window.removeEventListener('mousemove', h.mousemove);
     window.removeEventListener('mouseup', h.mouseup);
     this.container.removeEventListener('contextmenu', h.contextmenu);
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect();
+      this._resizeObserver = null;
+    }
   }
 
   /* ──────────────────────────────────────────────────────────────────
@@ -250,10 +264,37 @@ export class PinchZoomHandler {
 
   _setScale(newScale, apply = true) {
     this.scale = Math.max(this.minScale, Math.min(this.maxScale, newScale));
+    if (this.scale <= 1) {
+      this.panX = 0;
+      this.panY = 0;
+    }
     if (apply) this._applyTransform();
   }
 
+  /**
+   * Clamp panX/panY so the scaled content never leaves the viewport edges.
+   * At scale <= 1 the content fits entirely, so pan is zeroed.
+   */
+  _clampPan() {
+    if (this.scale <= 1) {
+      this.panX = 0;
+      this.panY = 0;
+      return;
+    }
+    const cw = this.container.clientWidth;
+    const ch = this.container.clientHeight;
+    const sw = cw * this.scale;
+    const sh = ch * this.scale;
+
+    // Negative pan = content shifted left/up, clamped so right/bottom edge stays in view
+    const minX = cw - sw;
+    const minY = ch - sh;
+    this.panX = Math.min(0, Math.max(minX, this.panX));
+    this.panY = Math.min(0, Math.max(minY, this.panY));
+  }
+
   _applyTransform() {
+    this._clampPan();
     this.content.style.transform = `translate(${this.panX}px, ${this.panY}px) scale(${this.scale})`;
     this.content.style.transition = 'none'; // Disable transition during interaction
   }
