@@ -1,0 +1,140 @@
+<div class="wy-view-scroll">
+
+  <div style="color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px; margin-bottom: 12px;">
+    CREATE AND MANAGE TIMED EVENTS TRACKED BY GAME CLOCK. WHEN A TIMER COMPLETES, ITS ACTIONS
+    FIRE AUTOMATICALLY (LOG ENTRIES, NAV CHANGES, SYSTEM STATUS UPDATES).
+    NAV ETA TIMERS ARE CREATED AUTOMATICALLY WHEN SAVING NAVIGATION WITH A PARSEABLE ETA.
+  </div>
+
+  {{!-- ── ACTIVE TIMERS ── --}}
+  <div class="wy-section-title">ACTIVE TIMERS</div>
+  <div class="wy-border-box" id="wy-active-timers-section">
+    {{#if activeTimers.length}}
+    {{#each activeTimers}}
+    <div class="wy-timer-row" data-timer-id="{{this.id}}" style="border-bottom: 1px solid var(--wy-green-dark); padding: 6px 0;">
+      {{!-- Display row --}}
+      <div class="wy-timer-display" style="display: flex; align-items: center; gap: 6px;">
+        <span style="flex: 1; color: var(--wy-amber); font-size: 11px; letter-spacing: 1px;">{{this.label}}{{#if this.permanent}} <span style="font-size: 9px; color: var(--wy-green-dim);">[DEFAULT]</span>{{/if}}</span>
+        <span style="width: 100px; text-align: right; color: var(--wy-green); font-size: 11px; letter-spacing: 1px; font-family: monospace;">{{this.remainingFormatted}}</span>
+        <span style="width: 50px; text-align: center; color: var(--wy-green-dim); font-size: 9px; letter-spacing: 1px; text-transform: uppercase;">{{this.category}}</span>
+        <button class="wy-muthur-send" data-action="edit-timer" data-timer-id="{{this.id}}" style="width: 50px; padding: 2px 6px; font-size: 9px;">EDIT</button>
+        {{#unless this.permanent}}
+        <button class="wy-muthur-send" data-action="cancel-timer" data-timer-id="{{this.id}}" style="width: 60px; padding: 2px 6px; font-size: 9px; border-color: var(--wy-amber-dim); color: var(--wy-amber);">CANCEL</button>
+        <button class="wy-muthur-send" data-action="delete-timer" data-timer-id="{{this.id}}" style="width: 50px; padding: 2px 6px; font-size: 9px; border-color: #a33; color: #f44;">DEL</button>
+        {{/unless}}
+      </div>
+
+      {{!-- Inline edit row (hidden by default) --}}
+      <div class="wy-timer-edit" style="display: none; margin-top: 6px; padding: 6px; border: 1px solid var(--wy-green-dark); background: rgba(0,0,0,0.3);">
+        <div class="wy-setting-row">
+          <span class="wy-setting-label" style="width: 80px;">LABEL</span>
+          <input class="wy-setting-input" type="text" data-edit-field="label" value="{{this.label}}" />
+        </div>
+        <div class="wy-setting-row">
+          <span class="wy-setting-label" style="width: 80px;">NEW DURATION</span>
+          <input class="wy-setting-input" type="text" data-edit-field="duration" placeholder="e.g. 2h 30m (resets countdown)" />
+        </div>
+        <div class="wy-setting-row">
+          <span class="wy-setting-label" style="width: 80px;">CATEGORY</span>
+          <select class="wy-setting-input" data-edit-field="category">
+            <option value="custom" {{#if (eq this.category 'custom')}}selected{{/if}}>CUSTOM</option>
+            <option value="system" {{#if (eq this.category 'system')}}selected{{/if}}>SYSTEM</option>
+            <option value="nav" {{#if (eq this.category 'nav')}}selected{{/if}}>NAVIGATION</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 6px; margin-top: 6px;">
+          <button class="wy-muthur-send" data-action="save-timer-edit" data-timer-id="{{this.id}}" style="flex: 1; font-size: 10px;">SAVE CHANGES</button>
+          <button class="wy-muthur-send" data-action="cancel-edit" data-timer-id="{{this.id}}" style="flex: 1; font-size: 10px; border-color: var(--wy-amber-dim); color: var(--wy-amber);">DISCARD</button>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+    {{else}}
+    <div style="color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px; padding: 4px 0;">NO ACTIVE TIMERS</div>
+    {{/if}}
+  </div>
+
+  {{!-- ── CREATE NEW TIMER ── --}}
+  <div class="wy-section-title" style="margin-top: 16px;">CREATE NEW TIMER</div>
+  <div class="wy-border-box" id="wy-create-timer-section">
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">LABEL</span>
+      <input class="wy-setting-input" type="text" id="wy-timer-label" placeholder="ENGINE RESTART" />
+    </div>
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">DURATION</span>
+      <input class="wy-setting-input" type="text" id="wy-timer-duration" placeholder="2h 30m / 3 days / 14 weeks" />
+    </div>
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">CATEGORY</span>
+      <select class="wy-setting-input" id="wy-timer-category">
+        <option value="custom">CUSTOM</option>
+        <option value="system">SYSTEM</option>
+        <option value="nav">NAVIGATION</option>
+      </select>
+    </div>
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">ON COMPLETE</span>
+      <select class="wy-setting-input" id="wy-timer-action-type">
+        <option value="log-only">LOG ENTRY ONLY</option>
+        <option value="set-system-state">SET SYSTEM STATE</option>
+      </select>
+    </div>
+    <div class="wy-setting-row" id="wy-timer-system-row" style="display: none;">
+      <span class="wy-setting-label">SYSTEM</span>
+      <select class="wy-setting-input" id="wy-timer-system-name">
+        {{#each shipSystems}}
+        <option value="{{this.name}}">{{this.name}}</option>
+        {{/each}}
+      </select>
+    </div>
+    <div class="wy-setting-row" id="wy-timer-system-state-row" style="display: none;">
+      <span class="wy-setting-label">SET STATE</span>
+      <select class="wy-setting-input" id="wy-timer-system-state">
+        <option value="ONLINE">ONLINE</option>
+        <option value="NOMINAL">NOMINAL</option>
+        <option value="WARNING">WARNING</option>
+        <option value="CRITICAL">CRITICAL</option>
+        <option value="OFFLINE">OFFLINE</option>
+      </select>
+    </div>
+
+    <div style="margin-top: 8px;">
+      <button class="wy-muthur-send" data-action="create-timer" style="width: 100%;">CREATE EVENT TIMER</button>
+    </div>
+  </div>
+
+  {{!-- ── COMPLETED / CANCELLED TIMERS ── --}}
+  {{#if completedTimers.length}}
+  <div class="wy-section-title" style="margin-top: 16px;">COMPLETED</div>
+  <div class="wy-border-box">
+    {{#each completedTimers}}
+    <div style="display: flex; align-items: center; border-bottom: 1px solid var(--wy-green-dark); padding: 4px 0;">
+      <span style="flex: 1; color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px;">{{this.label}}</span>
+      <span style="color: var(--wy-green-dim); font-size: 9px; letter-spacing: 1px; margin-right: 8px;">{{this.completedAt}}</span>
+      <button class="wy-muthur-send" data-action="delete-timer" data-timer-id="{{this.id}}" style="width: 50px; padding: 2px 6px; font-size: 9px; border-color: #a33; color: #f44;">DEL</button>
+    </div>
+    {{/each}}
+    <div style="margin-top: 8px;">
+      <button class="wy-muthur-send" data-action="purge-completed" style="width: 100%; border-color: var(--wy-amber-dim); color: var(--wy-amber); font-size: 10px;">CLEAR ALL COMPLETED</button>
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if cancelledTimers.length}}
+  <div class="wy-section-title" style="margin-top: 16px;">CANCELLED</div>
+  <div class="wy-border-box">
+    {{#each cancelledTimers}}
+    <div style="display: flex; align-items: center; border-bottom: 1px solid var(--wy-green-dark); padding: 4px 0;">
+      <span style="flex: 1; color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px;">{{this.label}}</span>
+      <span style="color: var(--wy-green-dim); font-size: 9px; letter-spacing: 1px; margin-right: 8px;">{{this.cancelledAt}}</span>
+      <button class="wy-muthur-send" data-action="delete-timer" data-timer-id="{{this.id}}" style="width: 50px; padding: 2px 6px; font-size: 9px; border-color: #a33; color: #f44;">DEL</button>
+    </div>
+    {{/each}}
+    <div style="margin-top: 8px;">
+      <button class="wy-muthur-send" data-action="purge-cancelled" style="width: 100%; border-color: var(--wy-amber-dim); color: var(--wy-amber); font-size: 10px;">CLEAR ALL CANCELLED</button>
+    </div>
+  </div>
+  {{/if}}
+
+</div>

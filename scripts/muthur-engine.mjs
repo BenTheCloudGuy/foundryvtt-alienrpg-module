@@ -797,6 +797,27 @@ ${newContent}
         if (navData.destination) parts.push(`  DESTINATION: ${navData.destination}`);
       }
 
+      // Active event timers — countdown data for MU/TH/UR awareness
+      const eventTimers = getSetting('eventTimers', []);
+      const activeTimers = eventTimers.filter(t => t.status === 'active');
+      if (activeTimers.length > 0) {
+        // Compute remaining time for each active timer using game clock
+        const gameClockEpoch = getSetting('gameClockEpoch', 0);
+        const realAnchor = getSetting('gameClockRealAnchor', Date.now());
+        const realElapsed = Date.now() - realAnchor;
+        const gameElapsed = realElapsed * 10;
+        const currentGameTime = gameClockEpoch + gameElapsed;
+
+        parts.push('\n--- ACTIVE EVENT TIMERS ---');
+        parts.push('These are timed events currently counting down in game time:');
+        for (const t of activeTimers) {
+          const remainingMs = Math.max(0, t.gameTargetTime - currentGameTime);
+          const remaining = this._formatTimerDuration(remainingMs);
+          parts.push(`  ${t.label} [${t.category.toUpperCase()}] — REMAINING: ${remaining}${remainingMs <= 0 ? ' (IMMINENT)' : ''}`);
+        }
+        parts.push('When asked about ETAs, time remaining, or scheduled events, use the data above as the authoritative countdown.');
+      }
+
       // Clearance level — GM always has MASTER_OVERRIDE
       const rawClearance = getSetting('activeClearanceLevel', 'NONE');
       const clearance = game.user?.isGM ? 'MASTER_OVERRIDE' : rawClearance;
@@ -826,6 +847,24 @@ ${newContent}
       console.warn('MuthurEngine | Failed to build live ship context:', e);
       return '';
     }
+  }
+
+  /**
+   * Format milliseconds into human-readable duration for MU/TH/UR context.
+   */
+  _formatTimerDuration(ms) {
+    if (ms <= 0) return '0M';
+    const totalMinutes = Math.floor(ms / 60000);
+    const weeks = Math.floor(totalMinutes / (7 * 24 * 60));
+    const days = Math.floor((totalMinutes % (7 * 24 * 60)) / (24 * 60));
+    const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
+    const minutes = totalMinutes % 60;
+    const parts = [];
+    if (weeks > 0) parts.push(`${weeks}W`);
+    if (days > 0) parts.push(`${days}D`);
+    if (hours > 0) parts.push(`${hours}H`);
+    if (minutes > 0 || parts.length === 0) parts.push(`${minutes}M`);
+    return parts.join(' ');
   }
 
   _playSound(soundName) {

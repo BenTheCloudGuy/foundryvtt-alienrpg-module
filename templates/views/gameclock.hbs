@@ -5,11 +5,27 @@
   <div class="wy-clock-display">
     <div class="wy-clock-date" id="wy-clock-date">{{clockDate}}</div>
     <div class="wy-clock-time" id="wy-clock-time">{{clockTime}}</div>
-    <div class="wy-clock-rate">TIME ACCELERATION: 10:1</div>
+    <div class="wy-clock-rate" id="wy-clock-rate">
+      {{#if clockPaused}}
+      <span class="wy-text-amber">TIME PAUSED</span>
+      {{else}}
+      TIME ACCELERATION: 10:1
+      {{/if}}
+    </div>
   </div>
 
   {{!-- GM adjustment controls --}}
   {{#if isGM}}
+  <div class="wy-clock-controls" style="margin-bottom: 12px;">
+    <div class="wy-clock-controls-title">GAME TIME CONTROL</div>
+    <div style="display: flex; gap: 8px; justify-content: center; padding: 8px 0;">
+      {{#if clockPaused}}
+      <button class="wy-keypad-btn wy-clock-action-btn" data-clock-action="start" style="flex: 1; color: var(--wy-green); border-color: var(--wy-green);">START CLOCK</button>
+      {{else}}
+      <button class="wy-keypad-btn wy-clock-action-btn" data-clock-action="stop" style="flex: 1; color: var(--wy-amber); border-color: var(--wy-amber);">STOP CLOCK</button>
+      {{/if}}
+    </div>
+  </div>
   <div class="wy-clock-controls">
     <div class="wy-clock-controls-title">ADJUST GAME CLOCK</div>
     <div class="wy-clock-grid">

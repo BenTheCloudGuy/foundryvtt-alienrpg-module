@@ -1,4 +1,4 @@
-<div class="wy-terminal {{#if scanlines}}scanlines{{/if}} {{#if crtFlicker}}crt-flicker{{/if}} wy-theme-{{uiTheme}}">
+<div class="wy-terminal {{#if scanlines}}scanlines{{/if}} {{#if crtFlicker}}crt-flicker{{/if}} wy-theme-{{uiTheme}}" style="--wy-scanline-opacity: {{scanlineOpacity}}; --wy-flicker-opacity: {{flickerOpacity}};">
   
   {{!-- Noise overlay for boot-up effect --}}
   <div class="wy-noise-overlay"></div>
@@ -83,6 +83,11 @@
       <button class="wy-nav-btn {{#if (eq activeView 'gameclock')}}active{{/if}}" data-view="gameclock">
         <span class="btn-icon">⏱</span>
         <span class="btn-label">GAME CLOCK</span>
+      </button>
+
+      <button class="wy-nav-btn {{#if (eq activeView 'timers')}}active{{/if}}" data-view="timers">
+        <span class="btn-icon">⏲</span>
+        <span class="btn-label">TIMERS</span>
       </button>
 
       <button class="wy-nav-btn emergency {{#if (eq activeView 'emergency')}}active{{/if}}" data-view="emergency">

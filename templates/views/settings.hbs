@@ -43,21 +43,45 @@
              value="{{shipRegistry}}" />
     </div>
 
+  </div>
+
+  {{#if isGM}}
+  <div class="wy-section-title" style="margin-top: 16px;">PLAYER TERMINAL EFFECTS</div>
+  <div class="wy-border-box" id="wy-player-effects-section">
+    <div style="color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px; margin-bottom: 8px;">
+      THESE SETTINGS APPLY TO PLAYER TERMINALS ONLY. GM TERMINAL IS ALWAYS CLEAN (NO CRT EFFECTS OR SOUND).
+    </div>
+
     <div class="wy-setting-row">
       <span class="wy-setting-label">CRT SCANLINES</span>
-      <input type="checkbox" data-setting="scanlines" {{#if scanlines}}checked{{/if}} />
+      <select class="wy-setting-input" data-player-effect="scanlines">
+        <option value="off" {{#if (eq scanlines "off")}}selected{{/if}}>OFF</option>
+        <option value="light" {{#if (eq scanlines "light")}}selected{{/if}}>LIGHT</option>
+        <option value="medium" {{#if (eq scanlines "medium")}}selected{{/if}}>MEDIUM</option>
+        <option value="heavy" {{#if (eq scanlines "heavy")}}selected{{/if}}>HEAVY</option>
+      </select>
     </div>
 
     <div class="wy-setting-row">
       <span class="wy-setting-label">CRT FLICKER</span>
-      <input type="checkbox" data-setting="crtFlicker" {{#if crtFlicker}}checked{{/if}} />
+      <select class="wy-setting-input" data-player-effect="crtFlicker">
+        <option value="off" {{#if (eq crtFlicker "off")}}selected{{/if}}>OFF</option>
+        <option value="light" {{#if (eq crtFlicker "light")}}selected{{/if}}>LIGHT</option>
+        <option value="medium" {{#if (eq crtFlicker "medium")}}selected{{/if}}>MEDIUM</option>
+        <option value="heavy" {{#if (eq crtFlicker "heavy")}}selected{{/if}}>HEAVY</option>
+      </select>
     </div>
 
     <div class="wy-setting-row">
       <span class="wy-setting-label">SOUND EFFECTS</span>
-      <input type="checkbox" data-setting="soundEnabled" {{#if soundEnabled}}checked{{/if}} />
+      <input type="checkbox" data-player-effect="soundEnabled" {{#if soundEnabled}}checked{{/if}} />
+    </div>
+
+    <div style="margin-top: 8px;">
+      <button class="wy-muthur-send" data-action="save-player-effects" style="width: 100%;">SAVE PLAYER EFFECTS</button>
     </div>
   </div>
+  {{/if}}
 
   {{#if isGM}}
   <div class="wy-section-title" style="margin-top: 16px;">MU/TH/UR AI ENGINE</div>
@@ -137,13 +161,25 @@
   </div>
 
   {{#if isGM}}
+  <div class="wy-section-title" style="margin-top: 16px;">FOUNDRYVTT OPTIMIZATION</div>
+  <div class="wy-border-box" style="margin-bottom: 12px;">
+    <div style="color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px; margin-bottom: 8px;">
+      AUTO-CONFIGURE CORE FOUNDRYVTT SETTINGS FOR OPTIMAL WY-TERMINAL EXPERIENCE.
+      DISABLES TOKEN ROTATION, DRAG PREVIEW, AND SCROLLING STATUS TEXT.
+      RESTRICTS AUDIO/VIDEO BROADCAST AND CURSOR SHARING PERMISSIONS.
+    </div>
+    <div style="margin-top: 8px;">
+      <button class="wy-muthur-send" data-action="optimize-foundry" style="width: 100%;">OPTIMIZE FOUNDRYVTT SETTINGS</button>
+    </div>
+  </div>
+
   <div class="wy-section-title" style="margin-top: 16px; color: var(--wy-amber);">RESET GAME SETTINGS</div>
   <div class="wy-border-box" style="border-color: var(--wy-amber-dim);">
     <div style="color: var(--wy-amber-dim); font-size: 10px; letter-spacing: 1px; margin-bottom: 8px;">
       WARNING: THESE ACTIONS CANNOT BE UNDONE. EACH BUTTON RESETS THE SELECTED DATA TO DEFAULTS.
     </div>
     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-      <button class="wy-muthur-send" data-action="reset-gameclock" style="flex:1; min-width: 140px; border-color: var(--wy-amber-dim); color: var(--wy-amber);">&#x27F2; RESET GAME CLOCK</button>
+      <button class="wy-muthur-send" data-action="reset-gameclock" style="flex:1; min-width: 140px; border-color: var(--wy-amber-dim); color: var(--wy-amber);">&#x27F2; RESET CLOCK &amp; TIMERS</button>
       <button class="wy-muthur-send" data-action="reset-logs" style="flex:1; min-width: 140px; border-color: var(--wy-amber-dim); color: var(--wy-amber);">&#x27F2; RESET LOGS</button>
     </div>
     <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
@@ -191,7 +227,7 @@
     </div>
     <div class="wy-setting-row">
       <span class="wy-setting-label">ETA</span>
-      <input class="wy-setting-input" type="text" data-nav="eta" value="{{navData.eta}}" placeholder="14 WEEKS" />
+      <input class="wy-setting-input" type="text" data-nav="eta" value="{{navData.eta}}" placeholder="1h / 2h 30m / 3 days / 14 weeks" />
     </div>
     <div class="wy-setting-row">
       <span class="wy-setting-label">POSITION</span>

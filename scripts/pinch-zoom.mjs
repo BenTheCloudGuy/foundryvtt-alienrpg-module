@@ -274,6 +274,7 @@ export class PinchZoomHandler {
   /**
    * Clamp panX/panY so the scaled content never leaves the viewport edges.
    * At scale <= 1 the content fits entirely, so pan is zeroed.
+   * Uses actual content dimensions (not container) for correct aspect-ratio handling.
    */
   _clampPan() {
     if (this.scale <= 1) {
@@ -283,8 +284,11 @@ export class PinchZoomHandler {
     }
     const cw = this.container.clientWidth;
     const ch = this.container.clientHeight;
-    const sw = cw * this.scale;
-    const sh = ch * this.scale;
+    // Use content element's natural rendered size (before transform)
+    const contentW = this.content.offsetWidth || cw;
+    const contentH = this.content.offsetHeight || ch;
+    const sw = contentW * this.scale;
+    const sh = contentH * this.scale;
 
     // Negative pan = content shifted left/up, clamped so right/bottom edge stays in view
     const minX = cw - sw;

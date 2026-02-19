@@ -69,20 +69,20 @@ export function registerSettings() {
 
   game.settings.register('wy-terminal', 'scanlines', {
     name: 'CRT Scanlines',
-    hint: 'Enable CRT scanline overlay effect.',
-    scope: 'client',
-    config: true,
-    type: Boolean,
-    default: true,
+    hint: 'CRT scanline overlay intensity (OFF / LIGHT / MEDIUM / HEAVY).',
+    scope: 'world',
+    config: false,
+    type: String,
+    default: 'medium',
   });
 
   game.settings.register('wy-terminal', 'crtFlicker', {
     name: 'CRT Flicker',
-    hint: 'Enable subtle CRT flicker animation.',
-    scope: 'client',
-    config: true,
-    type: Boolean,
-    default: true,
+    hint: 'CRT flicker animation intensity (OFF / LIGHT / MEDIUM / HEAVY).',
+    scope: 'world',
+    config: false,
+    type: String,
+    default: 'medium',
   });
 
   game.settings.register('wy-terminal', 'soundEnabled', {
@@ -193,6 +193,14 @@ export function registerSettings() {
     default: 0,
   });
 
+  // Internal: whether the game clock is paused (GM toggle)
+  game.settings.register('wy-terminal', 'gameClockPaused', {
+    scope: 'world',
+    config: false,
+    type: Boolean,
+    default: false,
+  });
+
   /* ════════════════════════════════════════════════════════════════
      MU/TH/UR ENGINE SETTINGS
      ════════════════════════════════════════════════════════════════ */
@@ -277,6 +285,15 @@ export function registerSettings() {
   // Internal: which ships are enabled for the Player-Terminal schematic selector
   // Stored as an array of profile ids, e.g. ['montero']. Empty = ALL ships visible.
   game.settings.register('wy-terminal', 'enabledShips', {
+    scope: 'world',
+    config: false,
+    type: Array,
+    default: [],
+  });
+
+  // Internal: event timers tracked against game clock
+  // Each entry: { id, label, category, gameTargetTime, createdAt, actions, status }
+  game.settings.register('wy-terminal', 'eventTimers', {
     scope: 'world',
     config: false,
     type: Array,

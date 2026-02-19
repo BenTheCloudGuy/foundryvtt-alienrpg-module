@@ -13,7 +13,7 @@
         <td class="wy-text-dim">FUEL RESERVES:</td>
         <td class="{{fuelClass}}">{{fuelLevel}}</td>
         <td class="wy-text-dim">ETA:</td>
-        <td class="wy-text-amber">{{eta}}</td>
+        <td class="wy-text-amber" id="wy-nav-eta-display">{{eta}}{{#if etaCountdownMs}} <span style="font-size: 10px; color: {{#if clockPaused}}var(--wy-amber){{else}}var(--wy-green-dim){{/if}};">{{#if clockPaused}}[PAUSED]{{else}}[LIVE]{{/if}}</span>{{/if}}</td>
       </tr>
       <tr>
         <td class="wy-text-dim">ENGINES:</td>
@@ -23,22 +23,108 @@
       </tr>
       <tr>
         <td class="wy-text-dim">POSITION:</td>
-        <td colspan="3">{{currentPosition}}</td>
+        <td>{{currentPosition}}</td>
+        <td class="wy-text-dim">DESTINATION:</td>
+        <td>{{destination}}</td>
       </tr>
       <tr>
-        <td class="wy-text-dim">DESTINATION:</td>
-        <td colspan="3">{{destination}}</td>
+        <td class="wy-text-dim">DST COORDINATES:</td>
+        <td class="wy-text-amber">{{dstCoordinates}}</td>
+        <td></td>
+        <td></td>
       </tr>
     </table>
   </div>
 
   <div class="wy-nav-starmap-container">
-    <div class="wy-nav-starmap-label">STELLAR NAVIGATION CHART</div>
+    <div class="wy-nav-starmap-label">
+      STELLAR NAVIGATION CHART
+      {{#if isGM}}
+      <button class="wy-nav-marker-toggle" id="wy-nav-marker-toggle" title="Click map to place a NAV marker">PLACE MARKER</button>
+      {{/if}}
+    </div>
     <div class="wy-nav-starmap" id="wy-nav-starmap">
       <img src="modules/wy-terminal/images/starmap.jpg" alt="STAR MAP" class="wy-nav-starmap-img" id="wy-nav-starmap-img" />
       <canvas id="wy-nav-starmap-overlay" class="wy-nav-starmap-overlay"></canvas>
     </div>
   </div>
+
+  {{!-- GM inline form for new / editing marker --}}
+  {{#if isGM}}
+  <div class="wy-nav-marker-form" id="wy-nav-marker-form" style="display: none;">
+    <div class="wy-section-title" style="font-size: 11px; margin-top: 8px;">NEW NAV MARKER</div>
+    <div class="wy-border-box">
+      <div class="wy-setting-row">
+        <span class="wy-setting-label">LABEL</span>
+        <input class="wy-setting-input" type="text" id="wy-nav-marker-label" placeholder="STATION ALPHA" />
+      </div>
+      <div class="wy-setting-row">
+        <span class="wy-setting-label">TYPE</span>
+        <select class="wy-setting-input" id="wy-nav-marker-type">
+          <option value="WAYPOINT">WAYPOINT</option>
+          <option value="STATION">STATION</option>
+          <option value="PLANET">PLANET</option>
+          <option value="HAZARD">HAZARD</option>
+          <option value="SIGNAL">SIGNAL</option>
+          <option value="ANOMALY">ANOMALY</option>
+          <option value="SHIP">SHIP</option>
+          <option value="DEPARTURE">DEPARTURE</option>
+          <option value="DESTINATION">DESTINATION</option>
+          <option value="PLAYER">PLAYER</option>
+          <option value="CUSTOM">CUSTOM</option>
+        </select>
+      </div>
+      <div class="wy-setting-row" id="wy-nav-marker-progress-row" style="display: none;">
+        <span class="wy-setting-label">PROGRESS</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <input type="range" id="wy-nav-marker-progress" min="0" max="100" value="0" style="width: 140px; accent-color: var(--wy-green);" />
+          <span id="wy-nav-marker-progress-val" class="wy-text-dim" style="font-size: 10px; min-width: 30px;">0%</span>
+        </div>
+      </div>
+      <input type="hidden" id="wy-nav-marker-x" />
+      <input type="hidden" id="wy-nav-marker-y" />
+      <input type="hidden" id="wy-nav-marker-edit-id" />
+      <div style="display: flex; gap: 6px; margin-top: 6px;">
+        <button class="wy-muthur-send" data-action="save-nav-marker" style="flex: 1;">SAVE MARKER</button>
+        <button class="wy-muthur-send wy-btn-dim" data-action="cancel-nav-marker" style="flex: 1;">CANCEL</button>
+      </div>
+    </div>
+  </div>
+  {{/if}}
+
+  {{!-- NAV markers list (GM only) --}}
+  {{#if isGM}}
+  {{#if navMarkers.length}}
+  <div class="wy-section-title" style="font-size: 13px; margin-top: 12px;">NAV MARKERS</div>
+  <div class="wy-border-box">
+    <table class="wy-data-table">
+      <thead>
+        <tr>
+          <th>DESIGNATION</th>
+          <th>TYPE</th>
+          <th>COORDS</th>
+          {{#if isGM}}<th style="width: 70px;"></th>{{/if}}
+        </tr>
+      </thead>
+      <tbody>
+        {{#each navMarkers}}
+        <tr>
+          <td>{{this.label}}</td>
+          <td class="wy-text-dim">{{this.type}}</td>
+          <td class="wy-text-dim">{{this.coordLabel}}</td>
+          {{#if ../isGM}}
+          <td style="text-align: right; white-space: nowrap;">
+            <button class="wy-muthur-send" data-action="edit-nav-marker" data-marker-id="{{this.id}}" style="width: 40px; padding: 2px 6px; font-size: 9px;" title="EDIT">EDT</button>
+            <button class="wy-muthur-send" data-action="delete-nav-marker" data-marker-id="{{this.id}}" style="width: 40px; padding: 2px 6px; font-size: 9px; border-color: #a33; color: #f44;" title="DELETE">DEL</button>
+          </td>
+          {{/if}}
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+  {{/if}}
+  {{/if}}
 
   {{#if navPoints}}
   <div class="wy-section-title" style="font-size: 13px; margin-top: 12px;">WAYPOINTS</div>

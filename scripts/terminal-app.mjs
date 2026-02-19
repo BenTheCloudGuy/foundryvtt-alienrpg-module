@@ -10,6 +10,11 @@ import { MuthurEngine } from './muthur-engine.mjs';
 import { getShipProfile, getAvailableProfiles, SHIP_PROFILES } from './ship-profiles.mjs';
 import { TerminalSFX } from './terminal-sounds.mjs';
 
+/** Well-known ID for the permanent NAV ETA timer (cannot be deleted). */
+const DEFAULT_NAV_ETA_ID = 'nav-eta-default';
+/** Default ETA duration in game-clock ms (1 hour = 3 600 000 ms). */
+const DEFAULT_NAV_ETA_MS = 60 * 60 * 1000;
+
 export class WYTerminalApp extends Application {
 
   /** @type {import('./ship-status.mjs').ShipStatusManager} */
@@ -99,10 +104,20 @@ export class WYTerminalApp extends Application {
     const profile = this._getShipProfile();
     const shipName = game.settings.get('wy-terminal', 'shipName');
     const shipClass = game.settings.get('wy-terminal', 'shipClass');
-    // CRT effects are player-only — GM terminal stays clean
+
+    // CRT effects — player terminals only, GM always clean
     const isGM = game.user.isGM;
-    const scanlines = isGM ? false : game.settings.get('wy-terminal', 'scanlines');
-    const crtFlicker = isGM ? false : game.settings.get('wy-terminal', 'crtFlicker');
+    let scanlines = false, crtFlicker = false, scanlineOpacity = 0, flickerOpacity = 0;
+    if (!isGM) {
+      const rawScanlines = game.settings.get('wy-terminal', 'scanlines');
+      const rawFlicker   = game.settings.get('wy-terminal', 'crtFlicker');
+      const scanlineIntensity = (rawScanlines === true) ? 'medium' : (rawScanlines === false) ? 'off' : (rawScanlines || 'medium');
+      const flickerIntensity  = (rawFlicker === true)   ? 'medium' : (rawFlicker === false)   ? 'off' : (rawFlicker || 'medium');
+      scanlines  = scanlineIntensity !== 'off';
+      crtFlicker = flickerIntensity  !== 'off';
+      scanlineOpacity = { light: 0.3, medium: 0.6, heavy: 1.0 }[scanlineIntensity] || 0;
+      flickerOpacity  = { light: 0.3, medium: 0.7, heavy: 1.0 }[flickerIntensity]  || 0;
+    }
     const status = this.shipStatus?.getStatus() ?? {};
 
     const systemStatus = status.alert ? 'WARNING' : 'NOMINAL';
@@ -114,6 +129,8 @@ export class WYTerminalApp extends Application {
       shipRegistry: game.settings.get('wy-terminal', 'shipRegistry'),
       scanlines,
       crtFlicker,
+      scanlineOpacity,
+      flickerOpacity,
       systemStatus,
       systemStatusClass,
       activeView: this.activeView,
@@ -179,6 +196,9 @@ export class WYTerminalApp extends Application {
     // Preload star systems database
     this._loadStarSystemsData();
 
+    // Start event timer tick (GM only — checks every 10 real seconds)
+    this._startEventTimerTick();
+
     // Render initial view
     this._renderView(this.activeView);
   }
@@ -216,6 +236,11 @@ export class WYTerminalApp extends Application {
     this._clearClockInterval();
     // Clean up self-destruct countdown interval when leaving status view
     this._clearSelfDestructInterval();
+    // Clean up nav ETA countdown when leaving nav view
+    if (this._navEtaInterval) {
+      clearInterval(this._navEtaInterval);
+      this._navEtaInterval = null;
+    }
     // Clean up audio playback when leaving logs view
     if (this._activeAudioCleanup) {
       this._activeAudioCleanup();
@@ -421,6 +446,9 @@ export class WYTerminalApp extends Application {
       case 'gameclock':
         return { ...base, ...this._getGameClockDisplayData() };
 
+      case 'timers':
+        return { ...base, ...this._getTimersViewData() };
+
       case 'weapons':
         return { ...base, ...this._getWeaponsData() };
 
@@ -441,8 +469,8 @@ export class WYTerminalApp extends Application {
           ...base,
           muthurUrl: game.settings.get('wy-terminal', 'muthurUrl'),
           statusPath: game.settings.get('wy-terminal', 'statusPath'),
-          scanlines: game.settings.get('wy-terminal', 'scanlines'),
-          crtFlicker: game.settings.get('wy-terminal', 'crtFlicker'),
+          scanlines: this._normalizeCrtSetting(game.settings.get('wy-terminal', 'scanlines')),
+          crtFlicker: this._normalizeCrtSetting(game.settings.get('wy-terminal', 'crtFlicker')),
           soundEnabled: game.settings.get('wy-terminal', 'soundEnabled'),
           openaiBaseUrl: game.settings.get('wy-terminal', 'openaiBaseUrl'),
           openaiApiKey: game.settings.get('wy-terminal', 'openaiApiKey') ? '••••••••' : '',
@@ -1079,11 +1107,57 @@ export class WYTerminalApp extends Application {
     let fuelClass = 'wy-text-green';
     if (fuelNum <= 25) fuelClass = 'wy-text-red';
     else if (fuelNum <= 50) fuelClass = 'wy-text-amber';
+
+    // Check the default NAV ETA timer for live countdown
+    let etaDisplay = nav.eta || 'N/A';
+    let etaCountdownMs = 0;
+    const etaTimer = this._getActiveTimers().find(t => t.id === DEFAULT_NAV_ETA_ID);
+    if (etaTimer && etaTimer.remainingMs > 0) {
+      etaCountdownMs = etaTimer.remainingMs;
+      etaDisplay = this._formatDuration(etaCountdownMs);
+    }
+
+    // NAV markers with formatted coord labels for the table
+    const rawMarkers = nav.navMarkers || [];
+    const navMarkers = rawMarkers.map(m => ({
+      ...m,
+      coordLabel: m.type === 'PLAYER' && m.progress !== undefined
+        ? `TRANSIT: ${Math.round(m.progress * 100)}%`
+        : `${(m.x * 100).toFixed(1)}%, ${(m.y * 100).toFixed(1)}%`,
+    }));
+
+    // Derive position and destination from markers when available
+    const depMarker = rawMarkers.find(m => m.type === 'DEPARTURE');
+    const destMarker = rawMarkers.find(m => m.type === 'DESTINATION');
+    const playerMarker = rawMarkers.find(m => m.type === 'PLAYER');
+
+    // POSITION: use PLAYER marker coordinates if it exists
+    let currentPosition = nav.position || 'SECTOR 87-C / ZETA RETICULI';
+    if (playerMarker) {
+      let px = playerMarker.x, py = playerMarker.y;
+      if (depMarker && destMarker && playerMarker.progress !== undefined) {
+        px = depMarker.x + (destMarker.x - depMarker.x) * playerMarker.progress;
+        py = depMarker.y + (destMarker.y - depMarker.y) * playerMarker.progress;
+      }
+      currentPosition = `${playerMarker.label} — ${(px * 100).toFixed(1)}%, ${(py * 100).toFixed(1)}%`;
+    }
+
+    // DESTINATION: use DESTINATION marker label + coords
+    let destination = nav.destination || 'NOT SET';
+    let dstCoordinates = 'N/A';
+    if (destMarker) {
+      destination = destMarker.label;
+      dstCoordinates = `${(destMarker.x * 100).toFixed(1)}%, ${(destMarker.y * 100).toFixed(1)}%`;
+    }
+
     return {
-      currentPosition: nav.position || 'SECTOR 87-C / ZETA RETICULI',
-      destination: nav.destination || 'NOT SET',
+      currentPosition,
+      destination,
+      dstCoordinates,
       heading: nav.heading || '042.7',
-      eta: nav.eta || 'N/A',
+      eta: etaDisplay,
+      etaCountdownMs,
+      clockPaused: game.settings.get('wy-terminal', 'gameClockPaused') ?? false,
       speed: nav.speed || 'STATION KEEPING',
       fuelLevel: fuel,
       fuelClass,
@@ -1092,13 +1166,8 @@ export class WYTerminalApp extends Application {
       thrusterStatus,
       thrusterClass: (thrusterStatus === 'OFFLINE') ? 'wy-text-red' : 'wy-text-green',
       navPoints: nav.navPoints || [],
-      // Star map route data for canvas
-      shipPos: nav.shipPos || { x: 0.72, y: 0.45 },
-      routePoints: nav.routePoints || [
-        { x: 0.72, y: 0.45, label: 'CURRENT' },
-        { x: 0.58, y: 0.38, label: '' },
-        { x: 0.42, y: 0.32, label: 'DESTINATION' },
-      ],
+      navMarkers,
+      isGM: game.user.isGM,
     };
   }
 
@@ -1293,6 +1362,9 @@ export class WYTerminalApp extends Application {
         break;
       case 'gameclock':
         this._setupGameClockView(contentEl);
+        break;
+      case 'timers':
+        this._setupTimersView(contentEl);
         break;
       case 'weapons':
       case 'science':
@@ -2710,77 +2782,216 @@ export class WYTerminalApp extends Application {
     if (formEl) formEl.classList.add('wy-hidden');
   }
 
-  /* ── Nav View Setup — star map canvas overlay ── */
+  /* ── Nav View Setup — star map canvas overlay + NAV markers ── */
   _setupNavView(contentEl) {
     const container = contentEl.querySelector('#wy-nav-starmap');
     const img = contentEl.querySelector('#wy-nav-starmap-img');
     const canvas = contentEl.querySelector('#wy-nav-starmap-overlay');
     if (!container || !img || !canvas) return;
 
-    const drawRoute = () => {
-      const w = img.naturalWidth || img.offsetWidth;
-      const h = img.naturalHeight || img.offsetHeight;
-      canvas.width = img.offsetWidth;
-      canvas.height = img.offsetHeight;
+    // Marker type → color map
+    const MARKER_COLORS = {
+      WAYPOINT:    '#7fff00',
+      STATION:     '#00ccff',
+      PLANET:      '#ffcc00',
+      HAZARD:      '#ff4444',
+      SIGNAL:      '#ff66ff',
+      ANOMALY:     '#ff8800',
+      SHIP:        '#00ffaa',
+      DEPARTURE:   '#4488ff',
+      DESTINATION: '#ffaa00',
+      PLAYER:      '#00ffff',
+      CUSTOM:      '#ffffff',
+    };
+
+    // Marker type → symbol map
+    const MARKER_SYMBOLS = {
+      WAYPOINT:    '◆',
+      STATION:     '■',
+      PLANET:      '●',
+      HAZARD:      '⚠',
+      SIGNAL:      '※',
+      ANOMALY:     '◎',
+      SHIP:        '▲',
+      DEPARTURE:   '⊙',
+      DESTINATION: '⊕',
+      PLAYER:      '△',
+      CUSTOM:      '✦',
+    };
+
+    // Temp drag state for live marker repositioning
+    let _dragTemp = null;
+
+    const drawMarkers = () => {
+      const iw = img.offsetWidth;
+      const ih = img.offsetHeight;
+      canvas.width = iw;
+      canvas.height = ih;
+      canvas.style.width = iw + 'px';
+      canvas.style.height = ih + 'px';
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
       const navData = this._getNavData();
-      const route = navData.routePoints || [];
-      const shipPos = navData.shipPos || { x: 0.5, y: 0.5 };
+      const markers = navData.navMarkers || [];
 
-      // Draw route line
-      if (route.length >= 2) {
-        ctx.strokeStyle = 'rgba(127, 255, 0, 0.5)';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([6, 4]);
-        ctx.beginPath();
-        route.forEach((pt, i) => {
-          const px = pt.x * canvas.width;
-          const py = pt.y * canvas.height;
-          if (i === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
-        });
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // Draw waypoint dots
-        route.forEach(pt => {
-          const px = pt.x * canvas.width;
-          const py = pt.y * canvas.height;
-          ctx.fillStyle = 'rgba(127, 255, 0, 0.6)';
-          ctx.beginPath();
-          ctx.arc(px, py, 3, 0, Math.PI * 2);
-          ctx.fill();
-          if (pt.label) {
-            ctx.fillStyle = 'rgba(127, 255, 0, 0.8)';
-            ctx.font = '10px monospace';
-            ctx.fillText(pt.label, px + 6, py - 6);
-          }
-        });
+      // Apply live drag position if active
+      if (_dragTemp) {
+        const dm = markers.find(m => m.id === _dragTemp.id);
+        if (dm) {
+          dm.x = _dragTemp.x;
+          dm.y = _dragTemp.y;
+          if (_dragTemp.progress !== undefined) dm.progress = _dragTemp.progress;
+        }
       }
 
-      // Draw ship position (blinking dot)
-      const sx = shipPos.x * canvas.width;
-      const sy = shipPos.y * canvas.height;
-      ctx.fillStyle = '#7fff00';
-      ctx.shadowColor = '#7fff00';
-      ctx.shadowBlur = 8;
-      ctx.beginPath();
-      ctx.arc(sx, sy, 5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
+      // Find special route markers
+      const dep = markers.find(m => m.type === 'DEPARTURE');
+      const dest = markers.find(m => m.type === 'DESTINATION');
 
-      // Ship label
-      ctx.fillStyle = '#7fff00';
-      ctx.font = 'bold 10px monospace';
-      ctx.fillText('▲ SHIP', sx + 8, sy + 4);
+      // Compute PLAYER positions from progress along DEP→DEST path
+      markers.forEach(m => {
+        if (m.type === 'PLAYER' && dep && dest && m.progress !== undefined) {
+          m.x = dep.x + (dest.x - dep.x) * m.progress;
+          m.y = dep.y + (dest.y - dep.y) * m.progress;
+        }
+      });
+
+      // ── Draw travel path line between DEPARTURE and DESTINATION ──
+      if (dep && dest) {
+        const depPx = dep.x * iw, depPy = dep.y * ih;
+        const destPx = dest.x * iw, destPy = dest.y * ih;
+        const player = markers.find(m => m.type === 'PLAYER');
+
+        if (player) {
+          const plPx = player.x * iw, plPy = player.y * ih;
+          // Traversed portion — solid line
+          ctx.strokeStyle = '#00ffff';
+          ctx.lineWidth = 0.8;
+          ctx.globalAlpha = 0.4;
+          ctx.setLineDash([]);
+          ctx.beginPath();
+          ctx.moveTo(depPx, depPy);
+          ctx.lineTo(plPx, plPy);
+          ctx.stroke();
+          // Remaining portion — dashed line
+          ctx.strokeStyle = '#556677';
+          ctx.lineWidth = 0.8;
+          ctx.globalAlpha = 0.3;
+          ctx.setLineDash([3, 3]);
+          ctx.beginPath();
+          ctx.moveTo(plPx, plPy);
+          ctx.lineTo(destPx, destPy);
+          ctx.stroke();
+        } else {
+          // Full dashed path (no player yet)
+          ctx.strokeStyle = '#556677';
+          ctx.lineWidth = 0.8;
+          ctx.globalAlpha = 0.4;
+          ctx.setLineDash([3, 3]);
+          ctx.beginPath();
+          ctx.moveTo(depPx, depPy);
+          ctx.lineTo(destPx, destPy);
+          ctx.stroke();
+        }
+        ctx.setLineDash([]);
+        ctx.globalAlpha = 1;
+      }
+
+      // ── Draw all markers ──
+      markers.forEach(m => {
+        const mx = m.x * iw;
+        const my = m.y * ih;
+        const color = MARKER_COLORS[m.type] || MARKER_COLORS.CUSTOM;
+        const isRoute = ['DEPARTURE', 'DESTINATION', 'PLAYER'].includes(m.type);
+        const ringR = isRoute ? 7 : 5;
+        const tickLen = isRoute ? 5 : 3;
+
+        if (m.type === 'PLAYER') {
+          // Ship triangle pointing toward destination
+          const angle = dest
+            ? Math.atan2(dest.y * ih - my, dest.x * iw - mx)
+            : 0;
+          ctx.save();
+          ctx.translate(mx, my);
+          ctx.rotate(angle);
+          ctx.fillStyle = color;
+          ctx.shadowColor = color;
+          ctx.shadowBlur = 6;
+          ctx.globalAlpha = 0.9;
+          ctx.beginPath();
+          ctx.moveTo(6, 0);
+          ctx.lineTo(-4, -3.5);
+          ctx.lineTo(-4, 3.5);
+          ctx.closePath();
+          ctx.fill();
+          ctx.shadowBlur = 0;
+          ctx.globalAlpha = 1;
+          ctx.restore();
+          // Outer ring
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 0.8;
+          ctx.globalAlpha = 0.3;
+          ctx.beginPath();
+          ctx.arc(mx, my, ringR, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+        } else {
+          // Outer ring
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 0.8;
+          ctx.globalAlpha = 0.35;
+          ctx.beginPath();
+          ctx.arc(mx, my, ringR, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+
+          // Inner ring for DEPARTURE / DESTINATION
+          if (m.type === 'DEPARTURE' || m.type === 'DESTINATION') {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 0.6;
+            ctx.globalAlpha = 0.5;
+            ctx.beginPath();
+            ctx.arc(mx, my, 3, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+          }
+
+          // Crosshair ticks
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 0.6;
+          ctx.globalAlpha = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(mx - tickLen, my); ctx.lineTo(mx - 1, my);
+          ctx.moveTo(mx + 1, my); ctx.lineTo(mx + tickLen, my);
+          ctx.moveTo(mx, my - tickLen); ctx.lineTo(mx, my - 1);
+          ctx.moveTo(mx, my + 1); ctx.lineTo(mx, my + tickLen);
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+
+          // Center dot
+          ctx.fillStyle = color;
+          ctx.shadowColor = color;
+          ctx.shadowBlur = isRoute ? 5 : 3;
+          ctx.beginPath();
+          ctx.arc(mx, my, isRoute ? 2 : 1.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+
+        // Label
+        const symbol = MARKER_SYMBOLS[m.type] || '✦';
+        ctx.fillStyle = color;
+        ctx.font = `${isRoute ? 8 : 7}px monospace`;
+        const labelText = `${symbol} ${m.label}`;
+        ctx.fillText(labelText, mx + (isRoute ? 9 : 7), my + 2);
+      });
     };
 
     if (img.complete) {
-      drawRoute();
+      drawMarkers();
     } else {
-      img.addEventListener('load', drawRoute);
+      img.addEventListener('load', drawMarkers);
     }
 
     // Pinch-zoom on star map
@@ -2794,6 +3005,333 @@ export class WYTerminalApp extends Application {
         // Sync canvas transform with image
         canvas.style.transform = img.style.transform;
       };
+    }
+
+    /* ── GM NAV marker placement ── */
+    if (game.user.isGM) {
+      let placingMarker = false;
+      const toggleBtn = contentEl.querySelector('#wy-nav-marker-toggle');
+      const formEl = contentEl.querySelector('#wy-nav-marker-form');
+      const labelInput = contentEl.querySelector('#wy-nav-marker-label');
+      const typeSelect = contentEl.querySelector('#wy-nav-marker-type');
+      const xInput = contentEl.querySelector('#wy-nav-marker-x');
+      const yInput = contentEl.querySelector('#wy-nav-marker-y');
+      const editIdInput = contentEl.querySelector('#wy-nav-marker-edit-id');
+      const progressRow = contentEl.querySelector('#wy-nav-marker-progress-row');
+      const progressInput = contentEl.querySelector('#wy-nav-marker-progress');
+      const progressVal = contentEl.querySelector('#wy-nav-marker-progress-val');
+
+      // Show/hide progress row when marker type changes
+      typeSelect?.addEventListener('change', () => {
+        if (progressRow) progressRow.style.display = typeSelect.value === 'PLAYER' ? '' : 'none';
+      });
+      progressInput?.addEventListener('input', () => {
+        if (progressVal) progressVal.textContent = progressInput.value + '%';
+      });
+
+      // Toggle placement mode
+      toggleBtn?.addEventListener('click', () => {
+        placingMarker = !placingMarker;
+        toggleBtn.classList.toggle('wy-active', placingMarker);
+        container.classList.toggle('wy-marker-placing', placingMarker);
+        if (!placingMarker && formEl) {
+          formEl.style.display = 'none';
+          editIdInput.value = '';
+        }
+      });
+
+      // Track mousedown position to distinguish click vs drag
+      let _mdX = 0, _mdY = 0;
+      container.addEventListener('mousedown', (e) => { _mdX = e.clientX; _mdY = e.clientY; });
+
+      // Click on star map to place marker (only when placement mode is active)
+      container.addEventListener('click', (e) => {
+        if (!placingMarker) return;
+        // Ignore if mouse moved more than 5px (was a pan/drag)
+        const dx = e.clientX - _mdX, dy = e.clientY - _mdY;
+        if (Math.sqrt(dx * dx + dy * dy) > 5) return;
+
+        const rect = container.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        // Reverse the zoom/pan transform to get image-local coords
+        const imgX = (clickX - navZoom.panX) / navZoom.scale;
+        const imgY = (clickY - navZoom.panY) / navZoom.scale;
+
+        // Normalize to 0-1
+        const normX = Math.max(0, Math.min(1, imgX / img.offsetWidth));
+        const normY = Math.max(0, Math.min(1, imgY / img.offsetHeight));
+
+        // Fill form
+        xInput.value = normX.toFixed(6);
+        yInput.value = normY.toFixed(6);
+        editIdInput.value = '';
+        labelInput.value = '';
+        typeSelect.value = 'WAYPOINT';
+        if (progressRow) progressRow.style.display = 'none';
+        if (progressInput) progressInput.value = '0';
+        if (progressVal) progressVal.textContent = '0%';
+        if (formEl) {
+          formEl.style.display = '';
+          formEl.querySelector('.wy-section-title').textContent = 'NEW NAV MARKER';
+        }
+        labelInput?.focus();
+      });
+
+      // Save marker
+      contentEl.querySelector('[data-action="save-nav-marker"]')?.addEventListener('click', async () => {
+        const label = labelInput?.value?.trim().toUpperCase();
+        if (!label) {
+          ui.notifications.warn('WY-Terminal: Marker label is required.');
+          return;
+        }
+        const type = typeSelect?.value || 'WAYPOINT';
+        const x = parseFloat(xInput?.value);
+        const y = parseFloat(yInput?.value);
+        if (isNaN(x) || isNaN(y)) return;
+
+        const navData = this._loadSetting('navData') || {};
+        const markers = navData.navMarkers || [];
+        const editId = editIdInput?.value;
+        const progress = type === 'PLAYER'
+          ? parseInt(progressInput?.value || '0') / 100
+          : undefined;
+
+        if (editId) {
+          // Update existing marker
+          const idx = markers.findIndex(m => m.id === editId);
+          if (idx >= 0) {
+            const updated = { ...markers[idx], label, type, x, y };
+            if (progress !== undefined) updated.progress = progress;
+            else delete updated.progress;
+            markers[idx] = updated;
+          }
+        } else {
+          // Add new marker
+          const newMarker = {
+            id: foundry.utils.randomID(),
+            label,
+            type,
+            x,
+            y,
+          };
+          if (progress !== undefined) newMarker.progress = progress;
+          markers.push(newMarker);
+        }
+
+        navData.navMarkers = markers;
+        await game.settings.set('wy-terminal', 'navData', navData);
+        ui.notifications.info(`WY-Terminal: NAV marker "${label}" saved.`);
+
+        // Reset form
+        if (formEl) formEl.style.display = 'none';
+        editIdInput.value = '';
+        placingMarker = false;
+        toggleBtn?.classList.remove('wy-active');
+        container.classList.remove('wy-marker-placing');
+
+        // Redraw and refresh marker list
+        drawMarkers();
+        this._broadcastSocket('refreshView', { view: 'nav' });
+        this.render(true);
+      });
+
+      // Cancel marker placement
+      contentEl.querySelector('[data-action="cancel-nav-marker"]')?.addEventListener('click', () => {
+        if (formEl) formEl.style.display = 'none';
+        editIdInput.value = '';
+        if (progressRow) progressRow.style.display = 'none';
+      });
+
+      // Edit marker from list
+      contentEl.querySelectorAll('[data-action="edit-nav-marker"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.markerId;
+          const navData = this._loadSetting('navData') || {};
+          const markers = navData.navMarkers || [];
+          const marker = markers.find(m => m.id === id);
+          if (!marker) return;
+
+          // Populate form for editing
+          editIdInput.value = marker.id;
+          labelInput.value = marker.label;
+          typeSelect.value = marker.type || 'WAYPOINT';
+          xInput.value = marker.x.toFixed(6);
+          yInput.value = marker.y.toFixed(6);
+          // Show/hide progress row for PLAYER type
+          const isPlayerType = marker.type === 'PLAYER';
+          if (progressRow) progressRow.style.display = isPlayerType ? '' : 'none';
+          if (progressInput && isPlayerType) {
+            progressInput.value = Math.round((marker.progress || 0) * 100);
+            if (progressVal) progressVal.textContent = progressInput.value + '%';
+          }
+          if (formEl) {
+            formEl.style.display = '';
+            formEl.querySelector('.wy-section-title').textContent = 'EDIT NAV MARKER';
+          }
+          labelInput?.focus();
+        });
+      });
+
+      // Delete marker from list
+      contentEl.querySelectorAll('[data-action="delete-nav-marker"]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.markerId;
+          const navData = this._loadSetting('navData') || {};
+          const markers = navData.navMarkers || [];
+          const idx = markers.findIndex(m => m.id === id);
+          if (idx < 0) return;
+          const label = markers[idx].label;
+          markers.splice(idx, 1);
+          navData.navMarkers = markers;
+          await game.settings.set('wy-terminal', 'navData', navData);
+          ui.notifications.info(`WY-Terminal: NAV marker "${label}" deleted.`);
+          drawMarkers();
+          this._broadcastSocket('refreshView', { view: 'nav' });
+          this.render(true);
+        });
+      });
+
+      /* ── GM drag-to-move markers on star map ── */
+      let dragMarker = null;
+
+      // Clean up previous window-level drag handlers
+      if (this._navDragMove) window.removeEventListener('mousemove', this._navDragMove);
+      if (this._navDragEnd) window.removeEventListener('mouseup', this._navDragEnd);
+
+      // Capture-phase mousedown: detect marker hit BEFORE PinchZoomHandler panning
+      container.addEventListener('mousedown', (e) => {
+        if (placingMarker || e.button !== 0) return;
+
+        const rect = container.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+        const imgX = (clickX - navZoom.panX) / navZoom.scale;
+        const imgY = (clickY - navZoom.panY) / navZoom.scale;
+
+        // Hit-test markers
+        const navData = this._loadSetting('navData') || {};
+        const markers = navData.navMarkers || [];
+        const dep = markers.find(m => m.type === 'DEPARTURE');
+        const dest = markers.find(m => m.type === 'DESTINATION');
+
+        let hitMarker = null;
+        for (const m of markers) {
+          let screenX = m.x * img.offsetWidth;
+          let screenY = m.y * img.offsetHeight;
+          // Use computed position for PLAYER on path
+          if (m.type === 'PLAYER' && dep && dest && m.progress !== undefined) {
+            screenX = (dep.x + (dest.x - dep.x) * m.progress) * img.offsetWidth;
+            screenY = (dep.y + (dest.y - dep.y) * m.progress) * img.offsetHeight;
+          }
+          const dist = Math.sqrt((imgX - screenX) ** 2 + (imgY - screenY) ** 2);
+          if (dist < 12) {
+            hitMarker = { ...m };
+            break;
+          }
+        }
+
+        if (hitMarker) {
+          dragMarker = hitMarker;
+          e.stopPropagation();
+          e.preventDefault();
+          container.style.cursor = 'grabbing';
+        }
+      }, true); // capture phase fires before PinchZoomHandler
+
+      // Mousemove: update marker position in real-time
+      this._navDragMove = (e) => {
+        if (!dragMarker) return;
+        e.preventDefault();
+
+        const rect = container.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+        const imgX = (clickX - navZoom.panX) / navZoom.scale;
+        const imgY = (clickY - navZoom.panY) / navZoom.scale;
+        const normX = Math.max(0, Math.min(1, imgX / img.offsetWidth));
+        const normY = Math.max(0, Math.min(1, imgY / img.offsetHeight));
+
+        // For PLAYER with DEP/DEST: project onto path line
+        const navData = this._loadSetting('navData') || {};
+        const markers = navData.navMarkers || [];
+        const dep = markers.find(m => m.type === 'DEPARTURE');
+        const dest = markers.find(m => m.type === 'DESTINATION');
+
+        if (dragMarker.type === 'PLAYER' && dep && dest) {
+          const dx = dest.x - dep.x, dy = dest.y - dep.y;
+          const len2 = dx * dx + dy * dy;
+          if (len2 > 0) {
+            let t = ((normX - dep.x) * dx + (normY - dep.y) * dy) / len2;
+            t = Math.max(0, Math.min(1, t));
+            dragMarker.progress = t;
+            dragMarker.x = dep.x + dx * t;
+            dragMarker.y = dep.y + dy * t;
+          }
+        } else {
+          dragMarker.x = normX;
+          dragMarker.y = normY;
+        }
+
+        _dragTemp = { id: dragMarker.id, x: dragMarker.x, y: dragMarker.y, progress: dragMarker.progress };
+        drawMarkers();
+      };
+      window.addEventListener('mousemove', this._navDragMove);
+
+      // Mouseup: persist final position
+      this._navDragEnd = async (e) => {
+        if (!dragMarker) return;
+        container.style.cursor = '';
+
+        const navData = this._loadSetting('navData') || {};
+        const markers = navData.navMarkers || [];
+        const idx = markers.findIndex(m => m.id === dragMarker.id);
+        if (idx >= 0) {
+          markers[idx].x = dragMarker.x;
+          markers[idx].y = dragMarker.y;
+          if (dragMarker.progress !== undefined) {
+            markers[idx].progress = dragMarker.progress;
+          }
+          navData.navMarkers = markers;
+          await game.settings.set('wy-terminal', 'navData', navData);
+          this._broadcastSocket('refreshView', { view: 'nav' });
+        }
+
+        dragMarker = null;
+        _dragTemp = null;
+        drawMarkers();
+        this.render(true);
+      };
+      window.addEventListener('mouseup', this._navDragEnd);
+    }
+
+    // Live ETA countdown ticker — reads from default NAV ETA timer by ID
+    // At 10x game speed, the minutes digit changes every ~6 real seconds
+    const etaEl = contentEl.querySelector('#wy-nav-eta-display');
+    if (etaEl) {
+      const etaTimer = this._getActiveTimers().find(t => t.id === DEFAULT_NAV_ETA_ID);
+      if (etaTimer && etaTimer.remainingMs > 0) {
+        let lastText = '';
+        let lastTag = '';
+        this._navEtaInterval = setInterval(() => {
+          const timer = this._getActiveTimers().find(t => t.id === DEFAULT_NAV_ETA_ID);
+          if (timer && timer.remainingMs > 0) {
+            const paused = game.settings.get('wy-terminal', 'gameClockPaused') ?? false;
+            const text = this._formatDuration(timer.remainingMs);
+            const tag = paused ? 'PAUSED' : 'LIVE';
+            if (text !== lastText || tag !== lastTag) {
+              lastText = text;
+              lastTag = tag;
+              const tagColor = paused ? 'var(--wy-amber)' : 'var(--wy-green-dim)';
+              etaEl.innerHTML = `${text} <span style="font-size: 10px; color: ${tagColor};">[${tag}]</span>`;
+            }
+          } else {
+            etaEl.textContent = 'ARRIVED';
+            clearInterval(this._navEtaInterval);
+          }
+        }, 1000);
+      }
     }
   }
 
@@ -3596,9 +4134,37 @@ export class WYTerminalApp extends Application {
           await game.settings.set('wy-terminal', 'gameClockRealAnchor', Date.now());
 
           tickClock();
-          this._broadcastSocket('refreshView', { view: 'gameclock' });
+          this._broadcastSocket('refreshView', { view: 'all' });
         });
       });
+
+      // Stop button — freeze game time
+      const stopBtn = contentEl.querySelector('[data-clock-action="stop"]');
+      if (stopBtn) {
+        stopBtn.addEventListener('click', async () => {
+          // Snapshot current game time into epoch, then mark paused
+          const { date } = this._getGameClockDate();
+          await game.settings.set('wy-terminal', 'gameClockEpoch', date.getTime());
+          await game.settings.set('wy-terminal', 'gameClockRealAnchor', Date.now());
+          await game.settings.set('wy-terminal', 'gameClockPaused', true);
+          ui.notifications.info('WY-Terminal: Game clock STOPPED.');
+          this._broadcastSocket('refreshView', { view: 'all' });
+          this.render(true);
+        });
+      }
+
+      // Start button — resume game time
+      const startBtn = contentEl.querySelector('[data-clock-action="start"]');
+      if (startBtn) {
+        startBtn.addEventListener('click', async () => {
+          // Re-anchor to now so clock resumes from frozen epoch
+          await game.settings.set('wy-terminal', 'gameClockRealAnchor', Date.now());
+          await game.settings.set('wy-terminal', 'gameClockPaused', false);
+          ui.notifications.info('WY-Terminal: Game clock STARTED.');
+          this._broadcastSocket('refreshView', { view: 'all' });
+          this.render(true);
+        });
+      }
 
       // Reset button
       const resetBtn = contentEl.querySelector('[data-clock-action="reset"]');
@@ -3606,9 +4172,11 @@ export class WYTerminalApp extends Application {
         resetBtn.addEventListener('click', async () => {
           await game.settings.set('wy-terminal', 'gameClockEpoch', Date.UTC(2183, 5, 12, 6, 0, 0));
           await game.settings.set('wy-terminal', 'gameClockRealAnchor', Date.now());
+          await game.settings.set('wy-terminal', 'gameClockPaused', false);
           tickClock();
-          this._broadcastSocket('refreshView', { view: 'gameclock' });
+          this._broadcastSocket('refreshView', { view: 'all' });
           ui.notifications.info('WY-Terminal: Game clock reset to 2183-06-12 06:00.');
+          this.render(true);
         });
       }
     }
@@ -4506,11 +5074,30 @@ export class WYTerminalApp extends Application {
       ui.notifications.info('WY-Terminal: Chat log cleared.');
     });
 
-    // Reset game clock to default epoch (2183-06-12 06:00 UTC)
+    // Save player terminal effects (scanlines, flicker, sound) — GM only control
+    contentEl.querySelector('[data-action="save-player-effects"]')?.addEventListener('click', async () => {
+      const effectInputs = contentEl.querySelectorAll('[data-player-effect]');
+      for (const input of effectInputs) {
+        const key = input.dataset.playerEffect;
+        const value = input.type === 'checkbox' ? input.checked : input.value;
+        try {
+          await game.settings.set('wy-terminal', key, value);
+        } catch (e) {
+          console.warn(`WY-Terminal | Could not save player effect "${key}":`, e);
+        }
+      }
+      ui.notifications.info('WY-Terminal: Player terminal effects saved.');
+      // Broadcast full re-render so player terminals pick up CRT and sound changes
+      this._broadcastSocket('refreshView', { view: 'all' });
+    });
+
+    // Reset game clock to default epoch (2183-06-12 06:00 UTC) + reset timers
     contentEl.querySelector('[data-action="reset-gameclock"]')?.addEventListener('click', async () => {
       await game.settings.set('wy-terminal', 'gameClockEpoch', Date.UTC(2183, 5, 12, 6, 0, 0));
       await game.settings.set('wy-terminal', 'gameClockRealAnchor', Date.now());
-      ui.notifications.info('WY-Terminal: Game clock reset to 2183-06-12 06:00.');
+      await game.settings.set('wy-terminal', 'gameClockPaused', false);
+      await this._resetTimersToDefault();
+      ui.notifications.info('WY-Terminal: Game clock and timers reset to defaults.');
       this.refreshCurrentView();
     });
 
@@ -4543,8 +5130,10 @@ export class WYTerminalApp extends Application {
     contentEl.querySelector('[data-action="reset-all"]')?.addEventListener('click', async () => {
       await game.settings.set('wy-terminal', 'gameClockEpoch', Date.UTC(2183, 5, 12, 6, 0, 0));
       await game.settings.set('wy-terminal', 'gameClockRealAnchor', Date.now());
+      await game.settings.set('wy-terminal', 'gameClockPaused', false);
       await game.settings.set('wy-terminal', 'logEntries', []);
       await this._loadFileLogEntries();
+      await this._resetTimersToDefault();
       await game.settings.set('wy-terminal', 'crewRoster', []);
       await game.settings.set('wy-terminal', 'shipStatusData', {});
       await game.settings.set('wy-terminal', 'shipSystems', []);
@@ -4604,6 +5193,28 @@ export class WYTerminalApp extends Application {
       this.render(true);
     });
 
+    // Optimize FoundryVTT core settings for best WY-Terminal experience
+    contentEl.querySelector('[data-action="optimize-foundry"]')?.addEventListener('click', async () => {
+      try {
+        // Disable distracting token/map behaviours
+        await game.settings.set('core', 'tokenAutoRotate', false);
+        await game.settings.set('core', 'tokenDragPreview', false);
+        await game.settings.set('core', 'scrollingStatusText', false);
+
+        // Restrict AV and cursor permissions
+        const perms = foundry.utils.deepClone(game.settings.get('core', 'permissions'));
+        perms.BROADCAST_AUDIO  = [3, 4];      // Assistant GM + GM only
+        perms.BROADCAST_VIDEO  = [2, 3, 4];    // Trusted + Assistant GM + GM
+        perms.SHOW_CURSOR      = [];            // Nobody
+        await game.settings.set('core', 'permissions', perms);
+
+        ui.notifications.info('WY-Terminal: FoundryVTT settings optimized for best experience.');
+      } catch (e) {
+        console.error('WY-Terminal | Failed to optimize FoundryVTT settings:', e);
+        ui.notifications.error('WY-Terminal: Could not apply FoundryVTT optimizations. Check console.');
+      }
+    });
+
     // Save navigation data
     contentEl.querySelector('[data-action="save-nav"]')?.addEventListener('click', async () => {
       const navInputs = contentEl.querySelectorAll('[data-nav]');
@@ -4613,7 +5224,30 @@ export class WYTerminalApp extends Application {
         navData[field] = input.value.trim();
       });
       await game.settings.set('wy-terminal', 'navData', navData);
-      ui.notifications.info('WY-Terminal: Navigation data saved.');
+
+      // Update the default NAV ETA timer with the new ETA duration
+      const etaDurationMs = this._parseEtaDuration(navData.eta);
+      if (etaDurationMs > 0) {
+        const dest = navData.destination?.trim().toUpperCase() || 'DESTINATION';
+        const { date: gameNow } = this._getGameClockDate();
+        await this._updateEventTimer(DEFAULT_NAV_ETA_ID, {
+          label: `ARRIVAL AT ${dest}`,
+          gameTargetTime: gameNow.getTime() + etaDurationMs,
+          status: 'active',
+          actions: this._buildDefaultEtaActions(dest),
+        });
+        // Clean up completed/cancelled state
+        const timers = this._loadSetting('eventTimers') || [];
+        const etaTimer = timers.find(t => t.id === DEFAULT_NAV_ETA_ID);
+        if (etaTimer) {
+          delete etaTimer.completedAt;
+          delete etaTimer.cancelledAt;
+          await game.settings.set('wy-terminal', 'eventTimers', timers);
+        }
+        ui.notifications.info(`WY-Terminal: Navigation saved. ETA timer set (${this._formatDuration(etaDurationMs)} game time).`);
+      } else {
+        ui.notifications.info('WY-Terminal: Navigation data saved.');
+      }
       // Broadcast refresh so player terminals update
       this._broadcastSocket('refreshView', { view: 'nav' });
     });
@@ -4669,12 +5303,599 @@ export class WYTerminalApp extends Application {
     }
 
     ui.notifications.info('WY-Terminal: Configuration saved.');
+    // Broadcast full re-render so player terminals pick up CRT and other changes
+    this._broadcastSocket('refreshView', { view: 'all' });
     this.render(true);
+  }
+
+  /* ══════════════════════════════════════════════════════════════════
+     TIMERS VIEW — Dedicated event timer management interface
+     ══════════════════════════════════════════════════════════════════ */
+
+  /**
+   * Build view data for the Timers view.
+   */
+  _getTimersViewData() {
+    const allTimers = this._getAllTimers() || [];
+    const { date: gameNow } = this._getGameClockDate();
+    const gameNowMs = gameNow.getTime();
+
+    const activeTimers = allTimers
+      .filter(t => t.status === 'active')
+      .map(t => {
+        const remainingMs = Math.max(0, t.gameTargetTime - gameNowMs);
+        return { ...t, remainingMs, remainingFormatted: this._formatDuration(remainingMs) };
+      })
+      .sort((a, b) => a.gameTargetTime - b.gameTargetTime);
+
+    const completedTimers = allTimers
+      .filter(t => t.status === 'completed')
+      .slice(-20);
+
+    const cancelledTimers = allTimers
+      .filter(t => t.status === 'cancelled')
+      .slice(-20);
+
+    return { activeTimers, completedTimers, cancelledTimers, isGM: game.user.isGM, shipSystems: this._getSystemsData() };
+  }
+
+  /**
+   * Set up the Timers view event handlers.
+   */
+  _setupTimersView(contentEl) {
+    if (!game.user.isGM) return;
+
+    // Toggle system rows visibility based on action type
+    const actionTypeSelect = contentEl.querySelector('#wy-timer-action-type');
+    const systemRow = contentEl.querySelector('#wy-timer-system-row');
+    const systemStateRow = contentEl.querySelector('#wy-timer-system-state-row');
+    if (actionTypeSelect && systemRow && systemStateRow) {
+      actionTypeSelect.addEventListener('change', () => {
+        const show = actionTypeSelect.value === 'set-system-state';
+        systemRow.style.display = show ? '' : 'none';
+        systemStateRow.style.display = show ? '' : 'none';
+      });
+    }
+
+    // Also show system rows when CATEGORY is 'system'
+    const categorySelect = contentEl.querySelector('#wy-timer-category');
+    if (categorySelect) {
+      categorySelect.addEventListener('change', () => {
+        if (categorySelect.value === 'system' && actionTypeSelect) {
+          actionTypeSelect.value = 'set-system-state';
+          actionTypeSelect.dispatchEvent(new Event('change'));
+        }
+      });
+    }
+
+    // CREATE timer
+    contentEl.querySelector('[data-action="create-timer"]')?.addEventListener('click', async () => {
+      const label = contentEl.querySelector('#wy-timer-label')?.value?.trim();
+      const durationStr = contentEl.querySelector('#wy-timer-duration')?.value?.trim();
+      const category = contentEl.querySelector('#wy-timer-category')?.value || 'custom';
+      const actionType = contentEl.querySelector('#wy-timer-action-type')?.value || 'log-only';
+
+      if (!label) { ui.notifications.warn('WY-Terminal: Timer label is required.'); return; }
+      if (!durationStr) { ui.notifications.warn('WY-Terminal: Timer duration is required.'); return; }
+
+      const durationMs = this._parseEtaDuration(durationStr);
+      if (durationMs <= 0) { ui.notifications.warn('WY-Terminal: Could not parse duration. Use formats like "2h 30m", "3 days", "14 weeks".'); return; }
+
+      const actions = [];
+      actions.push({
+        type: 'add-log',
+        sender: 'TIMER SYSTEM',
+        subject: `${label.toUpperCase()} COMPLETE`,
+        detail: `EVENT TIMER "${label.toUpperCase()}" HAS COMPLETED (${this._formatDuration(durationMs)} ELAPSED).`,
+        level: 'INFO',
+      });
+
+      if (actionType === 'set-system-state') {
+        const systemName = contentEl.querySelector('#wy-timer-system-name')?.value?.trim();
+        const systemState = contentEl.querySelector('#wy-timer-system-state')?.value || 'ONLINE';
+        if (!systemName) { ui.notifications.warn('WY-Terminal: System name is required for system status actions.'); return; }
+        actions.push({
+          type: 'set-system-status',
+          systemName: systemName.toUpperCase(),
+          status: systemState,
+          detail: `${systemName.toUpperCase()} STATE CHANGED TO ${systemState} VIA EVENT TIMER.`,
+        });
+      }
+
+      await this._createEventTimer({ label: label.toUpperCase(), category, durationMs, actions });
+      ui.notifications.info(`WY-Terminal: Event timer "${label.toUpperCase()}" created (${this._formatDuration(durationMs)} game time).`);
+      this.render(true);
+    });
+
+    // CANCEL timer
+    contentEl.querySelectorAll('[data-action="cancel-timer"]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const timerId = btn.dataset.timerId;
+        await this._cancelEventTimer(timerId);
+        ui.notifications.info('WY-Terminal: Timer cancelled.');
+        this.render(true);
+      });
+    });
+
+    // DELETE timer (remove from array entirely)
+    contentEl.querySelectorAll('[data-action="delete-timer"]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const timerId = btn.dataset.timerId;
+        await this._deleteEventTimer(timerId);
+        ui.notifications.info('WY-Terminal: Timer deleted.');
+        this.render(true);
+      });
+    });
+
+    // EDIT timer — toggle inline edit form visibility
+    contentEl.querySelectorAll('[data-action="edit-timer"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const timerId = btn.dataset.timerId;
+        const row = contentEl.querySelector(`.wy-timer-row[data-timer-id="${timerId}"]`);
+        if (!row) return;
+        const editDiv = row.querySelector('.wy-timer-edit');
+        const displayDiv = row.querySelector('.wy-timer-display');
+        if (editDiv && displayDiv) {
+          const isVisible = editDiv.style.display !== 'none';
+          editDiv.style.display = isVisible ? 'none' : '';
+        }
+      });
+    });
+
+    // SAVE EDIT — persist changes to timer
+    contentEl.querySelectorAll('[data-action="save-timer-edit"]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const timerId = btn.dataset.timerId;
+        const row = contentEl.querySelector(`.wy-timer-row[data-timer-id="${timerId}"]`);
+        if (!row) return;
+
+        const newLabel = row.querySelector('[data-edit-field="label"]')?.value?.trim();
+        const newDuration = row.querySelector('[data-edit-field="duration"]')?.value?.trim();
+        const newCategory = row.querySelector('[data-edit-field="category"]')?.value;
+
+        const updates = {};
+        if (newLabel) updates.label = newLabel.toUpperCase();
+        if (newCategory) updates.category = newCategory;
+
+        // If a new duration is specified, recalculate gameTargetTime from now
+        if (newDuration) {
+          const durationMs = this._parseEtaDuration(newDuration);
+          if (durationMs <= 0) {
+            ui.notifications.warn('WY-Terminal: Could not parse new duration.');
+            return;
+          }
+          const { date: gameNow } = this._getGameClockDate();
+          updates.gameTargetTime = gameNow.getTime() + durationMs;
+        }
+
+        await this._updateEventTimer(timerId, updates);
+        ui.notifications.info('WY-Terminal: Timer updated.');
+        this.render(true);
+      });
+    });
+
+    // DISCARD EDIT — hide edit form
+    contentEl.querySelectorAll('[data-action="cancel-edit"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const timerId = btn.dataset.timerId;
+        const row = contentEl.querySelector(`.wy-timer-row[data-timer-id="${timerId}"]`);
+        if (!row) return;
+        const editDiv = row.querySelector('.wy-timer-edit');
+        if (editDiv) editDiv.style.display = 'none';
+      });
+    });
+
+    // PURGE completed
+    contentEl.querySelector('[data-action="purge-completed"]')?.addEventListener('click', async () => {
+      await this._purgeTimersByStatus('completed');
+      ui.notifications.info('WY-Terminal: Completed timers cleared.');
+      this.render(true);
+    });
+
+    // PURGE cancelled
+    contentEl.querySelector('[data-action="purge-cancelled"]')?.addEventListener('click', async () => {
+      await this._purgeTimersByStatus('cancelled');
+      ui.notifications.info('WY-Terminal: Cancelled timers cleared.');
+      this.render(true);
+    });
+  }
+
+  /* ══════════════════════════════════════════════════════════════════
+     EVENT TIMER ENGINE — Game-clock-aware timers with auto-actions
+     ══════════════════════════════════════════════════════════════════ */
+
+  /**
+   * Start the GM-only event timer tick loop.
+   * Checks every 10 real seconds (= ~100 game-minutes at 10× speed).
+   * Player clients just display countdown data — they don't need to fire actions.
+   */
+  _startEventTimerTick() {
+    if (this._eventTimerInterval) return; // Already running
+    // Only the GM processes completions. Everybody can read timer state.
+    if (!game.user.isGM) return;
+
+    this._eventTimerInterval = setInterval(() => this._tickEventTimers(), 10_000);
+    // Fire once immediately on startup to catch any timers that expired while offline
+    setTimeout(() => this._tickEventTimers(), 2000);
+    // Ensure the default ETA timer exists (creates with 1hr if missing)
+    setTimeout(() => this._ensureDefaultEtaTimer(), 3000);
+  }
+
+  _stopEventTimerTick() {
+    if (this._eventTimerInterval) {
+      clearInterval(this._eventTimerInterval);
+      this._eventTimerInterval = null;
+    }
+  }
+
+  /**
+   * Ensure the permanent default NAV ETA timer exists.
+   * If missing (first boot or after reset), creates it with a 1-hour countdown.
+   * If it exists but was completed/cancelled, resets it to active with 1-hour.
+   * Called once on GM startup.
+   */
+  async _ensureDefaultEtaTimer() {
+    if (!game.user.isGM) return;
+    try {
+      const timers = game.settings.get('wy-terminal', 'eventTimers') || [];
+      const existing = timers.find(t => t.id === DEFAULT_NAV_ETA_ID);
+      if (existing && existing.status === 'active') return; // Already running
+
+      if (existing) {
+        // Timer exists but completed/cancelled — reset it to active with 1hr
+        const { date: gameNow } = this._getGameClockDate();
+        existing.status = 'active';
+        existing.gameTargetTime = gameNow.getTime() + DEFAULT_NAV_ETA_MS;
+        existing.label = 'NAV ETA';
+        existing.category = 'nav';
+        existing.actions = this._buildDefaultEtaActions();
+        delete existing.completedAt;
+        delete existing.cancelledAt;
+        await game.settings.set('wy-terminal', 'eventTimers', timers);
+      } else {
+        // Create fresh default timer
+        await this._createDefaultEtaTimer();
+      }
+      console.log('WY-Terminal | Default NAV ETA timer ensured (1hr)');
+      this._broadcastSocket('refreshView', { view: 'nav' });
+    } catch (e) {
+      console.warn('WY-Terminal | _ensureDefaultEtaTimer failed:', e);
+    }
+  }
+
+  /**
+   * Create the permanent default NAV ETA timer with 1-hour duration.
+   */
+  async _createDefaultEtaTimer() {
+    const timers = this._loadSetting('eventTimers') || [];
+    // Remove any stale default timer entry
+    const filtered = timers.filter(t => t.id !== DEFAULT_NAV_ETA_ID);
+    const { date: gameNow } = this._getGameClockDate();
+    filtered.push({
+      id: DEFAULT_NAV_ETA_ID,
+      label: 'NAV ETA',
+      category: 'nav',
+      gameTargetTime: gameNow.getTime() + DEFAULT_NAV_ETA_MS,
+      createdAt: this._getGameDate(),
+      actions: this._buildDefaultEtaActions(),
+      status: 'active',
+      permanent: true,
+    });
+    await game.settings.set('wy-terminal', 'eventTimers', filtered);
+    return filtered.find(t => t.id === DEFAULT_NAV_ETA_ID);
+  }
+
+  /**
+   * Build the default action set for the NAV ETA timer.
+   */
+  _buildDefaultEtaActions(dest) {
+    const d = dest || 'DESTINATION';
+    return [
+      { type: 'set-nav-field', field: 'speed', value: 'FULL STOP' },
+      { type: 'set-nav-field', field: 'eta', value: 'ARRIVED' },
+      { type: 'add-log', sender: 'NAV COMPUTER', subject: `ARRIVED AT ${d}`, detail: `VESSEL HAS REACHED DESTINATION: ${d}. SPEED SET TO FULL STOP.`, level: 'INFO' },
+    ];
+  }
+
+  /**
+   * Reset all timers to defaults — clears everything and recreates the default ETA timer.
+   */
+  async _resetTimersToDefault() {
+    await game.settings.set('wy-terminal', 'eventTimers', []);
+    await this._createDefaultEtaTimer();
+    this._broadcastSocket('refreshView', { view: 'all' });
+  }
+
+  /**
+   * Check all active timers against current game clock.
+   * When a timer's target time has passed, execute its actions and mark it completed.
+   */
+  async _tickEventTimers() {
+    let timers;
+    try { timers = game.settings.get('wy-terminal', 'eventTimers') || []; }
+    catch { return; }
+
+    const active = timers.filter(t => t.status === 'active');
+    if (active.length === 0) return;
+
+    const { date: gameNow } = this._getGameClockDate();
+    const gameNowMs = gameNow.getTime();
+    let changed = false;
+
+    for (const timer of active) {
+      if (gameNowMs >= timer.gameTargetTime) {
+        // Timer has fired
+        console.log(`WY-Terminal | Event timer completed: ${timer.label}`);
+        timer.status = 'completed';
+        timer.completedAt = this._getGameDate();
+        changed = true;
+
+        // Execute each action attached to this timer
+        await this._executeTimerActions(timer);
+      }
+    }
+
+    if (changed) {
+      await game.settings.set('wy-terminal', 'eventTimers', timers);
+      // Broadcast so all clients see the updated state
+      this._broadcastSocket('refreshView', { view: 'all' });
+    }
+  }
+
+  /**
+   * Execute the actions attached to a completed timer.
+   * Action types:
+   *   - set-nav-field: { field, value } — sets a nav data field
+   *   - add-log: { sender, subject, detail, level, classification } — adds a log entry
+   *   - set-system-status: { systemName, status, detail } — updates a ship system
+   */
+  async _executeTimerActions(timer) {
+    if (!timer.actions || timer.actions.length === 0) return;
+
+    for (const action of timer.actions) {
+      try {
+        switch (action.type) {
+          case 'set-nav-field': {
+            const navData = this._loadSetting('navData') || {};
+            navData[action.field] = action.value;
+            await game.settings.set('wy-terminal', 'navData', navData);
+            break;
+          }
+          case 'add-log': {
+            await this._addLog(
+              action.sender || 'MU/TH/UR',
+              action.subject || timer.label,
+              action.level || 'INFO',
+              action.detail || '',
+              'text', '', '',
+              action.classification || ''
+            );
+            this._broadcastSocket('refreshView', { view: 'logs' });
+            break;
+          }
+          case 'set-system-status': {
+            // Use _getSystemsData() to get actual systems (including defaults from ship profile)
+            let systems = this._getSystemsData();
+            const sys = systems.find(s => s.name?.toUpperCase() === action.systemName?.toUpperCase());
+            if (sys) {
+              if (action.status) sys.status = action.status;
+              if (action.detail !== undefined) sys.detail = action.detail;
+              await game.settings.set('wy-terminal', 'shipSystems', systems);
+              this._broadcastSocket('refreshView', { view: 'systems' });
+              console.log(`WY-Terminal | System "${action.systemName}" set to ${action.status}`);
+            } else {
+              console.warn(`WY-Terminal | Timer action: system "${action.systemName}" not found in ship systems.`);
+            }
+            break;
+          }
+          default:
+            console.warn(`WY-Terminal | Unknown timer action type: ${action.type}`);
+        }
+      } catch (e) {
+        console.error(`WY-Terminal | Timer action failed:`, action, e);
+      }
+    }
+  }
+
+  /**
+   * Parse a human-readable ETA string into game-clock milliseconds.
+   * Supports formats like: "2h", "30m", "1h 30m", "14 WEEKS", "3 DAYS", "45 MINUTES", "2 HOURS"
+   * Returns 0 if unparseable or if it looks like a status (ARRIVED, N/A, etc.).
+   */
+  _parseEtaDuration(etaStr) {
+    if (!etaStr) return 0;
+    const s = etaStr.trim().toUpperCase();
+    // Skip status-like values
+    if (['ARRIVED', 'N/A', 'FULL STOP', 'UNKNOWN', '-', '', 'NOW'].includes(s)) return 0;
+
+    // Skip values that look like _formatDuration output (live countdown text with 3+ segments)
+    // e.g. "2W 0D 00H 00M", "5D 02H 30M", "0D 01H 00M"
+    // These have at least 3 unit-segments (D+H+M or W+D+H+M). User-typed durations are simpler.
+    if (/^\d+[WD]\s+\d+[DHM]\s+\d+[HM]/i.test(s)) return 0;
+
+    let totalMinutes = 0;
+
+    // Match patterns: "14 WEEKS", "14W", "3 DAYS", "3D", "2 HOURS", "2H", "30 MINUTES", "30M"
+    const patterns = [
+      { re: /(\d+(?:\.\d+)?)\s*W(?:EEKS?)?\b/i, mult: 7 * 24 * 60 },
+      { re: /(\d+(?:\.\d+)?)\s*D(?:AYS?)?\b/i,  mult: 24 * 60 },
+      { re: /(\d+(?:\.\d+)?)\s*H(?:(?:OU)?RS?)?\b/i, mult: 60 },
+      { re: /(\d+(?:\.\d+)?)\s*M(?:IN(?:UTE)?S?)?\b/i, mult: 1 },
+    ];
+
+    for (const { re, mult } of patterns) {
+      const m = s.match(re);
+      if (m) totalMinutes += parseFloat(m[1]) * mult;
+    }
+
+    // Also try compact form: "1h30m", "2w3d", "2h", "30m"
+    if (totalMinutes === 0) {
+      const compact = s.match(/^(?:(\d+)W)?\s*(?:(\d+)D)?\s*(?:(\d+)H)?\s*(?:(\d+)M)?$/i);
+      if (compact && (compact[1] || compact[2] || compact[3] || compact[4])) {
+        totalMinutes += (parseInt(compact[1]) || 0) * 7 * 24 * 60;
+        totalMinutes += (parseInt(compact[2]) || 0) * 24 * 60;
+        totalMinutes += (parseInt(compact[3]) || 0) * 60;
+        totalMinutes += (parseInt(compact[4]) || 0);
+      }
+    }
+
+    return totalMinutes * 60 * 1000; // Return game-clock milliseconds
+  }
+
+  /**
+   * Create an event timer and persist it.
+   * @param {object} opts
+   * @param {string} opts.label — Display name (e.g. "ARRIVAL AT SUTTER'S WORLD")
+   * @param {string} opts.category — 'nav' | 'system' | 'custom'
+   * @param {number} opts.durationMs — Duration in game-clock ms from now
+   * @param {Array}  opts.actions — Array of action objects to execute on completion
+   * @returns {object} The created timer
+   */
+  async _createEventTimer({ label, category = 'custom', durationMs, actions = [] }) {
+    const timers = this._loadSetting('eventTimers') || [];
+    const { date: gameNow } = this._getGameClockDate();
+    const timer = {
+      id: `evt-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      label: label.toUpperCase(),
+      category,
+      gameTargetTime: gameNow.getTime() + durationMs,
+      createdAt: this._getGameDate(),
+      actions,
+      status: 'active',
+    };
+    timers.push(timer);
+    await game.settings.set('wy-terminal', 'eventTimers', timers);
+    console.log(`WY-Terminal | Event timer created: ${timer.label} (${Math.round(durationMs / 60000)}m game time)`);
+    return timer;
+  }
+
+  /**
+   * Cancel an active event timer by ID.
+   * Permanent timers (like the default NAV ETA) cannot be cancelled.
+   */
+  async _cancelEventTimer(timerId) {
+    const timers = this._loadSetting('eventTimers') || [];
+    const timer = timers.find(t => t.id === timerId);
+    if (timer?.permanent) return false; // Cannot cancel permanent timers
+    if (timer && timer.status === 'active') {
+      timer.status = 'cancelled';
+      timer.cancelledAt = this._getGameDate();
+      await game.settings.set('wy-terminal', 'eventTimers', timers);
+      this._broadcastSocket('refreshView', { view: 'nav' });
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Get all active timers with remaining time computed.
+   * Returns array of { ...timer, remainingMs, remainingFormatted }.
+   */
+  _getActiveTimers() {
+    let timers;
+    try { timers = game.settings.get('wy-terminal', 'eventTimers') || []; }
+    catch { return []; }
+
+    const { date: gameNow } = this._getGameClockDate();
+    const gameNowMs = gameNow.getTime();
+
+    return timers
+      .filter(t => t.status === 'active')
+      .map(t => {
+        const remainingMs = Math.max(0, t.gameTargetTime - gameNowMs);
+        return { ...t, remainingMs, remainingFormatted: this._formatDuration(remainingMs) };
+      })
+      .sort((a, b) => a.gameTargetTime - b.gameTargetTime);
+  }
+
+  /**
+   * Get all timers (active + completed + cancelled) for display.
+   */
+  _getAllTimers() {
+    try { return game.settings.get('wy-terminal', 'eventTimers') || []; }
+    catch { return []; }
+  }
+
+  /**
+   * Format a game-clock ms duration into a human-readable countdown string.
+   * Always shows down to minutes for visible ticking.
+   * e.g. 7200000 → "2H 00M", 86400000 → "1D 00H 00M", 604800000 → "1W 0D 00H 00M"
+   */
+  _formatDuration(ms) {
+    if (ms <= 0) return 'ARRIVED';
+    const totalMin = Math.floor(ms / 60000);
+    const weeks = Math.floor(totalMin / (7 * 24 * 60));
+    const days = Math.floor((totalMin % (7 * 24 * 60)) / (24 * 60));
+    const hours = Math.floor((totalMin % (24 * 60)) / 60);
+    const mins = totalMin % 60;
+    const parts = [];
+    if (weeks > 0) parts.push(`${weeks}W`);
+    if (days > 0 || weeks > 0) parts.push(`${days}D`);
+    const hasHigher = days > 0 || weeks > 0;
+    if (hours > 0 || hasHigher) parts.push(`${hasHigher ? String(hours).padStart(2, '0') : hours}H`);
+    parts.push(`${(hours > 0 || hasHigher) ? String(mins).padStart(2, '0') : mins}M`);
+    return parts.join(' ');
+  }
+
+  /**
+   * Clear all completed/cancelled timers from persistence.
+   */
+  async _purgeCompletedTimers() {
+    const timers = this._loadSetting('eventTimers') || [];
+    const active = timers.filter(t => t.status === 'active');
+    await game.settings.set('wy-terminal', 'eventTimers', active);
+  }
+
+  /**
+   * Delete a timer entirely (remove from array regardless of status).
+   * Permanent timers cannot be deleted.
+   */
+  async _deleteEventTimer(timerId) {
+    const timers = this._loadSetting('eventTimers') || [];
+    const target = timers.find(t => t.id === timerId);
+    if (target?.permanent) return; // Cannot delete permanent timers
+    const filtered = timers.filter(t => t.id !== timerId);
+    await game.settings.set('wy-terminal', 'eventTimers', filtered);
+    this._broadcastSocket('refreshView', { view: 'all' });
+  }
+
+  /**
+   * Update fields on an existing timer by ID.
+   * @param {string} timerId
+   * @param {object} updates — Partial timer fields to merge (label, category, gameTargetTime, etc.)
+   */
+  async _updateEventTimer(timerId, updates) {
+    const timers = this._loadSetting('eventTimers') || [];
+    const timer = timers.find(t => t.id === timerId);
+    if (!timer) return false;
+    Object.assign(timer, updates);
+    await game.settings.set('wy-terminal', 'eventTimers', timers);
+    this._broadcastSocket('refreshView', { view: 'all' });
+    return true;
+  }
+
+  /**
+   * Purge all timers with a specific status ('completed' or 'cancelled').
+   */
+  async _purgeTimersByStatus(status) {
+    const timers = this._loadSetting('eventTimers') || [];
+    const remaining = timers.filter(t => t.status !== status);
+    await game.settings.set('wy-terminal', 'eventTimers', remaining);
   }
 
   /* ══════════════════════════════════════════════════════════════════
      HELPERS
      ══════════════════════════════════════════════════════════════════ */
+
+  /**
+   * Normalize a CRT setting value for backward compatibility.
+   * Legacy Boolean true → 'medium', false → 'off'. Strings pass through.
+   */
+  _normalizeCrtSetting(val) {
+    if (val === true) return 'medium';
+    if (val === false) return 'off';
+    return val || 'medium';
+  }
 
   /**
    * Get the MU/TH/UR header name from the engine.
@@ -4703,11 +5924,13 @@ export class WYTerminalApp extends Application {
     try {
       let epoch = game.settings.get('wy-terminal', 'gameClockEpoch');
       let anchor = game.settings.get('wy-terminal', 'gameClockRealAnchor');
+      const paused = game.settings.get('wy-terminal', 'gameClockPaused') ?? false;
       if (!epoch) epoch = Date.UTC(2183, 5, 12, 6, 0, 0);
       if (!anchor) anchor = Date.now();
 
       // Elapsed real-world ms since anchor, ×10 for game time
-      const realElapsed = Math.max(0, Date.now() - anchor);
+      // When paused, no new elapsed time accumulates (epoch holds frozen game time)
+      const realElapsed = paused ? 0 : Math.max(0, Date.now() - anchor);
       const gameElapsed = realElapsed * 10;
 
       const d = new Date(epoch + gameElapsed);
@@ -4726,7 +5949,8 @@ export class WYTerminalApp extends Application {
    */
   _getGameClockDisplayData() {
     const { dateStr, timeStr } = this._getGameClockDate();
-    return { clockDate: dateStr, clockTime: timeStr, isGM: game.user.isGM };
+    const clockPaused = game.settings.get('wy-terminal', 'gameClockPaused') ?? false;
+    return { clockDate: dateStr, clockTime: timeStr, isGM: game.user.isGM, clockPaused };
   }
 
   _getDisplayTitle() {
@@ -4748,6 +5972,7 @@ export class WYTerminalApp extends Application {
       settings: 'CONFIGURATION',
       commandcode: 'COMMAND CODE AUTHORIZATION',
       gameclock: 'GAME CLOCK',
+      timers: 'EVENT TIMERS',
     };
     return titles[this.activeView] || 'TERMINAL';
   }

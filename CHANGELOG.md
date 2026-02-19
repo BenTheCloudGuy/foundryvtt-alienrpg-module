@@ -1,5 +1,59 @@
 # Changelog
 
+## v1.0.9 — 2026-02-19
+
+### NAV Markers — New Marker Types
+
+- Added DEPARTURE marker type representing the ship's origin point on the star map. Renders with a blue double-ring crosshair and larger footprint than standard markers.
+- Added DESTINATION marker type representing the ship's target location. Renders with an amber double-ring crosshair.
+- Added PLAYER marker type representing the player ship on the star map. Renders as a directional triangle that points toward the DESTINATION marker with a cyan glow.
+
+### NAV Markers — Travel Path
+
+- A path line is drawn between DEPARTURE and DESTINATION markers when both exist on the map.
+- When a PLAYER marker exists, the traversed portion of the path renders as a solid cyan line and the remaining portion renders as a dashed gray line.
+- When no PLAYER marker exists, the full path renders as a dashed line.
+
+### NAV Markers — Player Ship Traversal
+
+- PLAYER markers store a progress value (0-100%) representing how far along the DEPARTURE-to-DESTINATION path the ship has traveled.
+- PLAYER marker position is computed via linear interpolation along the path rather than stored as fixed coordinates.
+- Progress slider appears in the marker creation/edit form when the PLAYER type is selected.
+- NAV markers table shows "TRANSIT: XX%" for PLAYER markers instead of raw coordinates.
+
+### NAV Markers — GM Drag-to-Move
+
+- GM can click and drag any marker on the star map to reposition it in real time.
+- Drag uses capture-phase mouse handling so it fires before PinchZoomHandler panning, with a 12px hit radius.
+- PLAYER markers snap to the DEPARTURE-DESTINATION path line when dragged (projected onto the line segment), automatically updating the progress value.
+- All other marker types can be freely dragged to any position on the map.
+- Position persists on mouse release and broadcasts to all connected clients.
+
+### NAV — Marker-Driven Properties
+
+- POSITION field now derives from the PLAYER marker when present, showing the marker label and computed coordinates.
+- DESTINATION field now derives from the DESTINATION marker label when present.
+- Added DST COORDINATES field showing the DESTINATION marker's map coordinates in amber.
+- All three fields fall back to manually-set navData values when no markers exist.
+
+### NAV — Layout
+
+- Rebalanced the NAV status table so properties are evenly distributed across both columns. POSITION and DESTINATION now share a row instead of spanning the full width.
+- NAV MARKERS list table is now hidden from player terminals (GM-only).
+
+### Event Timers — Systems Dropdown
+
+- When creating a new timer with the ON COMPLETE action set to SET SYSTEM STATE, a SYSTEM dropdown now appears populated with all ship systems from the active ship profile instead of a free-text input.
+- Added a SET STATE dropdown with all valid system states: ONLINE, NOMINAL, WARNING, CRITICAL, OFFLINE.
+- Selecting SYSTEM as the timer category auto-selects SET SYSTEM STATE and reveals both dropdowns.
+
+### Event Timers — Execution Fix
+
+- Fixed timers with set-system-status actions silently failing when ship systems had never been explicitly saved. The action handler now uses _getSystemsData() which properly falls back to ship profile defaults instead of _loadSetting() which returned an empty array.
+- Added console logging on successful system state changes and a warning when a target system name is not found.
+
+---
+
 ## v1.0.8 — 2026-02-18
 
 ### Stellar Cartography — New SYSTEMS View
