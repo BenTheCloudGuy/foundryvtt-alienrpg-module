@@ -16,3 +16,10 @@ node_modules/
 *.lock
 # LevelDB lock files (packs)
 **/LOCK
+
+# Dev-container: user-supplied Foundry server files and generated data
+# (see .devcontainer/README.md — do NOT commit proprietary Foundry files)
+.foundry/server/
+.foundry/data/
+# Foundry distribution zips placed at repo root for convenience
+FoundryVTT-*.zip
