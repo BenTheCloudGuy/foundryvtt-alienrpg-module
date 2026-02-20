@@ -730,6 +730,11 @@ export class WYTerminalApp extends Application {
 
     // Sort by timestamp ascending (oldest first)
     merged.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+
+    // Hide CORPORATE classified logs from non-GM players
+    if (!game.user.isGM) {
+      return merged.filter(l => l.classification !== 'CORPORATE');
+    }
     return merged;
   }
 
@@ -1093,6 +1098,81 @@ export class WYTerminalApp extends Application {
     };
   }
 
+  /* ── Route path helpers (shared by _getNavData & _initNavView) ── */
+
+  /** Build ordered route: DEPARTURE → WAYPOINT(s) → DESTINATION. */
+  _buildRoutePath(markers) {
+    const dep = markers.find(m => m.type === 'DEPARTURE');
+    const dest = markers.find(m => m.type === 'DESTINATION');
+    if (!dep || !dest) return [];
+    const waypoints = markers.filter(m => m.type === 'WAYPOINT');
+    return [dep, ...waypoints, dest];
+  }
+
+  /** Cumulative segment distances for a route path. */
+  _getRouteSegments(path) {
+    const segments = [];
+    let totalDist = 0;
+    for (let i = 1; i < path.length; i++) {
+      const dx = path[i].x - path[i - 1].x;
+      const dy = path[i].y - path[i - 1].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      segments.push({ from: path[i - 1], to: path[i], dist });
+      totalDist += dist;
+    }
+    return { segments, totalDist };
+  }
+
+  /** Interpolate position + heading on route at progress (0-1). */
+  _positionOnRoute(path, progress) {
+    if (path.length < 2) return { x: 0, y: 0, angle: 0 };
+    const { segments, totalDist } = this._getRouteSegments(path);
+    if (totalDist === 0) return { x: path[0].x, y: path[0].y, angle: 0 };
+
+    const targetDist = progress * totalDist;
+    let accumulated = 0;
+    for (const seg of segments) {
+      if (accumulated + seg.dist >= targetDist || seg === segments[segments.length - 1]) {
+        const segProgress = seg.dist > 0 ? (targetDist - accumulated) / seg.dist : 0;
+        const t = Math.max(0, Math.min(1, segProgress));
+        return {
+          x: seg.from.x + (seg.to.x - seg.from.x) * t,
+          y: seg.from.y + (seg.to.y - seg.from.y) * t,
+          angle: Math.atan2(seg.to.y - seg.from.y, seg.to.x - seg.from.x),
+        };
+      }
+      accumulated += seg.dist;
+    }
+    const last = path[path.length - 1];
+    return { x: last.x, y: last.y, angle: 0 };
+  }
+
+  /** Project a point onto the route and return closest { progress, x, y }. */
+  _projectOntoRoute(path, px, py) {
+    if (path.length < 2) return { progress: 0, x: px, y: py };
+    const { segments, totalDist } = this._getRouteSegments(path);
+    if (totalDist === 0) return { progress: 0, x: path[0].x, y: path[0].y };
+
+    let bestDist = Infinity, bestX = px, bestY = py, bestAccum = 0;
+    let accumulated = 0;
+    for (const seg of segments) {
+      const dx = seg.to.x - seg.from.x, dy = seg.to.y - seg.from.y;
+      const len2 = dx * dx + dy * dy;
+      let t = 0;
+      if (len2 > 0) t = Math.max(0, Math.min(1, ((px - seg.from.x) * dx + (py - seg.from.y) * dy) / len2));
+      const cx = seg.from.x + dx * t, cy = seg.from.y + dy * t;
+      const d = Math.sqrt((px - cx) ** 2 + (py - cy) ** 2);
+      if (d < bestDist) {
+        bestDist = d;
+        bestX = cx;
+        bestY = cy;
+        bestAccum = accumulated + t * seg.dist;
+      }
+      accumulated += seg.dist;
+    }
+    return { progress: totalDist > 0 ? bestAccum / totalDist : 0, x: bestX, y: bestY };
+  }
+
   /* ── Nav data ── */
   _getNavData() {
     const nav = this._loadSetting('navData') || {};
@@ -1127,17 +1207,18 @@ export class WYTerminalApp extends Application {
     }));
 
     // Derive position and destination from markers when available
-    const depMarker = rawMarkers.find(m => m.type === 'DEPARTURE');
     const destMarker = rawMarkers.find(m => m.type === 'DESTINATION');
     const playerMarker = rawMarkers.find(m => m.type === 'PLAYER');
+    const routePath = this._buildRoutePath(rawMarkers);
 
-    // POSITION: use PLAYER marker coordinates if it exists
+    // POSITION: use PLAYER marker coordinates on route path
     let currentPosition = nav.position || 'SECTOR 87-C / ZETA RETICULI';
     if (playerMarker) {
       let px = playerMarker.x, py = playerMarker.y;
-      if (depMarker && destMarker && playerMarker.progress !== undefined) {
-        px = depMarker.x + (destMarker.x - depMarker.x) * playerMarker.progress;
-        py = depMarker.y + (destMarker.y - depMarker.y) * playerMarker.progress;
+      if (routePath.length >= 2 && playerMarker.progress !== undefined) {
+        const pos = this._positionOnRoute(routePath, playerMarker.progress);
+        px = pos.x;
+        py = pos.y;
       }
       currentPosition = `${playerMarker.label} — ${(px * 100).toFixed(1)}%, ${(py * 100).toFixed(1)}%`;
     }
@@ -2822,6 +2903,12 @@ export class WYTerminalApp extends Application {
     // Temp drag state for live marker repositioning
     let _dragTemp = null;
 
+    // Local aliases for class-level route helpers
+    const buildRoutePath = (m) => this._buildRoutePath(m);
+    const getRouteSegments = (p) => this._getRouteSegments(p);
+    const positionOnRoute = (p, pr) => this._positionOnRoute(p, pr);
+    const projectOntoRoute = (p, px, py) => this._projectOntoRoute(p, px, py);
+
     const drawMarkers = () => {
       const iw = img.offsetWidth;
       const ih = img.offsetHeight;
@@ -2845,44 +2932,67 @@ export class WYTerminalApp extends Application {
         }
       }
 
-      // Find special route markers
-      const dep = markers.find(m => m.type === 'DEPARTURE');
-      const dest = markers.find(m => m.type === 'DESTINATION');
+      // Build full route path: DEPARTURE → WAYPOINT(s) → DESTINATION
+      const routePath = buildRoutePath(markers);
 
-      // Compute PLAYER positions from progress along DEP→DEST path
+      // Compute PLAYER positions from progress along route path
       markers.forEach(m => {
-        if (m.type === 'PLAYER' && dep && dest && m.progress !== undefined) {
-          m.x = dep.x + (dest.x - dep.x) * m.progress;
-          m.y = dep.y + (dest.y - dep.y) * m.progress;
+        if (m.type === 'PLAYER' && routePath.length >= 2 && m.progress !== undefined) {
+          const pos = positionOnRoute(routePath, m.progress);
+          m.x = pos.x;
+          m.y = pos.y;
+          m._angle = pos.angle;
         }
       });
 
-      // ── Draw travel path line between DEPARTURE and DESTINATION ──
-      if (dep && dest) {
-        const depPx = dep.x * iw, depPy = dep.y * ih;
-        const destPx = dest.x * iw, destPy = dest.y * ih;
+      // ── Draw travel path line along route ──
+      if (routePath.length >= 2) {
         const player = markers.find(m => m.type === 'PLAYER');
+        const { segments, totalDist } = getRouteSegments(routePath);
 
-        if (player) {
-          const plPx = player.x * iw, plPy = player.y * ih;
+        if (player && totalDist > 0) {
+          const playerProgress = player.progress ?? 0;
+          const targetDist = playerProgress * totalDist;
+          let accumulated = 0;
+
           // Traversed portion — solid line
           ctx.strokeStyle = '#00ffff';
           ctx.lineWidth = 0.8;
           ctx.globalAlpha = 0.4;
           ctx.setLineDash([]);
           ctx.beginPath();
-          ctx.moveTo(depPx, depPy);
-          ctx.lineTo(plPx, plPy);
-          ctx.stroke();
-          // Remaining portion — dashed line
-          ctx.strokeStyle = '#556677';
-          ctx.lineWidth = 0.8;
-          ctx.globalAlpha = 0.3;
-          ctx.setLineDash([3, 3]);
-          ctx.beginPath();
-          ctx.moveTo(plPx, plPy);
-          ctx.lineTo(destPx, destPy);
-          ctx.stroke();
+          ctx.moveTo(routePath[0].x * iw, routePath[0].y * ih);
+
+          for (const seg of segments) {
+            if (accumulated + seg.dist >= targetDist) {
+              // Partial segment up to player position
+              const segT = seg.dist > 0 ? (targetDist - accumulated) / seg.dist : 0;
+              const plPx = (seg.from.x + (seg.to.x - seg.from.x) * segT) * iw;
+              const plPy = (seg.from.y + (seg.to.y - seg.from.y) * segT) * ih;
+              ctx.lineTo(plPx, plPy);
+              ctx.stroke();
+
+              // Remaining portion — dashed line from player onward
+              ctx.strokeStyle = '#556677';
+              ctx.lineWidth = 0.8;
+              ctx.globalAlpha = 0.3;
+              ctx.setLineDash([3, 3]);
+              ctx.beginPath();
+              ctx.moveTo(plPx, plPy);
+              ctx.lineTo(seg.to.x * iw, seg.to.y * ih);
+              accumulated += seg.dist;
+              // Continue with remaining full segments
+              const segIdx = segments.indexOf(seg);
+              for (let i = segIdx + 1; i < segments.length; i++) {
+                ctx.lineTo(segments[i].to.x * iw, segments[i].to.y * ih);
+              }
+              ctx.stroke();
+              break;
+            } else {
+              ctx.lineTo(seg.to.x * iw, seg.to.y * ih);
+              accumulated += seg.dist;
+            }
+          }
         } else {
           // Full dashed path (no player yet)
           ctx.strokeStyle = '#556677';
@@ -2890,8 +3000,10 @@ export class WYTerminalApp extends Application {
           ctx.globalAlpha = 0.4;
           ctx.setLineDash([3, 3]);
           ctx.beginPath();
-          ctx.moveTo(depPx, depPy);
-          ctx.lineTo(destPx, destPy);
+          ctx.moveTo(routePath[0].x * iw, routePath[0].y * ih);
+          for (let i = 1; i < routePath.length; i++) {
+            ctx.lineTo(routePath[i].x * iw, routePath[i].y * ih);
+          }
           ctx.stroke();
         }
         ctx.setLineDash([]);
@@ -2908,10 +3020,8 @@ export class WYTerminalApp extends Application {
         const tickLen = isRoute ? 5 : 3;
 
         if (m.type === 'PLAYER') {
-          // Ship triangle pointing toward destination
-          const angle = dest
-            ? Math.atan2(dest.y * ih - my, dest.x * iw - mx)
-            : 0;
+          // Ship triangle pointing along route path
+          const angle = m._angle ?? 0;
           ctx.save();
           ctx.translate(mx, my);
           ctx.rotate(angle);
@@ -2989,11 +3099,13 @@ export class WYTerminalApp extends Application {
     };
 
     if (img.complete) {
-      drawMarkers();
+      try { drawMarkers(); } catch (err) { console.error('WY-Terminal | drawMarkers init error:', err); }
     } else {
-      img.addEventListener('load', drawMarkers);
+      img.addEventListener('load', () => { try { drawMarkers(); } catch (err) { console.error('WY-Terminal | drawMarkers load error:', err); } });
     }
 
+    // Clean up previous navZoom to avoid leaked window listeners
+    if (this._navZoom) { try { this._navZoom.destroy(); } catch (_) {} }
     // Pinch-zoom on star map
     const navZoom = new PinchZoomHandler(container, img);
     this._navZoom = navZoom;
@@ -3213,17 +3325,17 @@ export class WYTerminalApp extends Application {
         // Hit-test markers
         const navData = this._loadSetting('navData') || {};
         const markers = navData.navMarkers || [];
-        const dep = markers.find(m => m.type === 'DEPARTURE');
-        const dest = markers.find(m => m.type === 'DESTINATION');
+        const routePath = buildRoutePath(markers);
 
         let hitMarker = null;
         for (const m of markers) {
           let screenX = m.x * img.offsetWidth;
           let screenY = m.y * img.offsetHeight;
-          // Use computed position for PLAYER on path
-          if (m.type === 'PLAYER' && dep && dest && m.progress !== undefined) {
-            screenX = (dep.x + (dest.x - dep.x) * m.progress) * img.offsetWidth;
-            screenY = (dep.y + (dest.y - dep.y) * m.progress) * img.offsetHeight;
+          // Use computed position for PLAYER on route path
+          if (m.type === 'PLAYER' && routePath.length >= 2 && m.progress !== undefined) {
+            const pos = positionOnRoute(routePath, m.progress);
+            screenX = pos.x * img.offsetWidth;
+            screenY = pos.y * img.offsetHeight;
           }
           const dist = Math.sqrt((imgX - screenX) ** 2 + (imgY - screenY) ** 2);
           if (dist < 12) {
@@ -3234,7 +3346,7 @@ export class WYTerminalApp extends Application {
 
         if (hitMarker) {
           dragMarker = hitMarker;
-          e.stopPropagation();
+          e.stopImmediatePropagation();
           e.preventDefault();
           container.style.cursor = 'grabbing';
         }
@@ -3253,22 +3365,16 @@ export class WYTerminalApp extends Application {
         const normX = Math.max(0, Math.min(1, imgX / img.offsetWidth));
         const normY = Math.max(0, Math.min(1, imgY / img.offsetHeight));
 
-        // For PLAYER with DEP/DEST: project onto path line
+        // For PLAYER: project onto route path through waypoints
         const navData = this._loadSetting('navData') || {};
         const markers = navData.navMarkers || [];
-        const dep = markers.find(m => m.type === 'DEPARTURE');
-        const dest = markers.find(m => m.type === 'DESTINATION');
+        const routePath = buildRoutePath(markers);
 
-        if (dragMarker.type === 'PLAYER' && dep && dest) {
-          const dx = dest.x - dep.x, dy = dest.y - dep.y;
-          const len2 = dx * dx + dy * dy;
-          if (len2 > 0) {
-            let t = ((normX - dep.x) * dx + (normY - dep.y) * dy) / len2;
-            t = Math.max(0, Math.min(1, t));
-            dragMarker.progress = t;
-            dragMarker.x = dep.x + dx * t;
-            dragMarker.y = dep.y + dy * t;
-          }
+        if (dragMarker.type === 'PLAYER' && routePath.length >= 2) {
+          const proj = projectOntoRoute(routePath, normX, normY);
+          dragMarker.progress = proj.progress;
+          dragMarker.x = proj.x;
+          dragMarker.y = proj.y;
         } else {
           dragMarker.x = normX;
           dragMarker.y = normY;
