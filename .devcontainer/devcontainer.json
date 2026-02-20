@@ -1,0 +1,27 @@
+{
+  "name": "FoundryVTT Module Dev (wy-terminal)",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-20",
+
+  // Forward FoundryVTT's default port and mark it public so Codespaces
+  // port-forwarding produces a reachable URL out of the box.
+  "forwardPorts": [30000],
+  "portsAttributes": {
+    "30000": {
+      "label": "FoundryVTT",
+      "onAutoForward": "notify",
+      "visibility": "public"
+    }
+  },
+
+  // Install Node dependencies after the container is created.
+  "postCreateCommand": "npm install",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  }
+}
