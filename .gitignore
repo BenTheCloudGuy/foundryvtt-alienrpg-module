@@ -23,3 +23,6 @@ node_modules/
 .foundry/data/
 # Foundry distribution zips placed at repo root for convenience
 FoundryVTT-*.zip
+
+# Credentials / secrets
+foundryvtt.ini
