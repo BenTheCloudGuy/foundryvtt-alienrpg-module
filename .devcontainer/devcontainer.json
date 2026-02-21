@@ -18,6 +18,18 @@
     }
   },
 
+  // Pass secrets into the container.
+  // In Codespaces these resolve from Codespaces Secrets automatically.
+  // Locally (Docker), set them as Windows User environment variables first:
+  //   powershell -File .devcontainer\set-local-secrets.ps1
+  "remoteEnv": {
+    "FOUNDRY_USERNAME":    "${localEnv:FOUNDRY_USERNAME}",
+    "FOUNDRY_PASSWORD":    "${localEnv:FOUNDRY_PASSWORD}",
+    "FOUNDRY_LICENSE_KEY": "${localEnv:FOUNDRY_LICENSE_KEY}",
+    "FOUNDRY_BUILD":       "${localEnv:FOUNDRY_BUILD}",
+    "OPENAI_API_KEY":      "${localEnv:OPENAI_API_KEY}"
+  },
+
   // Install Node dependencies after the container is created.
   "postCreateCommand": "npm install",
 
