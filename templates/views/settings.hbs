@@ -207,6 +207,22 @@
     </div>
   </div>
 
+  <div class="wy-section-title" style="margin-top: 16px;">CREW MANIFEST FOLDERS</div>
+  <div class="wy-border-box" id="wy-crew-folder-section">
+    <div style="color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px; margin-bottom: 8px;">
+      SELECT WHICH ACTOR FOLDERS APPEAR IN THE CREW VIEW. UNCHECK FOLDERS TO HIDE THOSE CREWS. IF NONE ARE SELECTED, ALL CHARACTER ACTORS ARE SHOWN.
+    </div>
+    {{#each actorFolderList}}
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">{{this.name}}<span class="wy-text-dim" style="margin-left: 6px; font-size: 9px;">({{this.count}} ACTORS)</span></span>
+      <input type="checkbox" data-crew-folder="{{this.id}}" {{#if this.enabled}}checked{{/if}} />
+    </div>
+    {{/each}}
+    <div style="margin-top: 8px;">
+      <button class="wy-muthur-send" data-action="save-crew-folders" style="width: 100%;">SAVE CREW FOLDERS</button>
+    </div>
+  </div>
+
   <div class="wy-section-title" style="margin-top: 16px;">NAVIGATION</div>
   <div class="wy-border-box" id="wy-nav-settings-section">
     <div style="color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px; margin-bottom: 8px;">

@@ -83,6 +83,18 @@ In FoundryVTT, open the WY-Terminal module settings and update:
 | API Key       | Leave blank (Ollama needs no auth)          |
 | AI Model      | `llama3.1:8b` (or whichever model you pulled) |
 
+> **Remote players?** The MU/TH/UR engine makes API calls from the
+> **browser**.  If players connect from other machines, `localhost` will
+> resolve to *their* machine, not the server.  Use the server's LAN IP or
+> hostname instead:
+>
+> ```
+> http://<server-ip>:11434/v1
+> ```
+>
+> Make sure Ollama's port (11434) and Whisper's port (9000) are reachable
+> from the player's network (firewall / port forwarding).
+
 ## Change the Model
 
 Edit `.env` to set a different default model:

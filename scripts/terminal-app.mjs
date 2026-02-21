@@ -142,6 +142,7 @@ export class WYTerminalApp extends Application {
       muthurOnline: this._isMuthurAvailable(),
       isGM: game.user.isGM,
       activeClearance: this._getActiveClearance(),
+      playerClearance: this._getPlayerClearance(),
       shipProfile: profile.id,
       uiTheme: profile.uiTheme,
       interfaceVersion: profile.interfaceVersion,
@@ -441,7 +442,7 @@ export class WYTerminalApp extends Application {
         return { ...base, ...this._getCargoViewData() };
 
       case 'commandcode':
-        return { ...base, activeClearance: this._getActiveClearance(), commandCodes: this._loadCommandCodes(), isGM: game.user.isGM };
+        return { ...base, activeClearance: this._getActiveClearance(), playerClearance: this._getPlayerClearance(), commandCodes: this._loadCommandCodes(), isGM: game.user.isGM };
 
       case 'gameclock':
         return { ...base, ...this._getGameClockDisplayData() };
@@ -465,6 +466,15 @@ export class WYTerminalApp extends Application {
           enabled: enabledShips.length === 0 || enabledShips.includes(p.id),
         }));
 
+        // Build Actor folder list for crew filtering
+        const crewFolders = game.settings.get('wy-terminal', 'crewFolders') || [];
+        const actorFolderList = (game.folders?.filter(f => f.type === 'Actor') || []).map(f => ({
+          id: f.id,
+          name: f.name,
+          count: game.actors?.filter(a => a.folder?.id === f.id && (a.type === 'character' || a.type === 'synthetic')).length || 0,
+          enabled: crewFolders.length === 0 || crewFolders.includes(f.id),
+        })).filter(f => f.count > 0);
+
         return {
           ...base,
           muthurUrl: game.settings.get('wy-terminal', 'muthurUrl'),
@@ -480,6 +490,7 @@ export class WYTerminalApp extends Application {
           activeShip: game.settings.get('wy-terminal', 'activeShip'),
           availableShips: getAvailableProfiles(),
           shipAccessList,
+          actorFolderList,
           navData: this._getNavSettingsData(),
           activeClearance: this._getActiveClearance(),
           isGM: game.user.isGM,
@@ -535,9 +546,15 @@ export class WYTerminalApp extends Application {
   /* ── Crew data ── */
   _getCrewData() {
     // Pull live actor data from FoundryVTT actors collection
-    const actors = game.actors?.filter(a =>
+    let actors = game.actors?.filter(a =>
       (a.type === 'character' || a.type === 'synthetic') && !a.system?.header?.npc
     ) || [];
+
+    // Filter by GM-selected crew folders (if configured)
+    const crewFolders = game.settings.get('wy-terminal', 'crewFolders') || [];
+    if (crewFolders.length > 0) {
+      actors = actors.filter(a => a.folder && crewFolders.includes(a.folder.id));
+    }
 
     // Load GM overrides (status, location) keyed by actor name
     const overrides = this._loadSetting('crewRoster');
@@ -3957,7 +3974,8 @@ export class WYTerminalApp extends Application {
 
           if (match) {
             const role = (match.role || 'NONE').toUpperCase();
-            const currentRank = this._getClearanceRank(this._getActiveClearance());
+            // Compare against the PLAYER clearance (not GM access level) so codes can elevate
+            const currentRank = this._getClearanceRank(this._getPlayerClearance());
             const newRank = this._getClearanceRank(role);
 
             // Only upgrade clearance, never downgrade
@@ -4035,6 +4053,22 @@ export class WYTerminalApp extends Application {
           updateDisplay();
         }
       });
+    });
+
+    // ── Logout button (player terminal) — revoke clearance back to NONE ──
+    contentEl.querySelector('[data-action="logout-clearance"]')?.addEventListener('click', async () => {
+      if (game.user.isGM) {
+        await this._setActiveClearance('NONE');
+      } else {
+        game.socket.emit('module.wy-terminal', {
+          type: 'setClearance',
+          payload: { level: 'NONE' },
+        });
+      }
+      this._updateFooterClearance('NONE');
+      ui.notifications.info('WY-Terminal: Clearance revoked. Authorization level set to NONE.');
+      this._broadcastSocket('refreshView', { view: 'all' });
+      this.render(true);
     });
 
     // ── GM Command Code Management (only present in GM template) ──
@@ -4330,6 +4364,17 @@ export class WYTerminalApp extends Application {
     } catch { return 'NONE'; }
   }
 
+  /**
+   * Get the player-facing clearance level (stored setting).
+   * Unlike _getActiveClearance(), this does NOT auto-elevate for GM.
+   * Used for display in footer and CMD CODE view so GM sees the actual player state.
+   */
+  _getPlayerClearance() {
+    try {
+      return game.settings.get('wy-terminal', 'activeClearanceLevel') || 'NONE';
+    } catch { return 'NONE'; }
+  }
+
   _getClearanceRank(level) {
     return WYTerminalApp.CLEARANCE_RANK[level] ?? 0;
   }
@@ -4400,8 +4445,8 @@ export class WYTerminalApp extends Application {
       return `COMMAND CODE ACCEPTED.\nCLEARANCE LEVEL: ${role}\n\nINSUFFICIENT CLEARANCE.\nCORPORATE OR MASTER OVERRIDE AUTHORIZATION REQUIRED.`;
     }
 
-    // Elevate clearance
-    const currentRank = this._getClearanceRank(this._getActiveClearance());
+    // Elevate clearance (compare against player clearance, not GM access level)
+    const currentRank = this._getClearanceRank(this._getPlayerClearance());
     if (rank > currentRank) {
       if (game.user.isGM) {
         await this._setActiveClearance(role);
@@ -5369,6 +5414,18 @@ export class WYTerminalApp extends Application {
       ui.notifications.info(`WY-Terminal: Player ship access updated. ${enabled.length} ship(s) enabled.`);
       // Broadcast to players so their schematic selector updates immediately
       this._broadcastSocket('refreshView', { view: 'scenes' });
+    });
+
+    // Save crew folder selection (which Actor folders appear in CREW view)
+    contentEl.querySelector('[data-action="save-crew-folders"]')?.addEventListener('click', async () => {
+      const checkboxes = contentEl.querySelectorAll('[data-crew-folder]');
+      const selected = [];
+      checkboxes.forEach(cb => {
+        if (cb.checked) selected.push(cb.dataset.crewFolder);
+      });
+      await game.settings.set('wy-terminal', 'crewFolders', selected);
+      ui.notifications.info(`WY-Terminal: Crew folders updated. ${selected.length} folder(s) selected.`);
+      this._broadcastSocket('refreshView', { view: 'crew' });
     });
   }
 

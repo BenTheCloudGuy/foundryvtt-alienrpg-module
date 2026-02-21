@@ -84,7 +84,45 @@ The script will:
 | Environment | URL |
 |-------------|-----|
 | Local dev container | `http://localhost:30000` |
+| Remote players (LAN) | `http://<host-ip>:30000` |
 | GitHub Codespaces | The forwarded-port URL shown in the **Ports** panel (port 30000 is marked **public** automatically) |
+
+### Remote access (players on other machines)
+
+The devcontainer publishes port 30000 via Docker's `-p` flag (`appPort` in
+`devcontainer.json`), which binds to **all interfaces** (`0.0.0.0`) on the
+host.  This means remote machines on the same network can connect using the
+host machine's IP address.
+
+Find your host IP:
+
+```bash
+# Linux / macOS
+ip addr show | grep 'inet '
+# or
+hostname -I
+
+# Windows (PowerShell)
+Get-NetIPAddress -AddressFamily IPv4
+```
+
+Players connect to `http://<host-ip>:30000`.
+
+#### Internet access (players on different networks)
+
+If your players are on different networks (e.g. not your home LAN), you need
+one of:
+
+1. **Port forwarding** — Forward TCP port `30000` on your router to your
+   host machine's local IP.  Players use your **public IP** or a dynamic-DNS
+   hostname.
+2. **Reverse tunnel** — Use a service like [ngrok](https://ngrok.com),
+   [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/),
+   or [Tailscale](https://tailscale.com) to expose the port without touching
+   your router.
+
+> **Firewall note:** Make sure port `30000` (TCP) is allowed through the
+> host's firewall (`ufw`, `iptables`, Windows Firewall, etc.).
 
 ---
 
@@ -100,8 +138,8 @@ Example — use a custom port:
 FOUNDRY_PORT=8080 bash .devcontainer/scripts/start-foundry.sh
 ```
 
-> If you change the port, update `forwardPorts` in `devcontainer.json` to
-> match.
+> If you change the port, update `appPort` and `forwardPorts` in
+> `devcontainer.json` to match.
 
 ---
 

@@ -194,11 +194,12 @@ export function registerSettings() {
   });
 
   // Internal: whether the game clock is paused (GM toggle)
+  // Defaults to true so the clock starts STOPPED — GM must hit START CLOCK.
   game.settings.register('wy-terminal', 'gameClockPaused', {
     scope: 'world',
     config: false,
     type: Boolean,
-    default: false,
+    default: true,
   });
 
   /* ════════════════════════════════════════════════════════════════
@@ -276,6 +277,15 @@ export function registerSettings() {
   // Internal: command codes for crew access (GM-managed)
   // Each entry: { name: 'MILLER', role: 'CAPTAIN', code: '1234' }
   game.settings.register('wy-terminal', 'commandCodes', {
+    scope: 'world',
+    config: false,
+    type: Array,
+    default: [],
+  });
+
+  // Internal: which Actor folders to show in the CREW view.
+  // Stored as an array of Folder IDs. Empty = show ALL character/synthetic actors.
+  game.settings.register('wy-terminal', 'crewFolders', {
     scope: 'world',
     config: false,
     type: Array,

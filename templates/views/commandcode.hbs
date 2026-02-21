@@ -4,7 +4,7 @@
   {{!-- Current Clearance Display --}}
   <div class="wy-cc-status-display">
     <div class="wy-cc-current-label">CURRENT CLEARANCE LEVEL</div>
-    <div class="wy-cc-current-value wy-cc-level-{{activeClearance}}">{{activeClearance}}</div>
+    <div class="wy-cc-current-value wy-cc-level-{{playerClearance}}">{{playerClearance}}</div>
   </div>
 
   {{#if isGM}}
@@ -27,11 +27,11 @@
     <div class="wy-setting-row" style="margin-bottom: 8px; border-bottom: 1px solid var(--wy-border); padding-bottom: 8px;">
       <span class="wy-setting-label">PLAYER CLEARANCE</span>
       <select class="wy-setting-input" data-action="set-clearance">
-        <option value="NONE" {{#if (eq activeClearance 'NONE')}}selected{{/if}}>NONE</option>
-        <option value="MEDICAL" {{#if (eq activeClearance 'MEDICAL')}}selected{{/if}}>MEDICAL</option>
-        <option value="CAPTAIN" {{#if (eq activeClearance 'CAPTAIN')}}selected{{/if}}>CAPTAIN</option>
-        <option value="CORPORATE" {{#if (eq activeClearance 'CORPORATE')}}selected{{/if}}>CORPORATE</option>
-        <option value="MASTER_OVERRIDE" {{#if (eq activeClearance 'MASTER_OVERRIDE')}}selected{{/if}}>MASTER OVERRIDE</option>
+        <option value="NONE" {{#if (eq playerClearance 'NONE')}}selected{{/if}}>NONE</option>
+        <option value="MEDICAL" {{#if (eq playerClearance 'MEDICAL')}}selected{{/if}}>MEDICAL</option>
+        <option value="CAPTAIN" {{#if (eq playerClearance 'CAPTAIN')}}selected{{/if}}>CAPTAIN</option>
+        <option value="CORPORATE" {{#if (eq playerClearance 'CORPORATE')}}selected{{/if}}>CORPORATE</option>
+        <option value="MASTER_OVERRIDE" {{#if (eq playerClearance 'MASTER_OVERRIDE')}}selected{{/if}}>MASTER OVERRIDE</option>
       </select>
     </div>
 
@@ -75,6 +75,9 @@
       <button class="wy-keypad-btn wy-keypad-clear" data-cc-keypad="clear">CLR</button>
       <button class="wy-keypad-btn" data-cc-keypad="0">0</button>
       <button class="wy-keypad-btn wy-keypad-enter" data-cc-keypad="enter">ENT</button>
+    </div>
+    <div style="margin-top: 12px;">
+      <button class="wy-muthur-send" data-action="logout-clearance" style="width: 100%; border-color: var(--wy-amber-dim); color: var(--wy-amber);">⏻ LOGOUT — REVOKE CLEARANCE</button>
     </div>
   </div>
   {{/if}}
