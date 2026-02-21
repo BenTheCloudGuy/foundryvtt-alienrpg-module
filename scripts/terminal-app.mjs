@@ -364,6 +364,50 @@ export class WYTerminalApp extends Application {
     if (bar) bar.classList.remove('active');
   }
 
+  /**
+   * Show a clearance overlay banner inside the display content area.
+   * Displays for 5 seconds, then fades out and removes itself.
+   * @param {string} title   - e.g. 'ACCESS DENIED' or 'ACCESS GRANTED'
+   * @param {string} detail  - e.g. 'REQUIRES CORPORATE CLEARANCE OR HIGHER'
+   * @param {object} [opts]
+   * @param {string} [opts.currentClearance] - Current clearance level to display
+   * @param {boolean} [opts.granted=false]   - If true, shows green (granted) styling
+   */
+  _showClearanceOverlay(title, detail, opts = {}) {
+    const { currentClearance, granted = false } = opts;
+    const contentEl = this.element[0]?.querySelector('#wy-display-content')
+      ?? this.element?.find?.('#wy-display-content')?.[0];
+    if (!contentEl) return;
+
+    // Remove any existing overlay first
+    contentEl.querySelector('.wy-clearance-overlay')?.remove();
+
+    const overlayClass = granted ? 'wy-clearance-granted' : 'wy-clearance-denied';
+    const icon = granted ? '\u2714' : '\u26A0';
+    const currentLine = currentClearance != null
+      ? `CURRENT CLEARANCE: ${currentClearance || 'CREWMEMBER'}`
+      : '';
+
+    const overlay = document.createElement('div');
+    overlay.className = `wy-clearance-overlay ${overlayClass}`;
+    overlay.innerHTML = `
+      <div class="wy-clearance-overlay-icon">${icon}</div>
+      <div class="wy-clearance-overlay-title">${title}</div>
+      <div class="wy-clearance-overlay-detail">${detail}</div>
+      ${currentLine ? `<div class="wy-clearance-overlay-current">${currentLine}</div>` : ''}
+    `;
+    contentEl.prepend(overlay);
+
+    // Play denied sound
+    if (!granted) TerminalSFX.play('buzz');
+
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      overlay.classList.add('wy-clearance-overlay-fade');
+      overlay.addEventListener('animationend', () => overlay.remove(), { once: true });
+    }, 5000);
+  }
+
   /* ══════════════════════════════════════════════════════════════════
      VIEW DATA PROVIDERS
      ══════════════════════════════════════════════════════════════════ */
@@ -441,8 +485,26 @@ export class WYTerminalApp extends Application {
       case 'cargo':
         return { ...base, ...this._getCargoViewData() };
 
-      case 'commandcode':
-        return { ...base, activeClearance: this._getActiveClearance(), playerClearance: this._getPlayerClearance(), commandCodes: this._loadCommandCodes(), isGM: game.user.isGM };
+      case 'commandcode': {
+        const activeClearance = this._getActiveClearance();
+        const playerClearance = this._getPlayerClearance();
+        const isGM = game.user.isGM;
+        let userList = [];
+        if (isGM) {
+          const levels = game.settings.get('wy-terminal', 'userClearanceLevels') || {};
+          const codes = game.settings.get('wy-terminal', 'userCommandCodes') || {};
+          userList = game.users
+            .filter(u => !u.isGM)
+            .map(u => ({
+              id: u.id,
+              name: u.name.toUpperCase(),
+              clearance: levels[u.id] || 'CREWMEMBER',
+              code: codes[u.id]?.code || '',
+              role: codes[u.id]?.role || 'CREWMEMBER',
+            }));
+        }
+        return { ...base, activeClearance, playerClearance, userList, isGM };
+      }
 
       case 'gameclock':
         return { ...base, ...this._getGameClockDisplayData() };
@@ -748,9 +810,10 @@ export class WYTerminalApp extends Application {
     // Sort by timestamp ascending (oldest first)
     merged.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
 
-    // Hide CORPORATE classified logs from non-GM players
+    // Filter classified logs based on the current user's clearance level
     if (!game.user.isGM) {
-      return merged.filter(l => l.classification !== 'CORPORATE');
+      const clearance = this._getActiveClearance();
+      return merged.filter(l => this._canAccessClassification(l.classification, clearance));
     }
     return merged;
   }
@@ -1493,7 +1556,11 @@ export class WYTerminalApp extends Application {
           const clearance = this._getActiveClearance();
           if (!this._canAccessClassification(log.classification, clearance)) {
             const required = this._requiredClearanceFor(log.classification);
-            ui.notifications.warn(`ACCESS DENIED — ${log.classification} CLASSIFIED. REQUIRES ${required} CLEARANCE OR HIGHER.`);
+            this._showClearanceOverlay(
+              'ACCESS DENIED',
+              `${log.classification} CLASSIFIED \u2014 REQUIRES ${required} CLEARANCE OR HIGHER`,
+              { currentClearance: clearance }
+            );
             return;
           }
         }
@@ -3488,8 +3555,12 @@ export class WYTerminalApp extends Application {
           return;
         }
 
-        // No clearance — show ACCESS DENIED (no keypad, player must use CMD CODE view)
-        ui.notifications.warn('ACCESS DENIED — COMMAND CODE REQUIRED. Use the CMD CODE button to authorize.');
+        // No clearance — show ACCESS DENIED overlay (player must use CMD CODE view)
+        this._showClearanceOverlay(
+          'ACCESS DENIED',
+          'COMMAND CODE REQUIRED \u2014 USE CMD CODE TO AUTHORIZE',
+          { currentClearance: clearance }
+        );
       });
     });
 
@@ -3968,12 +4039,11 @@ export class WYTerminalApp extends Application {
         if (val === 'enter') {
           if (!buffer.length) return;
 
-          // Validate code against stored command codes
-          const codes = this._loadCommandCodes();
-          const match = codes.find(c => c.code === buffer);
+          // Validate code against the current user's command code (per-user)
+          const userCode = this._loadUserCommandCode();
 
-          if (match) {
-            const role = (match.role || 'NONE').toUpperCase();
+          if (userCode && userCode.code === buffer) {
+            const role = (userCode.role || 'CREWMEMBER').toUpperCase();
             // Compare against the PLAYER clearance (not GM access level) so codes can elevate
             const currentRank = this._getClearanceRank(this._getPlayerClearance());
             const newRank = this._getClearanceRank(role);
@@ -3986,7 +4056,7 @@ export class WYTerminalApp extends Application {
                 // Players can't write world settings — ask GM via socket
                 game.socket.emit('module.wy-terminal', {
                   type: 'setClearance',
-                  payload: { level: role },
+                  payload: { level: role, userId: game.user.id },
                 });
               }
             }
@@ -4055,77 +4125,103 @@ export class WYTerminalApp extends Application {
       });
     });
 
-    // ── Logout button (player terminal) — revoke clearance back to NONE ──
+    // ── Logout button — revoke clearance back to CREWMEMBER ──
+    // Uses same pattern as command code elevation: socket to GM + local DOM update
     contentEl.querySelector('[data-action="logout-clearance"]')?.addEventListener('click', async () => {
-      if (game.user.isGM) {
-        await this._setActiveClearance('NONE');
-      } else {
-        game.socket.emit('module.wy-terminal', {
-          type: 'setClearance',
-          payload: { level: 'NONE' },
-        });
+      // Ask GM to write the setting via socket (players can't write world settings)
+      game.socket.emit('module.wy-terminal', {
+        type: 'setClearance',
+        payload: { level: 'CREWMEMBER', userId: game.user.id },
+      });
+
+      // Update footer clearance display
+      this._updateFooterClearance('CREWMEMBER');
+
+      // Update the current clearance display in this view (direct DOM, no re-render)
+      const valueEl = contentEl.querySelector('.wy-cc-current-value');
+      if (valueEl) {
+        valueEl.className = valueEl.className.replace(/wy-cc-level-\S+/g, '');
+        valueEl.classList.add('wy-cc-level-CREWMEMBER');
+        valueEl.textContent = 'CREWMEMBER';
       }
-      this._updateFooterClearance('NONE');
-      ui.notifications.info('WY-Terminal: Clearance revoked. Authorization level set to NONE.');
-      this._broadcastSocket('refreshView', { view: 'all' });
-      this.render(true);
+
+      // Broadcast to other clients
+      this._broadcastSocket('clearanceUpdated', { level: 'CREWMEMBER', userId: game.user.id });
     });
 
-    // ── GM Command Code Management (only present in GM template) ──
+    // ── GM Per-User Command Code Management ──
     if (game.user.isGM) {
-      // Set player clearance dropdown
-      contentEl.querySelector('[data-action="set-clearance"]')?.addEventListener('change', async (e) => {
-        const newLevel = e.target.value;
-        await this._setActiveClearance(newLevel);
-        ui.notifications.info(`WY-Terminal: Player clearance set to ${newLevel}.`);
-        this._broadcastSocket('refreshView', { view: 'all' });
-      });
-
-      // Add code button
-      contentEl.querySelector('[data-action="add-code"]')?.addEventListener('click', () => {
-        const list = contentEl.querySelector('#wy-command-codes-list');
-        if (!list) return;
-        const idx = list.querySelectorAll('.wy-cmd-code-row').length;
-        const autoCode = Array.from({ length: 8 }, () => Math.floor(Math.random() * 10)).join('');
-        const row = document.createElement('div');
-        row.className = 'wy-setting-row wy-cmd-code-row';
-        row.dataset.codeIndex = idx;
-        row.innerHTML = `
-          <input class="wy-setting-input" type="text" data-field="name" value="" placeholder="NAME" />
-          <select class="wy-setting-input" data-field="role">
-            <option value="MEDICAL">MEDICAL</option>
-            <option value="CAPTAIN">CAPTAIN</option>
-            <option value="CORPORATE">CORPORATE</option>
-            <option value="MASTER_OVERRIDE">MASTER OVERRIDE</option>
-          </select>
-          <input class="wy-setting-input" type="text" data-field="code" value="${autoCode}" placeholder="CODE" maxlength="8" />
-          <button class="wy-cmd-code-delete" data-action="remove-code" title="Remove">✕</button>
-        `;
-        row.querySelector('[data-action="remove-code"]').addEventListener('click', () => row.remove());
-        list.appendChild(row);
-      });
-
-      // Remove code buttons
-      contentEl.querySelectorAll('[data-action="remove-code"]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          btn.closest('.wy-cmd-code-row')?.remove();
+      // Per-user clearance dropdowns — each row has [data-user-id] and [data-field="clearance"]
+      contentEl.querySelectorAll('.wy-user-clearance-row [data-field="clearance"]').forEach(sel => {
+        sel.addEventListener('change', async (e) => {
+          const userId = e.target.closest('.wy-user-clearance-row')?.dataset?.userId;
+          if (!userId) return;
+          const newLevel = e.target.value;
+          await this._setActiveClearance(newLevel, userId);
+          // Broadcast so the target user's client updates
+          this._broadcastSocket('clearanceUpdated', { level: newLevel, userId });
         });
       });
 
-      // Save codes button
-      contentEl.querySelector('[data-action="save-codes"]')?.addEventListener('click', async () => {
-        const rows = contentEl.querySelectorAll('.wy-cmd-code-row');
-        const codes = [];
+      // Save all user codes button
+      contentEl.querySelector('[data-action="save-user-codes"]')?.addEventListener('click', async () => {
+        const rows = contentEl.querySelectorAll('.wy-user-clearance-row');
+        const codes = this._loadAllUserCommandCodes();
+        const levels = game.settings.get('wy-terminal', 'userClearanceLevels') || {};
+        let count = 0;
         rows.forEach(row => {
-          const name = row.querySelector('[data-field="name"]')?.value?.trim().toUpperCase() || '';
-          const role = row.querySelector('[data-field="role"]')?.value?.trim().toUpperCase() || '';
+          const userId = row.dataset.userId;
+          if (!userId) return;
+          const role = row.querySelector('[data-field="role"]')?.value?.trim().toUpperCase() || 'CREWMEMBER';
           const code = (row.querySelector('[data-field="code"]')?.value?.trim() || '').slice(0, 8);
-          if (name && code) {
-            codes.push({ name, role, code });
-          }
+          const clearance = row.querySelector('[data-field="clearance"]')?.value || 'CREWMEMBER';
+          codes[userId] = { code, role };
+          levels[userId] = clearance;
+          count++;
         });
-        await game.settings.set('wy-terminal', 'commandCodes', codes);
-        ui.notifications.info(`WY-Terminal: ${codes.length} command code(s) saved.`);
+        await game.settings.set('wy-terminal', 'userCommandCodes', codes);
+        await game.settings.set('wy-terminal', 'userClearanceLevels', levels);
+        ui.notifications.info(`WY-Terminal: ${count} user code(s) saved.`);
+        // Broadcast so all clients pick up changes
+        for (const row of rows) {
+          const userId = row.dataset.userId;
+          const clearance = row.querySelector('[data-field="clearance"]')?.value || 'CREWMEMBER';
+          this._broadcastSocket('clearanceUpdated', { level: clearance, userId });
+        }
+        this._renderView('commandcode');
+      });
+
+      // Regenerate all codes button
+      contentEl.querySelector('[data-action="regenerate-codes"]')?.addEventListener('click', async () => {
+        const codes = this._loadAllUserCommandCodes();
+        const rows = contentEl.querySelectorAll('.wy-user-clearance-row');
+        rows.forEach(row => {
+          const userId = row.dataset.userId;
+          if (!userId) return;
+          const newCode = Array.from({ length: 8 }, () => Math.floor(Math.random() * 10)).join('');
+          const codeInput = row.querySelector('[data-field="code"]');
+          if (codeInput) codeInput.value = newCode;
+          // Update in-memory map
+          if (!codes[userId]) codes[userId] = { code: newCode, role: 'CREWMEMBER' };
+          else codes[userId].code = newCode;
+        });
+        await game.settings.set('wy-terminal', 'userCommandCodes', codes);
+        ui.notifications.info('WY-Terminal: All command codes regenerated.');
+        this._renderView('commandcode');
+      });
+
+      // Revoke all clearance button
+      contentEl.querySelector('[data-action="revoke-all-clearance"]')?.addEventListener('click', async () => {
+        const levels = game.settings.get('wy-terminal', 'userClearanceLevels') || {};
+        for (const userId of Object.keys(levels)) {
+          levels[userId] = 'CREWMEMBER';
+        }
+        await game.settings.set('wy-terminal', 'userClearanceLevels', levels);
+        // Broadcast to all clients
+        for (const userId of Object.keys(levels)) {
+          this._broadcastSocket('clearanceUpdated', { level: 'CREWMEMBER', userId });
+        }
+        this._renderView('commandcode');
       });
     }
   }
@@ -4345,6 +4441,32 @@ export class WYTerminalApp extends Application {
     badge.classList.add('wy-footer-clearance', `wy-cc-level-${level}`);
   }
 
+  /**
+   * Load the current user's command code entry.
+   * @param {string} [userId] - optional user ID (defaults to current user)
+   * @returns {{ code: string, role: string } | null}
+   */
+  _loadUserCommandCode(userId = null) {
+    try {
+      const codes = game.settings.get('wy-terminal', 'userCommandCodes') || {};
+      return codes[userId || game.user.id] || null;
+    } catch { return null; }
+  }
+
+  /**
+   * Load all per-user command codes (GM management).
+   * @returns {Object} map of userId → { code, role }
+   */
+  _loadAllUserCommandCodes() {
+    try {
+      return game.settings.get('wy-terminal', 'userCommandCodes') || {};
+    } catch { return {}; }
+  }
+
+  /**
+   * Legacy: load the old shared command codes array.
+   * @deprecated Use _loadUserCommandCode() instead.
+   */
   _loadCommandCodes() {
     try {
       const codes = game.settings.get('wy-terminal', 'commandCodes');
@@ -4355,13 +4477,14 @@ export class WYTerminalApp extends Application {
   }
 
   /* ── Clearance Level Helpers ── */
-  static CLEARANCE_RANK = { 'NONE': 0, 'MEDICAL': 1, 'CAPTAIN': 2, 'CORPORATE': 3, 'MASTER_OVERRIDE': 4 };
+  static CLEARANCE_RANK = { 'NONE': 0, 'CREWMEMBER': 0, 'MEDICAL': 1, 'CAPTAIN': 2, 'CORPORATE': 3, 'MASTER_OVERRIDE': 4 };
 
   _getActiveClearance() {
     if (game.user.isGM) return 'MASTER_OVERRIDE';
     try {
-      return game.settings.get('wy-terminal', 'activeClearanceLevel') || 'NONE';
-    } catch { return 'NONE'; }
+      const levels = game.settings.get('wy-terminal', 'userClearanceLevels') || {};
+      return levels[game.user.id] || 'CREWMEMBER';
+    } catch { return 'CREWMEMBER'; }
   }
 
   /**
@@ -4371,16 +4494,20 @@ export class WYTerminalApp extends Application {
    */
   _getPlayerClearance() {
     try {
-      return game.settings.get('wy-terminal', 'activeClearanceLevel') || 'NONE';
-    } catch { return 'NONE'; }
+      const levels = game.settings.get('wy-terminal', 'userClearanceLevels') || {};
+      return levels[game.user.id] || 'CREWMEMBER';
+    } catch { return 'CREWMEMBER'; }
   }
 
   _getClearanceRank(level) {
     return WYTerminalApp.CLEARANCE_RANK[level] ?? 0;
   }
 
-  async _setActiveClearance(level) {
-    await game.settings.set('wy-terminal', 'activeClearanceLevel', level);
+  async _setActiveClearance(level, userId = null) {
+    const targetId = userId || game.user.id;
+    const levels = game.settings.get('wy-terminal', 'userClearanceLevels') || {};
+    levels[targetId] = level;
+    await game.settings.set('wy-terminal', 'userClearanceLevels', levels);
   }
 
   /**
@@ -4428,15 +4555,15 @@ export class WYTerminalApp extends Application {
     // Only check strings that look like command codes (8 digits)
     if (!/^\d{8}$/.test(input)) return null;
 
-    const codes = this._loadCommandCodes();
-    const match = codes.find(c => c.code === input);
+    // Validate against the current user's command code (per-user)
+    const userCode = this._loadUserCommandCode();
 
-    if (!match) {
+    if (!userCode || userCode.code !== input) {
       TerminalSFX.play('buzz');
       return 'INVALID COMMAND CODE.\nACCESS DENIED.';
     }
 
-    const role = (match.role || 'NONE').toUpperCase();
+    const role = (userCode.role || 'CREWMEMBER').toUpperCase();
     const rank = this._getClearanceRank(role);
 
     // Only CORPORATE (3) or MASTER_OVERRIDE (4) unlocks restricted data
@@ -4453,7 +4580,7 @@ export class WYTerminalApp extends Application {
       } else {
         game.socket.emit('module.wy-terminal', {
           type: 'setClearance',
-          payload: { level: role },
+          payload: { level: role, userId: game.user.id },
         });
       }
       this._updateFooterClearance(role);
@@ -4512,6 +4639,18 @@ export class WYTerminalApp extends Application {
 
   /* ── Emergency View Setup ── */
   _setupEmergencyView(contentEl) {
+    // Show clearance-check overlay for non-GM players
+    if (!game.user.isGM) {
+      const clearance = this._getActiveClearance();
+      const rank = this._getClearanceRank(clearance);
+      const hasAccess = rank >= 3; // CORPORATE or higher required
+      const title = hasAccess ? 'ACCESS GRANTED' : 'ACCESS DENIED';
+      const detail = hasAccess
+        ? `CLEARANCE LEVEL: ${clearance}`
+        : `INSUFFICIENT CLEARANCE \u2014 REQUIRES CORPORATE OR HIGHER`;
+      this._showClearanceOverlay(title, detail, { currentClearance: clearance, granted: hasAccess });
+    }
+
     contentEl.querySelectorAll('[data-emergency]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const action = e.currentTarget.dataset.emergency;
@@ -4546,7 +4685,7 @@ export class WYTerminalApp extends Application {
         if (game.user.isGM) {
           this._showSelfDestructDialog();
         } else {
-          ui.notifications.warn('AUTHORIZATION REQUIRED — GM ACCESS ONLY');
+          this._showClearanceOverlay('AUTHORIZATION REQUIRED', 'GM ACCESS ONLY \u2014 EMERGENCY PROTOCOLS RESTRICTED', { currentClearance: this._getActiveClearance() });
         }
         break;
       case 'cancel-self-destruct':
@@ -4556,7 +4695,7 @@ export class WYTerminalApp extends Application {
         if (game.user.isGM) {
           this._showEmergencyTriggerDialog('EVACUATION PROTOCOL', 'evacuate');
         } else {
-          ui.notifications.warn('AUTHORIZATION REQUIRED — GM ACCESS ONLY');
+          this._showClearanceOverlay('AUTHORIZATION REQUIRED', 'GM ACCESS ONLY \u2014 EMERGENCY PROTOCOLS RESTRICTED', { currentClearance: this._getActiveClearance() });
         }
         break;
       case 'cancel-evacuate':
@@ -4566,7 +4705,7 @@ export class WYTerminalApp extends Application {
         if (game.user.isGM) {
           this._showEmergencyTriggerDialog('SHIP LOCKDOWN', 'lockdown');
         } else {
-          ui.notifications.warn('AUTHORIZATION REQUIRED — GM ACCESS ONLY');
+          this._showClearanceOverlay('AUTHORIZATION REQUIRED', 'GM ACCESS ONLY \u2014 EMERGENCY PROTOCOLS RESTRICTED', { currentClearance: this._getActiveClearance() });
         }
         break;
       case 'cancel-lockdown':
@@ -4576,7 +4715,7 @@ export class WYTerminalApp extends Application {
         if (game.user.isGM) {
           this._showEmergencyTriggerDialog('DISTRESS SIGNAL', 'distress');
         } else {
-          ui.notifications.warn('AUTHORIZATION REQUIRED — GM ACCESS ONLY');
+          this._showClearanceOverlay('AUTHORIZATION REQUIRED', 'GM ACCESS ONLY \u2014 EMERGENCY PROTOCOLS RESTRICTED', { currentClearance: this._getActiveClearance() });
         }
         break;
       case 'cancel-distress':
@@ -4586,7 +4725,7 @@ export class WYTerminalApp extends Application {
         if (game.user.isGM) {
           this._showAtmospherePurgeDialog();
         } else {
-          ui.notifications.warn('AUTHORIZATION REQUIRED — GM ACCESS ONLY');
+          this._showClearanceOverlay('AUTHORIZATION REQUIRED', 'GM ACCESS ONLY \u2014 EMERGENCY PROTOCOLS RESTRICTED', { currentClearance: this._getActiveClearance() });
         }
         break;
       case 'cancel-purge':
@@ -4596,7 +4735,7 @@ export class WYTerminalApp extends Application {
         if (game.user.isGM) {
           this._showBioalertDialog();
         } else {
-          ui.notifications.warn('AUTHORIZATION REQUIRED — GM ACCESS ONLY');
+          this._showClearanceOverlay('AUTHORIZATION REQUIRED', 'GM ACCESS ONLY \u2014 EMERGENCY PROTOCOLS RESTRICTED', { currentClearance: this._getActiveClearance() });
         }
         break;
       case 'cancel-bioalert':

@@ -35,6 +35,10 @@ AlienRPG Modules
 
 
 
-## Issues
-- Validate AI Integration is working.. I don't think it is via LLM
-
+## To-Do 
+- Create custom Personal TERMINAL for each Player Character aboard the MONTERO. 
+- Hard code MARKERS into default game settings
+- Fix CREW info based on ACTOR/CHARACTER_SHEET 
+- Allow CREW PAGES to scroll up and down but no pinch/zoom/pan. 
+- Update GAME SYSTEM character sheets elemets. 
+- 

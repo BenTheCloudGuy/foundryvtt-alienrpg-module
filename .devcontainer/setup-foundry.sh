@@ -3,18 +3,39 @@ set -e
 
 ###############################################################################
 # setup-foundry.sh
-# Downloads, installs, and configures FoundryVTT in a Codespace using
-# repository Codespaces secrets:
+# Downloads, installs, and configures FoundryVTT in a DevContainer.
+#
+# Required environment variables:
 #   FOUNDRY_USERNAME   – foundryvtt.com account email
 #   FOUNDRY_PASSWORD   – foundryvtt.com account password
 #   FOUNDRY_LICENSE_KEY – FoundryVTT license key
 #   FOUNDRY_BUILD       – FoundryVTT build number (e.g. 351)
+#
+# These are provided automatically in both environments:
+#
+#   Codespaces:    Set as Codespaces Secrets on the repo.
+#                  (Repo -> Settings -> Secrets -> Codespaces)
+#                  GitHub injects them directly as env vars.
+#
+#   Local Docker:  Set as Windows User environment variables, then
+#                  devcontainer.json remoteEnv forwards them into
+#                  the container via ${localEnv:...}.
+#                  Run:  powershell -File .devcontainer\set-local-secrets.ps1
 ###############################################################################
 
 INSTALL_DIR="$HOME/foundryvtt"
 DATA_DIR="$HOME/foundrydata"
 MODULE_LINK="$DATA_DIR/Data/modules/wy-terminal"
 WORKSPACE="/workspaces/foundryvtt-alienrpg-module"
+
+# ── Detect environment ───────────────────────────────────────────────────────
+if [ "${CODESPACES:-}" = "true" ]; then
+  RUNTIME_ENV="codespaces"
+  echo "── Environment: GitHub Codespaces ──"
+else
+  RUNTIME_ENV="local"
+  echo "── Environment: Local Docker DevContainer ──"
+fi
 
 # ── Pre-flight checks ───────────────────────────────────────────────────────
 missing=()
@@ -24,8 +45,14 @@ missing=()
 [ -z "$FOUNDRY_BUILD" ]       && missing+=("FOUNDRY_BUILD")
 
 if [ ${#missing[@]} -ne 0 ]; then
-  echo "⚠  Missing Codespaces secrets: ${missing[*]}"
-  echo "   Set them at: Repo → Settings → Secrets → Codespaces"
+  echo "WARNING: Missing environment variables: ${missing[*]}"
+  if [ "$RUNTIME_ENV" = "codespaces" ]; then
+    echo "   Set them at: Repo -> Settings -> Secrets and variables -> Codespaces"
+  else
+    echo "   Set them as Windows User env vars, then rebuild the container:"
+    echo "     powershell -File .devcontainer\\set-local-secrets.ps1"
+    echo "   Or export them in this shell before re-running this script."
+  fi
   echo "   Skipping FoundryVTT installation."
   exit 0
 fi
@@ -302,6 +329,7 @@ echo "✔  World 'alienrpg-dev' launched"
 
 rm -f "$ADMIN_COOKIE"
 
-echo "✔  FoundryVTT is ready on port 30000"
-echo "   Admin password: (same as FOUNDRY_PASSWORD secret)"
+echo "FoundryVTT is ready on port 30000"
+echo "   Environment: $RUNTIME_ENV"
+echo "   Admin password: (same as FOUNDRY_PASSWORD)"
 echo "   World: alienrpg-dev (auto-launched)"

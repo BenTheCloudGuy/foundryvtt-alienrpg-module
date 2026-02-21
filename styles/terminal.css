@@ -2745,7 +2745,8 @@
 }
 
 /* Clearance level color classes — used on footer badge, current-value, etc. */
-.wy-cc-level-NONE {
+.wy-cc-level-NONE,
+.wy-cc-level-CREWMEMBER {
   color: var(--wy-green-dim) !important;
 }
 .wy-cc-level-MEDICAL {
@@ -2760,6 +2761,37 @@
 .wy-cc-level-MASTER_OVERRIDE {
   color: #ff1744 !important;
   text-shadow: 0 0 8px rgba(255, 23, 68, 0.5);
+}
+
+/* Per-user clearance row (GM CMD CODE view) */
+.wy-user-clearance-row {
+  border: 1px solid var(--wy-border);
+  padding: 8px;
+  margin-bottom: 8px;
+}
+.wy-user-row-header {
+  color: var(--wy-amber);
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+.wy-user-row-fields {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.wy-user-field-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 100px;
+}
+.wy-user-field-label {
+  color: var(--wy-green-dim);
+  font-size: 9px;
+  letter-spacing: 1px;
+  margin-bottom: 2px;
 }
 
 /* Footer clearance badge */
@@ -2835,6 +2867,110 @@
 .wy-logo-mark {
   fill: var(--wy-green);
   filter: drop-shadow(0 0 4px var(--wy-green-glow));
+}
+
+/* ============================================================================
+   CLEARANCE CHECK OVERLAY (Player Terminal)
+   ============================================================================ */
+
+.wy-clearance-overlay {
+  position: relative;
+  border: 2px solid var(--wy-red);
+  background: rgba(255, 0, 0, 0.08);
+  padding: 20px 24px;
+  margin: 0 20px 16px;
+  text-align: center;
+  animation: wy-clearance-slide-in 0.4s ease-out;
+  z-index: 10;
+}
+
+.wy-clearance-overlay.wy-clearance-granted {
+  border-color: var(--wy-green);
+  background: rgba(0, 255, 65, 0.06);
+  animation: wy-clearance-slide-in 0.4s ease-out, wy-clearance-pulse-green 2s ease-in-out infinite 0.4s;
+}
+
+.wy-clearance-overlay.wy-clearance-denied {
+  animation: wy-clearance-slide-in 0.4s ease-out, wy-eo-pulse 2s ease-in-out infinite 0.4s;
+}
+
+.wy-clearance-overlay-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+  letter-spacing: 4px;
+}
+
+.wy-clearance-denied .wy-clearance-overlay-icon {
+  color: var(--wy-red);
+  text-shadow: 0 0 12px rgba(255, 51, 51, 0.6);
+}
+
+.wy-clearance-granted .wy-clearance-overlay-icon {
+  color: var(--wy-green);
+  text-shadow: 0 0 12px rgba(0, 255, 65, 0.6);
+}
+
+.wy-clearance-overlay-title {
+  font-size: 18px;
+  font-family: var(--wy-font-display);
+  letter-spacing: 6px;
+  margin-bottom: 8px;
+}
+
+.wy-clearance-denied .wy-clearance-overlay-title {
+  color: var(--wy-red);
+  text-shadow: 0 0 12px rgba(255, 51, 51, 0.6);
+}
+
+.wy-clearance-granted .wy-clearance-overlay-title {
+  color: var(--wy-green);
+  text-shadow: 0 0 12px rgba(0, 255, 65, 0.6);
+}
+
+.wy-clearance-overlay-detail {
+  font-size: 12px;
+  font-family: var(--wy-font);
+  letter-spacing: 3px;
+  margin-bottom: 6px;
+}
+
+.wy-clearance-denied .wy-clearance-overlay-detail {
+  color: var(--wy-red);
+  opacity: 0.9;
+}
+
+.wy-clearance-granted .wy-clearance-overlay-detail {
+  color: var(--wy-green);
+  opacity: 0.9;
+}
+
+.wy-clearance-overlay-current {
+  font-size: 11px;
+  font-family: var(--wy-font);
+  letter-spacing: 2px;
+  color: var(--wy-green-dim);
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+/* Fade out animation (triggered after 5s) */
+.wy-clearance-overlay-fade {
+  animation: wy-clearance-fade-out 0.6s ease-in forwards !important;
+}
+
+@keyframes wy-clearance-slide-in {
+  0%   { opacity: 0; transform: translateY(-20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes wy-clearance-fade-out {
+  0%   { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+@keyframes wy-clearance-pulse-green {
+  0%, 100% { border-color: var(--wy-green); background: rgba(0, 255, 65, 0.06); }
+  50%      { border-color: rgba(0, 255, 65, 0.3); background: rgba(0, 255, 65, 0.12); }
 }
 
 /* ============================================================================

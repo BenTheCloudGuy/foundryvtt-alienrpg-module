@@ -30,13 +30,13 @@ The GM runs FoundryVTT normally on their screen. Players get a dedicated termina
 - **COMMS** -- Communications array frequency and status display.
 - **CARGO** -- Full cargo manifest of everything aboard the ship.
 - **SCHEMATICS** -- Renders FoundryVTT scenes as deck schematics with tokens, pinch-zoom, and pan.
-- **CMD CODE** -- Numeric keypad for entering command codes that unlock higher clearance levels.
+- **CMD CODE** -- Numeric keypad for entering command codes that unlock higher clearance levels. Each player has a unique code and independent clearance state.
 
 **GM-only buttons:**
 
 - **GAME CLOCK** -- In-game time tracker that broadcasts to all player terminals.
 - **EMERGENCY** -- Triggers emergency protocols (self-destruct, evacuation, lockdown, distress, atmosphere purge) with alarms and voice warnings on player terminals.
-- **GM CONTROLS** -- Module settings, ship profile switching, and terminal configuration.
+- **GM CONTROLS** -- Module settings, ship profile switching, crew folder filters, and terminal configuration.
 
 ---
 
@@ -154,11 +154,9 @@ game.wyTerminal.sendGmCommand({ type: 'switch_plugin', plugin: 'cronus_life_supp
 
 ## To Do
 
-- GM CONTROLS button to auto-configure FoundryVTT for the best experience
 - Custom wire art renderings of the ships to replace current maps (working on this with artists on Fiverr)
 - Custom art for LOGS, such as scientific samples (working on this with artists on Fiverr)
 - Custom log entries for Chariot of the Gods with video/gif animations
-- Add support for audio playback logs
 - Add support for speech-to-text so players can converse with MU/TH/UR via voice
 - Create a custom agent for gameplay and use it for MU/TH/UR interactions, plus allow the GM to query the scenario and AlienRPG via Foundry chat -- should improve performance and reduce token costs
 

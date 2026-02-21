@@ -1,5 +1,49 @@
 # Changelog
 
+## v1.1.0 — 2026-02-20
+
+### Per-User Clearance System
+
+- Replaced global shared clearance with independent per-user clearance levels. Each logged-in user now has their own clearance state that can be elevated or revoked independently.
+- Each player user is assigned a unique 8-digit command code tied to a clearance role (MEDICAL, CAPTAIN, CORPORATE, MASTER_OVERRIDE).
+- CMD CODE view redesigned for GM: displays a per-user management table showing every player's name, current clearance dropdown, code role dropdown, and 8-digit code input.
+- Added SAVE ALL, REGENERATE ALL CODES, and REVOKE ALL CLEARANCE bulk-action buttons to the GM CMD CODE view.
+- Player CMD CODE view unchanged — numeric keypad for code entry plus a LOGOUT button to voluntarily revoke own clearance.
+- MU/TH/UR chat now validates command codes against the entering user's own assigned code and role.
+- Socket payloads include `userId` so clearance changes target the correct user without affecting others.
+- Added `userClearanceLevels` and `userCommandCodes` world settings (Object type) to store per-user state.
+
+### Clearance Overlay Banners
+
+- Replaced native `ui.notifications.warn` access-denied messages with a custom full-width clearance overlay banner.
+- Overlay displays "CLEARANCE LEVEL [X] REQUIRED" in amber with CRT-styled animation, auto-dismissing after a few seconds.
+- Applied consistently across crew, logs, and emergency views when a player lacks sufficient clearance.
+
+### CORPORATE Log Visibility Fix
+
+- Fixed hard-coded filter that unconditionally stripped CORPORATE-classified log entries from non-GM players regardless of their clearance level.
+- Log visibility now uses `_canAccessClassification()` which properly checks the requesting user's per-user clearance against the log's classification.
+
+### Crew Folder Filter
+
+- Added a crew folder filter section to GM CONTROLS allowing the GM to select which Actor folders appear in the CREW manifest view.
+
+### Dev Container & User Management
+
+- Added Dev Container configuration for GitHub Codespaces with auto-download of FoundryVTT on container start.
+- World auto-configuration now creates 7 user accounts: GameMaster, ship-terminal, and 5 character-specific players (JOHN.WILSON, KAYLA_RYE, LEAH_DAVIS, LYRON_CHAN, VANESSA_MILLER).
+- Old users not in the configured list are automatically cleaned up on setup.
+- Player passwords use proper PBKDF2 hashing of empty string (compatible with FoundryVTT v13's `testPassword()`) so players can log in without entering a password.
+- Per-user command codes and clearance levels are force-written to world settings during setup.
+
+### Bug Fixes
+
+- Fixed CRLF line endings in devcontainer shell scripts that prevented execution on Linux.
+- Fixed LOGOUT / REVOKE clearance not updating the terminal view until a manual refresh.
+- Fixed GM unable to write per-user clearance settings due to player permission errors (now uses socket relay to GM client).
+
+---
+
 ## v1.0.9 — 2026-02-19
 
 ### NAV Markers — New Marker Types

@@ -8,7 +8,7 @@
   </div>
 
   {{#if isGM}}
-  {{!-- GM: No keypad needed — always MASTER_OVERRIDE. Show code management instead. --}}
+  {{!-- GM: No keypad needed — always MASTER_OVERRIDE. Show per-user code management. --}}
   <div class="wy-border-box" style="margin-top: 16px; border-color: var(--wy-amber);">
     <div style="color: var(--wy-amber); font-size: 11px; letter-spacing: 2px; margin-bottom: 4px;">
       GM TERMINAL — MASTER OVERRIDE ACTIVE
@@ -18,41 +18,57 @@
     </div>
   </div>
 
-  <div class="wy-section-title" style="margin-top: 16px;">COMMAND CODES</div>
-  <div class="wy-border-box" id="wy-command-codes-section">
-    <div style="color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px; margin-bottom: 8px;">
-      PERSONNEL AUTHORIZATION CODES. CLEARANCE DETERMINES ACCESS TO CLASSIFIED LOGS AND CREW FILES.
+  <div class="wy-section-title" style="margin-top: 16px;">USER CLEARANCE &amp; COMMAND CODES</div>
+  <div class="wy-border-box" id="wy-user-codes-section">
+    <div style="color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px; margin-bottom: 12px;">
+      EACH USER HAS AN INDEPENDENT CLEARANCE LEVEL AND UNIQUE 8-DIGIT COMMAND CODE.
     </div>
 
-    <div class="wy-setting-row" style="margin-bottom: 8px; border-bottom: 1px solid var(--wy-border); padding-bottom: 8px;">
-      <span class="wy-setting-label">PLAYER CLEARANCE</span>
-      <select class="wy-setting-input" data-action="set-clearance">
-        <option value="NONE" {{#if (eq playerClearance 'NONE')}}selected{{/if}}>NONE</option>
-        <option value="MEDICAL" {{#if (eq playerClearance 'MEDICAL')}}selected{{/if}}>MEDICAL</option>
-        <option value="CAPTAIN" {{#if (eq playerClearance 'CAPTAIN')}}selected{{/if}}>CAPTAIN</option>
-        <option value="CORPORATE" {{#if (eq playerClearance 'CORPORATE')}}selected{{/if}}>CORPORATE</option>
-        <option value="MASTER_OVERRIDE" {{#if (eq playerClearance 'MASTER_OVERRIDE')}}selected{{/if}}>MASTER OVERRIDE</option>
-      </select>
-    </div>
-
-    <div id="wy-command-codes-list">
-      {{#each commandCodes}}
-      <div class="wy-setting-row wy-cmd-code-row" data-code-index="{{@index}}">
-        <input class="wy-setting-input" type="text" data-field="name" value="{{this.name}}" placeholder="NAME" />
-        <select class="wy-setting-input" data-field="role">
-          <option value="MEDICAL" {{#if (eq this.role 'MEDICAL')}}selected{{/if}}>MEDICAL</option>
-          <option value="CAPTAIN" {{#if (eq this.role 'CAPTAIN')}}selected{{/if}}>CAPTAIN</option>
-          <option value="CORPORATE" {{#if (eq this.role 'CORPORATE')}}selected{{/if}}>CORPORATE</option>
-          <option value="MASTER_OVERRIDE" {{#if (eq this.role 'MASTER_OVERRIDE')}}selected{{/if}}>MASTER OVERRIDE</option>
-        </select>
-        <input class="wy-setting-input" type="text" data-field="code" value="{{this.code}}" placeholder="CODE" maxlength="8" />
-        <button class="wy-cmd-code-delete" data-action="remove-code" data-code-index="{{@index}}" title="Remove">✕</button>
+    {{#each userList}}
+    <div class="wy-user-clearance-row" data-user-id="{{this.id}}">
+      <div class="wy-user-row-header">{{this.name}}</div>
+      <div class="wy-user-row-fields">
+        <div class="wy-user-field-group">
+          <label class="wy-user-field-label">CLEARANCE</label>
+          <select class="wy-setting-input" data-field="clearance">
+            <option value="CREWMEMBER" {{#if (eq this.clearance 'CREWMEMBER')}}selected{{/if}}>CREWMEMBER</option>
+            <option value="NONE" {{#if (eq this.clearance 'NONE')}}selected{{/if}}>NONE</option>
+            <option value="MEDICAL" {{#if (eq this.clearance 'MEDICAL')}}selected{{/if}}>MEDICAL</option>
+            <option value="CAPTAIN" {{#if (eq this.clearance 'CAPTAIN')}}selected{{/if}}>CAPTAIN</option>
+            <option value="CORPORATE" {{#if (eq this.clearance 'CORPORATE')}}selected{{/if}}>CORPORATE</option>
+            <option value="MASTER_OVERRIDE" {{#if (eq this.clearance 'MASTER_OVERRIDE')}}selected{{/if}}>MASTER OVERRIDE</option>
+          </select>
+        </div>
+        <div class="wy-user-field-group">
+          <label class="wy-user-field-label">CODE ROLE</label>
+          <select class="wy-setting-input" data-field="role">
+            <option value="CREWMEMBER" {{#if (eq this.role 'CREWMEMBER')}}selected{{/if}}>CREWMEMBER</option>
+            <option value="MEDICAL" {{#if (eq this.role 'MEDICAL')}}selected{{/if}}>MEDICAL</option>
+            <option value="CAPTAIN" {{#if (eq this.role 'CAPTAIN')}}selected{{/if}}>CAPTAIN</option>
+            <option value="CORPORATE" {{#if (eq this.role 'CORPORATE')}}selected{{/if}}>CORPORATE</option>
+            <option value="MASTER_OVERRIDE" {{#if (eq this.role 'MASTER_OVERRIDE')}}selected{{/if}}>MASTER OVERRIDE</option>
+          </select>
+        </div>
+        <div class="wy-user-field-group">
+          <label class="wy-user-field-label">CMD CODE</label>
+          <input class="wy-setting-input" type="text" data-field="code" value="{{this.code}}" placeholder="8-DIGIT CODE" maxlength="8" style="font-family: monospace; letter-spacing: 2px;" />
+        </div>
       </div>
-      {{/each}}
     </div>
-    <div style="margin-top: 8px; display: flex; gap: 8px;">
-      <button class="wy-muthur-send" data-action="add-code" style="flex: 1;">+ ADD CODE</button>
-      <button class="wy-muthur-send" data-action="save-codes" style="flex: 1;">SAVE CODES</button>
+    {{/each}}
+
+    {{#unless userList.length}}
+    <div style="color: var(--wy-amber-dim); font-size: 10px; text-align: center; padding: 12px;">
+      NO PLAYER USERS FOUND. CREATE USERS IN FOUNDRYVTT USER MANAGEMENT.
+    </div>
+    {{/unless}}
+
+    <div style="margin-top: 12px; display: flex; gap: 8px;">
+      <button class="wy-muthur-send" data-action="save-user-codes" style="flex: 1;">SAVE ALL</button>
+      <button class="wy-muthur-send" data-action="regenerate-codes" style="flex: 1;">REGENERATE ALL CODES</button>
+    </div>
+    <div style="margin-top: 8px;">
+      <button class="wy-muthur-send" data-action="revoke-all-clearance" style="width: 100%; border-color: var(--wy-amber-dim); color: var(--wy-amber);">⏻ REVOKE ALL CLEARANCE — SET ALL CREWMEMBER</button>
     </div>
   </div>
 

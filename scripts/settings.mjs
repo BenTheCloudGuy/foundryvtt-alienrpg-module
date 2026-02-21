@@ -265,22 +265,41 @@ export function registerSettings() {
     default: {},
   });
 
-  // Internal: active clearance level (per-client, persisted for GM reset)
-  // Values: NONE | MEDICAL | CAPTAIN | CORPORATE | MASTER_OVERRIDE
+  // Internal: active clearance level (legacy single-value, kept for migration)
+  // Values: CREWMEMBER | NONE | MEDICAL | CAPTAIN | CORPORATE | MASTER_OVERRIDE
   game.settings.register('wy-terminal', 'activeClearanceLevel', {
     scope: 'world',
     config: false,
     type: String,
-    default: 'NONE',
+    default: 'CREWMEMBER',
   });
 
-  // Internal: command codes for crew access (GM-managed)
+  // Internal: per-user clearance levels — { [userId]: 'CORPORATE', ... }
+  // Each connected user has their own independent clearance level.
+  game.settings.register('wy-terminal', 'userClearanceLevels', {
+    scope: 'world',
+    config: false,
+    type: Object,
+    default: {},
+  });
+
+  // Internal: command codes for crew access (legacy array, kept for migration)
   // Each entry: { name: 'MILLER', role: 'CAPTAIN', code: '1234' }
   game.settings.register('wy-terminal', 'commandCodes', {
     scope: 'world',
     config: false,
     type: Array,
     default: [],
+  });
+
+  // Internal: per-user command codes — { [userId]: { code: '12345678', role: 'CAPTAIN' }, ... }
+  // Each user has a unique 8-digit command code with an associated clearance role.
+  // Valid roles: CREWMEMBER, MEDICAL, CAPTAIN, CORPORATE, MASTER_OVERRIDE
+  game.settings.register('wy-terminal', 'userCommandCodes', {
+    scope: 'world',
+    config: false,
+    type: Object,
+    default: {},
   });
 
   // Internal: which Actor folders to show in the CREW view.

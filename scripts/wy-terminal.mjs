@@ -338,32 +338,44 @@ Hooks.once('ready', () => {
       TerminalSFX.play('boot');
       terminalApp.render(true);
     }
-    // Player requests clearance change — only GM writes the setting
+    // Player requests clearance change — only GM writes the setting (per-user)
     if (data.type === 'setClearance' && game.user.isGM) {
       const level = data.payload?.level;
-      if (level && WYTerminalApp.CLEARANCE_RANK?.[level] !== undefined) {
-        const current = game.settings.get('wy-terminal', 'activeClearanceLevel') || 'NONE';
-        const currentRank = WYTerminalApp.CLEARANCE_RANK[current] ?? 0;
-        const newRank = WYTerminalApp.CLEARANCE_RANK[level] ?? 0;
-        if (newRank > currentRank) {
-          game.settings.set('wy-terminal', 'activeClearanceLevel', level).then(() => {
-            console.log(`WY-Terminal | Clearance set to ${level} (requested by player)`);
-            // Broadcast to all clients so they update their footers
+      const userId = data.payload?.userId;
+      if (level && userId && WYTerminalApp.CLEARANCE_RANK?.[level] !== undefined) {
+        const levels = game.settings.get('wy-terminal', 'userClearanceLevels') || {};
+        if (levels[userId] !== level) {
+          levels[userId] = level;
+          game.settings.set('wy-terminal', 'userClearanceLevels', levels).then(() => {
+            console.log(`WY-Terminal | Clearance for user ${userId} set to ${level}`);
+            // Broadcast to all clients so the target user updates their footer
             game.socket.emit('module.wy-terminal', {
               type: 'clearanceUpdated',
-              payload: { level },
+              payload: { level, userId },
             });
-            // Update GM's own footer if terminal is open
+            // Update GM's own terminal if open
             if (terminalApp?.rendered) {
-              terminalApp._updateFooterClearance(level);
+              if (userId === game.user.id) {
+                terminalApp._updateFooterClearance(level);
+              }
+              // Re-render GM's CMD CODE view to reflect updated user states
+              if (terminalApp.activeView === 'commandcode') {
+                terminalApp._renderView('commandcode');
+              }
             }
           });
         }
       }
     }
-    // Clearance was updated by GM — all clients update their footer display
+    // Clearance was updated by GM — target user updates their footer and re-renders
     if (data.type === 'clearanceUpdated' && terminalApp?.rendered) {
-      terminalApp._updateFooterClearance(data.payload.level);
+      const { level, userId } = data.payload;
+      // Only update footer if this clearance change is for the current user
+      if (userId === game.user.id) {
+        terminalApp._updateFooterClearance(level);
+      }
+      // Re-render current view (player sees updated access, GM sees updated user list)
+      terminalApp._renderView(terminalApp.activeView);
     }
     // Player requests frequency change — only GM writes the setting
     if (data.type === 'setCommFrequency' && game.user.isGM) {

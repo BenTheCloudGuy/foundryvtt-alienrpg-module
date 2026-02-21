@@ -6,7 +6,8 @@
  *
  * Tasks:
  *  1. Enable the wy-terminal module
- *  2. Create a "player-terminal" user (PLAYER role, no password)
+ *  2. Create users: GameMaster (GM), ship-terminal (shared PLAYER),
+ *     JOHN.WILSON, KAYLA_RYE, LEAH_DAVIS, LYRON_CHAN, VANESSA_MILLER (PLAYERs)
  *  3. Import all actors from the wyt-cog-actors compendium pack
  *  4. Set recommended GM-Terminal default settings
  */
@@ -81,33 +82,78 @@ async function enableModule(settingsDb) {
   console.log('  ✔  Enabled wy-terminal module');
 }
 
-// ── 2. Create player-terminal user ──────────────────────────────────────────
-async function createPlayerTerminal(usersDb) {
+// ── 2. Create user accounts ─────────────────────────────────────────────────
+const USERS_TO_CREATE = [
+  { name: 'GameMaster',       role: 4, color: '#ff6400' },  // GAMEMASTER
+  { name: 'ship-terminal',    role: 1, color: '#00ff41' },  // PLAYER — shared bridge terminal
+  { name: 'JOHN.WILSON',      role: 1, color: '#33ccff' },  // PLAYER
+  { name: 'KAYLA_RYE',        role: 1, color: '#e6c200' },  // PLAYER
+  { name: 'LEAH_DAVIS',       role: 1, color: '#ff4081' },  // PLAYER
+  { name: 'LYRON_CHAN',        role: 1, color: '#7c4dff' },  // PLAYER
+  { name: 'VANESSA_MILLER',   role: 1, color: '#00e5ff' },  // PLAYER
+];
+
+/**
+ * Create an empty-password hash.
+ * FoundryVTT v13 always runs testPassword() even for "no password" users.
+ * We must store a hash of '' (empty string) so submitting a blank form succeeds.
+ */
+function createEmptyPassword() {
+  const salt = crypto.randomBytes(32).toString('hex').slice(0, 64);
+  const hash = crypto.pbkdf2Sync('', salt, 1000, 64, 'sha512').toString('hex');
+  return { hash, salt };
+}
+
+async function createUsers(usersDb) {
+  // Collect existing users: name → { _id, key }
+  const existingUsers = new Map();
   for await (const [key, value] of usersDb.iterator()) {
-    if (value.name === 'player-terminal') {
-      console.log('  ✔  player-terminal user already exists');
-      return;
+    existingUsers.set(value.name, { _id: value._id, key });
+  }
+
+  // Remove users not in USERS_TO_CREATE (clean up old user accounts)
+  const desiredNames = new Set(USERS_TO_CREATE.map(u => u.name));
+  for (const [name, { _id, key }] of existingUsers) {
+    if (!desiredNames.has(name)) {
+      await usersDb.del(key);
+      console.log(`  ✖  Removed old user: ${name} (${_id})`);
     }
   }
 
-  const id = randomId();
-  const user = {
-    name: 'player-terminal',
-    role: 1, // PLAYER
-    _id: id,
-    password: '',
-    passwordSalt: null,
-    avatar: null,
-    character: null,
-    color: '#00ff41',
-    pronouns: '',
-    hotbar: {},
-    permissions: {},
-    flags: {},
-    _stats: makeStats(),
-  };
-  await usersDb.put(`!users!${id}`, user);
-  console.log('  ✔  Created player-terminal user (PLAYER, no password)');
+  // Map of userName → userId (includes both existing and newly created)
+  const userIdMap = new Map();
+
+  for (const { name, role, color } of USERS_TO_CREATE) {
+    if (existingUsers.has(name)) {
+      console.log(`  ✔  ${name} user already exists`);
+      userIdMap.set(name, existingUsers.get(name)._id);
+      continue;
+    }
+
+    const id = randomId();
+    const { hash, salt } = createEmptyPassword();
+    const user = {
+      name,
+      role,
+      _id: id,
+      password: hash,
+      passwordSalt: salt,
+      avatar: null,
+      character: null,
+      color,
+      pronouns: '',
+      hotbar: {},
+      permissions: {},
+      flags: {},
+      _stats: makeStats(),
+    };
+    await usersDb.put(`!users!${id}`, user);
+    userIdMap.set(name, id);
+    const roleName = role === 4 ? 'GAMEMASTER' : 'PLAYER';
+    console.log(`  ✔  Created ${name} user (${roleName}, no password)`);
+  }
+
+  return userIdMap;
 }
 
 // ── 3. Import wyt-cog-actors from compendium-src JSON files ─────────────────
@@ -185,11 +231,27 @@ async function importCompendiumActors(actorsDb, foldersDb) {
 }
 
 // ── 4. Set recommended GM-Terminal default settings ─────────────────────────
-async function setDefaultSettings(settingsDb, foldersDb) {
+function generateCode() {
+  return Array.from({ length: 8 }, () => Math.floor(Math.random() * 10)).join('');
+}
+
+async function setDefaultSettings(settingsDb, foldersDb, userIdMap = new Map()) {
   // Collect existing setting keys
   const existingKeys = new Set();
   for await (const [key, value] of settingsDb.iterator()) {
     existingKeys.add(value.key);
+  }
+
+  // Build per-user clearance levels and command codes for non-GM users
+  const userClearanceLevels = {};
+  const userCommandCodes = {};
+  for (const [userName, userId] of userIdMap) {
+    // Skip GM users (role 4)
+    const userDef = USERS_TO_CREATE.find(u => u.name === userName);
+    if (userDef?.role === 4) continue;
+    userClearanceLevels[userId] = 'CREWMEMBER';
+    userCommandCodes[userId] = { code: generateCode(), role: 'CREWMEMBER' };
+    console.log(`  ✔  Generated command code for ${userName}: ${userCommandCodes[userId].code} (role: CREWMEMBER)`);
   }
 
   // Default recommended settings for development
@@ -217,6 +279,10 @@ async function setDefaultSettings(settingsDb, foldersDb) {
     // AI / OpenAI settings — auto-populate from OPENAI_API_KEY env var if set
     'wy-terminal.openaiBaseUrl':  'https://api.openai.com/v1',
     'wy-terminal.openaiModel':    'gpt-4o-mini',
+
+    // Per-user clearance levels and command codes
+    'wy-terminal.userClearanceLevels': userClearanceLevels,
+    'wy-terminal.userCommandCodes': userCommandCodes,
 
     // ── Crew folder filter (only show selected folders in CREW view) ──
     // Look up the 'Montero Crew' folder ID from the folders DB
@@ -272,9 +338,32 @@ async function setDefaultSettings(settingsDb, foldersDb) {
     }
   }
 
+  // Per-user settings that should ALWAYS be updated (user IDs may change between runs)
+  const FORCE_UPDATE_KEYS = new Set([
+    'wy-terminal.userClearanceLevels',
+    'wy-terminal.userCommandCodes',
+  ]);
+
   let setCount = 0;
   for (const [settingKey, settingValue] of Object.entries(defaults)) {
-    if (existingKeys.has(settingKey)) continue;
+    const forceUpdate = FORCE_UPDATE_KEYS.has(settingKey);
+
+    // If key exists and is NOT force-update, skip
+    if (existingKeys.has(settingKey) && !forceUpdate) continue;
+
+    // For force-update keys that exist, find and replace in DB
+    if (existingKeys.has(settingKey) && forceUpdate) {
+      for await (const [dbKey, dbVal] of settingsDb.iterator()) {
+        if (dbVal.key === settingKey) {
+          dbVal.value = settingValue;
+          await settingsDb.put(dbKey, dbVal);
+          console.log(`  ✔  Force-updated ${settingKey}`);
+          setCount++;
+          break;
+        }
+      }
+      continue;
+    }
 
     const id = randomId();
     const doc = {
@@ -311,9 +400,9 @@ async function main() {
 
   try {
     await enableModule(settingsDb);
-    await createPlayerTerminal(usersDb);
+    const userIdMap = await createUsers(usersDb);
     await importCompendiumActors(actorsDb, foldersDb);
-    await setDefaultSettings(settingsDb, foldersDb);
+    await setDefaultSettings(settingsDb, foldersDb, userIdMap);
   } finally {
     await settingsDb.close();
     await usersDb.close();
