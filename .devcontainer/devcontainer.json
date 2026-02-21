@@ -27,12 +27,13 @@
     "FOUNDRY_LICENSE_KEY": "${localEnv:FOUNDRY_LICENSE_KEY}",
     "FOUNDRY_BUILD":       "${localEnv:FOUNDRY_BUILD}",
     "OPENAI_API_KEY":      "${localEnv:OPENAI_API_KEY}",
-    "SSH_AUTH_SOCK":       "/ssh-agent"
+    "SSH_AUTH_SOCK":       "/tmp/ssh-agent.sock"
   },
 
-  // Mount the host's SSH agent socket into the container for Git operations.
+  // Mount Windows SSH keys (readonly). A startup script copies them into $HOME/.ssh
+  // with strict permissions, then starts ssh-agent inside the container.
   "mounts": [
-    "source=${env:SSH_AUTH_SOCK},target=/ssh-agent,type=bind"
+    "source=${localEnv:USERPROFILE}\\.ssh,target=/tmp/windows-ssh,type=bind,readonly"
   ],
 
   // Install Node dependencies after the container is created.
@@ -40,7 +41,7 @@
 
   // Download & launch FoundryVTT using Codespaces secrets:
   //   FOUNDRY_USERNAME, FOUNDRY_PASSWORD, FOUNDRY_LICENSE_KEY, FOUNDRY_BUILD
-  "postStartCommand": "bash .devcontainer/setup-foundry.sh",
+  "postStartCommand": "bash .devcontainer/setup-ssh-agent.sh && bash .devcontainer/setup-foundry.sh",
 
   "customizations": {
     "vscode": {
