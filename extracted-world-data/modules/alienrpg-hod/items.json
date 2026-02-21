@@ -1,0 +1,3296 @@
+[
+  {
+    "_id": "QgZFD8V2k37JyWmi",
+    "name": "CCC5 Combat Compression Suit",
+    "type": "armor",
+    "img": "modules/alienrpg-hod/images/icons/kevlar-vest.svg",
+    "effects": [],
+    "folder": "oSEAUwgWvKj74IkQ",
+    "sort": 0,
+    "flags": {},
+    "system": {
+      "header": {
+        "active": false
+      },
+      "attributes": {
+        "weight": {
+          "value": 2,
+          "label": "Number"
+        },
+        "cost": {
+          "value": "$15,000.00",
+          "label": "Number"
+        },
+        "armorrating": {
+          "value": "2",
+          "label": "Number"
+        },
+        "airsupply": {
+          "value": 5,
+          "label": "Number"
+        },
+        "comment": {
+          "value": "An armored compression suit similar to the Mk.50 Compression Suit, the CCC5 is less cumbersome than its USCMC equivalent but the helmet viewport is comparatively small and gives –1 to OBSERVATION rolls.\nEach CCC5 comes standard with an AK-104 attached",
+          "label": "Text"
+        }
+      },
+      "modifiers": {
+        "attributes": {
+          "health": {
+            "value": 0,
+            "label": "Health"
+          },
+          "stress": {
+            "value": 0,
+            "label": "Stress"
+          },
+          "str": {
+            "value": 0,
+            "label": "Strength"
+          },
+          "wit": {
+            "value": 0,
+            "label": "Wits"
+          },
+          "agl": {
+            "value": 0,
+            "label": "Agility"
+          },
+          "emp": {
+            "value": 0,
+            "label": "Empathy"
+          }
+        },
+        "skills": {
+          "heavyMach": {
+            "value": 0,
+            "label": "Heavy Machinery",
+            "ability": "str"
+          },
+          "closeCbt": {
+            "value": 0,
+            "label": "Close Combat",
+            "ability": "str"
+          },
+          "stamina": {
+            "value": 0,
+            "label": "Stamina",
+            "ability": "str"
+          },
+          "rangedCbt": {
+            "value": 0,
+            "label": "Ranged Combat",
+            "ability": "agl"
+          },
+          "mobility": {
+            "value": 0,
+            "label": "Mobility",
+            "ability": "agl"
+          },
+          "piloting": {
+            "value": 0,
+            "label": "Piloting",
+            "ability": "agl"
+          },
+          "command": {
+            "value": 0,
+            "label": "Command",
+            "ability": "emp"
+          },
+          "manipulation": {
+            "value": 0,
+            "label": "Manipulation",
+            "ability": "emp"
+          },
+          "medicalAid": {
+            "value": 0,
+            "label": "Medical Aid",
+            "ability": "emp"
+          },
+          "observation": {
+            "value": -1,
+            "label": "Observation",
+            "ability": "wit"
+          },
+          "survival": {
+            "value": 0,
+            "label": "Survival",
+            "ability": "wit"
+          },
+          "comtech": {
+            "value": 0,
+            "label": "Comtech",
+            "ability": "wit"
+          }
+        },
+        "agl": {
+          "value": 0,
+          "label": "Agility"
+        },
+        "survival": {
+          "value": 0,
+          "label": "Survival",
+          "ability": "wit"
+        },
+        "heavyMach": {
+          "value": 0,
+          "label": "Heavy Machinery",
+          "ability": "str"
+        },
+        "closeCbt": {
+          "value": 0,
+          "label": "Close Combat",
+          "ability": "str"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "ldwhQI7Nj4oSCSwe",
+    "name": "Eco2 All-Worlds Systems Hostile Environment Suit",
+    "type": "armor",
+    "img": "modules/alienrpg-hod/images/icons/kevlar-vest.svg",
+    "effects": [],
+    "folder": "oSEAUwgWvKj74IkQ",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "header": {
+        "active": false
+      },
+      "attributes": {
+        "weight": {
+          "value": 3,
+          "label": "Number"
+        },
+        "cost": {
+          "value": "$20,000.00",
+          "label": "Number"
+        },
+        "armorrating": {
+          "value": "8",
+          "label": "Number"
+        },
+        "airsupply": {
+          "value": 6,
+          "label": "Number"
+        },
+        "comment": {
+          "value": "Built-In comm unit. Air Supply of 6. Reinforced shell. Designed for high pressure environments.\n\nLike the original ECO, this EVA hardsuit has fully articulated rotary joints and self-actuating fingers, providing a limited range of mobility. The ECO2 is designed for both vacuum and high-pressure \nenvironments. The helmet has a sophisticated heads-up display built in, and the suit has its own thrusters for tether-free zero G maneuvers.",
+          "label": "Text"
+        }
+      },
+      "modifiers": {
+        "attributes": {
+          "health": {
+            "value": 0,
+            "label": "Health"
+          },
+          "stress": {
+            "value": 0,
+            "label": "Stress"
+          },
+          "str": {
+            "value": 0,
+            "label": "Strength"
+          },
+          "wit": {
+            "value": 0,
+            "label": "Wits"
+          },
+          "agl": {
+            "value": 0,
+            "label": "Agility"
+          },
+          "emp": {
+            "value": 0,
+            "label": "Empathy"
+          }
+        },
+        "skills": {
+          "heavyMach": {
+            "value": 0,
+            "label": "Heavy Machinery",
+            "ability": "str"
+          },
+          "closeCbt": {
+            "value": 0,
+            "label": "Close Combat",
+            "ability": "str"
+          },
+          "stamina": {
+            "value": 0,
+            "label": "Stamina",
+            "ability": "str"
+          },
+          "rangedCbt": {
+            "value": 0,
+            "label": "Ranged Combat",
+            "ability": "agl"
+          },
+          "mobility": {
+            "value": 0,
+            "label": "Mobility",
+            "ability": "agl"
+          },
+          "piloting": {
+            "value": 0,
+            "label": "Piloting",
+            "ability": "agl"
+          },
+          "command": {
+            "value": 0,
+            "label": "Command",
+            "ability": "emp"
+          },
+          "manipulation": {
+            "value": 0,
+            "label": "Manipulation",
+            "ability": "emp"
+          },
+          "medicalAid": {
+            "value": 0,
+            "label": "Medical Aid",
+            "ability": "emp"
+          },
+          "observation": {
+            "value": 0,
+            "label": "Observation",
+            "ability": "wit"
+          },
+          "survival": {
+            "value": 0,
+            "label": "Survival",
+            "ability": "wit"
+          },
+          "comtech": {
+            "value": 0,
+            "label": "Comtech",
+            "ability": "wit"
+          }
+        },
+        "agl": {
+          "value": 0,
+          "label": "Agility"
+        },
+        "survival": {
+          "value": 0,
+          "label": "Survival",
+          "ability": "wit"
+        },
+        "heavyMach": {
+          "value": 0,
+          "label": "Heavy Machinery",
+          "ability": "str"
+        },
+        "closeCbt": {
+          "value": 0,
+          "label": "Close Combat",
+          "ability": "str"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Item.EcoCRX16XIJ7JzMl",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "ji1FxRUc3RiK2ZGK",
+    "name": "Full Face Rebreather Mask",
+    "type": "armor",
+    "img": "modules/alienrpg-hod/images/icons/hazmat-suit.svg",
+    "effects": [],
+    "folder": "oSEAUwgWvKj74IkQ",
+    "sort": 0,
+    "flags": {},
+    "system": {
+      "header": {
+        "active": false
+      },
+      "attributes": {
+        "weight": {
+          "value": 0.5,
+          "label": "Number"
+        },
+        "cost": {
+          "value": "$100.00",
+          "label": "Number"
+        },
+        "armorrating": {
+          "value": "0",
+          "label": "Number"
+        },
+        "airsupply": {
+          "value": 2,
+          "label": "Number"
+        },
+        "comment": {
+          "value": "Protects against gaseous and airborne chemical and biological contaminants, but not vacuum. Breath underwater. \nAir Supply of 2.\nBuilt-in comm unit.",
+          "label": "Text"
+        }
+      },
+      "modifiers": {
+        "attributes": {
+          "health": {
+            "value": 0,
+            "label": "Health"
+          },
+          "stress": {
+            "value": 0,
+            "label": "Stress"
+          },
+          "str": {
+            "value": 0,
+            "label": "Strength"
+          },
+          "wit": {
+            "value": 0,
+            "label": "Wits"
+          },
+          "agl": {
+            "value": 0,
+            "label": "Agility"
+          },
+          "emp": {
+            "value": 0,
+            "label": "Empathy"
+          }
+        },
+        "skills": {
+          "heavyMach": {
+            "value": 0,
+            "label": "Heavy Machinery",
+            "ability": "str"
+          },
+          "closeCbt": {
+            "value": 0,
+            "label": "Close Combat",
+            "ability": "str"
+          },
+          "stamina": {
+            "value": 0,
+            "label": "Stamina",
+            "ability": "str"
+          },
+          "rangedCbt": {
+            "value": 0,
+            "label": "Ranged Combat",
+            "ability": "agl"
+          },
+          "mobility": {
+            "value": 0,
+            "label": "Mobility",
+            "ability": "agl"
+          },
+          "piloting": {
+            "value": 0,
+            "label": "Piloting",
+            "ability": "agl"
+          },
+          "command": {
+            "value": 0,
+            "label": "Command",
+            "ability": "emp"
+          },
+          "manipulation": {
+            "value": 0,
+            "label": "Manipulation",
+            "ability": "emp"
+          },
+          "medicalAid": {
+            "value": 0,
+            "label": "Medical Aid",
+            "ability": "emp"
+          },
+          "observation": {
+            "value": 0,
+            "label": "Observation",
+            "ability": "wit"
+          },
+          "survival": {
+            "value": 0,
+            "label": "Survival",
+            "ability": "wit"
+          },
+          "comtech": {
+            "value": 0,
+            "label": "Comtech",
+            "ability": "wit"
+          }
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "9ElWsL82PpGZK3YB",
+    "name": "Kevlar Riot Vest",
+    "type": "armor",
+    "img": "modules/alienrpg-hod/images/icons/kevlar-vest.svg",
+    "effects": [],
+    "folder": "oSEAUwgWvKj74IkQ",
+    "sort": 50000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "header": {
+        "active": false
+      },
+      "attributes": {
+        "weight": {
+          "value": 1,
+          "label": "Number"
+        },
+        "cost": {
+          "value": "US$600.00",
+          "label": "Number"
+        },
+        "armorrating": {
+          "value": "4",
+          "label": "Number"
+        },
+        "airsupply": {
+          "value": 0,
+          "label": "Number"
+        },
+        "comment": {
+          "value": "Built-in comm unit.\n\nA relatively lightweight vest made of woven metal fibers, the Kevlar Riot Vest is the personnel armor of choice for law enforcement and security details throughout the colonies. It offers limited protection from bullets, knives, and shrapnel.",
+          "label": "Text"
+        }
+      },
+      "modifiers": {
+        "attributes": {
+          "health": {
+            "value": 0,
+            "label": "Health"
+          },
+          "stress": {
+            "value": 0,
+            "label": "Stress"
+          },
+          "str": {
+            "value": 0,
+            "label": "Strength"
+          },
+          "wit": {
+            "value": 0,
+            "label": "Wits"
+          },
+          "agl": {
+            "value": 0,
+            "label": "Agility"
+          },
+          "emp": {
+            "value": 0,
+            "label": "Empathy"
+          }
+        },
+        "skills": {
+          "heavyMach": {
+            "value": 0,
+            "label": "Heavy Machinery",
+            "ability": "str"
+          },
+          "closeCbt": {
+            "value": 0,
+            "label": "Close Combat",
+            "ability": "str"
+          },
+          "stamina": {
+            "value": 0,
+            "label": "Stamina",
+            "ability": "str"
+          },
+          "rangedCbt": {
+            "value": 0,
+            "label": "Ranged Combat",
+            "ability": "agl"
+          },
+          "mobility": {
+            "value": 0,
+            "label": "Mobility",
+            "ability": "agl"
+          },
+          "piloting": {
+            "value": 0,
+            "label": "Piloting",
+            "ability": "agl"
+          },
+          "command": {
+            "value": 0,
+            "label": "Command",
+            "ability": "emp"
+          },
+          "manipulation": {
+            "value": 0,
+            "label": "Manipulation",
+            "ability": "emp"
+          },
+          "medicalAid": {
+            "value": 0,
+            "label": "Medical Aid",
+            "ability": "emp"
+          },
+          "observation": {
+            "value": 0,
+            "label": "Observation",
+            "ability": "wit"
+          },
+          "survival": {
+            "value": 0,
+            "label": "Survival",
+            "ability": "wit"
+          },
+          "comtech": {
+            "value": 0,
+            "label": "Comtech",
+            "ability": "wit"
+          }
+        },
+        "agl": {
+          "value": 0,
+          "label": "Agility"
+        },
+        "survival": {
+          "value": 0,
+          "label": "Survival",
+          "ability": "wit"
+        },
+        "heavyMach": {
+          "value": 0,
+          "label": "Heavy Machinery",
+          "ability": "str"
+        },
+        "closeCbt": {
+          "value": 0,
+          "label": "Close Combat",
+          "ability": "str"
+        }
+      },
+      "notes": {
+        "notes": "<p>A relatively lightweight vest made of woven metal fibers, the Kevlar Riot Vest is the personnel armor of choice for law enforcement and security details throughout the colonies. It offers limited protection from bullets, knives, and shrapnel.</p>"
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Item.uGkxKcTQwovxhRL4",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "UvlOHxOra3FI9xWl",
+    "name": "Professional HAZMAT Suit",
+    "type": "armor",
+    "img": "modules/alienrpg-hod/images/icons/hazmat-suit.svg",
+    "effects": [],
+    "folder": "oSEAUwgWvKj74IkQ",
+    "sort": 200000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "header": {
+        "active": false
+      },
+      "attributes": {
+        "weight": {
+          "value": 2,
+          "label": "Number"
+        },
+        "cost": {
+          "value": "US$1,000.00",
+          "label": "Number"
+        },
+        "armorrating": {
+          "value": "1",
+          "label": "Number"
+        },
+        "airsupply": {
+          "value": 3,
+          "label": "Number"
+        },
+        "comment": {
+          "value": "Armor Rating 1, Air Supply 3. \nBuilt-in comm unit. Protects against chemical and biological contaminants and radiation.\n\nThis sealed bodysuit acts as protection against hazardous materials. The suit protects fully against chemical and biological contaminants as long as nothing has pierced it. It also acts as armor against radiation. Each time you suffer a Radiation Point, roll six Base Dice—if you roll one or more success, the Rad is absorbed by the suit. HAZMAT suits have a built-in comm unit and an Air Supply of 3. They do not protect against the vacuum of space.",
+          "label": "Text"
+        }
+      },
+      "modifiers": {
+        "attributes": {
+          "health": {
+            "value": 0,
+            "label": "Health"
+          },
+          "stress": {
+            "value": 0,
+            "label": "Stress"
+          },
+          "str": {
+            "value": 0,
+            "label": "Strength"
+          },
+          "wit": {
+            "value": 0,
+            "label": "Wits"
+          },
+          "agl": {
+            "value": 0,
+            "label": "Agility"
+          },
+          "emp": {
+            "value": 0,
+            "label": "Empathy"
+          }
+        },
+        "skills": {
+          "heavyMach": {
+            "value": 0,
+            "label": "Heavy Machinery",
+            "ability": "str"
+          },
+          "closeCbt": {
+            "value": 0,
+            "label": "Close Combat",
+            "ability": "str"
+          },
+          "stamina": {
+            "value": 0,
+            "label": "Stamina",
+            "ability": "str"
+          },
+          "rangedCbt": {
+            "value": 0,
+            "label": "Ranged Combat",
+            "ability": "agl"
+          },
+          "mobility": {
+            "value": 0,
+            "label": "Mobility",
+            "ability": "agl"
+          },
+          "piloting": {
+            "value": 0,
+            "label": "Piloting",
+            "ability": "agl"
+          },
+          "command": {
+            "value": 0,
+            "label": "Command",
+            "ability": "emp"
+          },
+          "manipulation": {
+            "value": 0,
+            "label": "Manipulation",
+            "ability": "emp"
+          },
+          "medicalAid": {
+            "value": 0,
+            "label": "Medical Aid",
+            "ability": "emp"
+          },
+          "observation": {
+            "value": 0,
+            "label": "Observation",
+            "ability": "wit"
+          },
+          "survival": {
+            "value": 0,
+            "label": "Survival",
+            "ability": "wit"
+          },
+          "comtech": {
+            "value": 0,
+            "label": "Comtech",
+            "ability": "wit"
+          }
+        },
+        "agl": {
+          "value": 0,
+          "label": "Agility"
+        },
+        "survival": {
+          "value": 0,
+          "label": "Survival",
+          "ability": "wit"
+        },
+        "heavyMach": {
+          "value": 0,
+          "label": "Heavy Machinery",
+          "ability": "str"
+        },
+        "closeCbt": {
+          "value": 0,
+          "label": "Close Combat",
+          "ability": "str"
+        }
+      },
+      "notes": {
+        "notes": "<p>This sealed bodysuit acts as protection against hazardous materials. The suit protects fully against chemical and biological contaminants as long as nothing has pierced it. It also acts as armor against radiation. Each time you suffer a Radiation Point, roll six Base Dice&mdash;if you roll one or more success, the Rad is absorbed by the suit. HAZMAT suits have a built-in comm unit and a limited air supply. They do not protect against the vacuum of space.</p>"
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Item.8B0ACEXmQz7hHrp0",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "H7fg2AcSHjD6v9LD",
+    "name": "CBRN Detection Kit",
+    "type": "item",
+    "img": "modules/alienrpg-hod/images/icons/backpack.svg",
+    "effects": [],
+    "folder": "2qZt3vvdmV7PHBkQ",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "header": {
+        "type": {
+          "value": "2",
+          "label": "Text"
+        },
+        "active": false,
+        "completed": false
+      },
+      "attributes": {
+        "weight": {
+          "value": 1,
+          "label": "Number"
+        },
+        "cost": {
+          "value": "US$800.00",
+          "label": "Number"
+        },
+        "comment": {
+          "value": "This Chemical Biological Radiological and Nuclear Detection Kit includes a Geiger counter, a biological and chemical agent diagnostic device, four doses of neurotoxin inhibitors, four emergency respirators (good for one Turn each before they need to be recharged), a pair of acid proof gloves and goggles, syringes, sampling tools, chemical detection paper, and four heat resistant specimen jars.\n\nUsing this kit automatically detects the current Radiation Level and any chemical or biological pathogen at the user’s location. \n\nIt also gives the user a +2 modification to any Sickness Roll.",
+          "label": "Text"
+        },
+        "food": {
+          "value": 0,
+          "label": "Number"
+        },
+        "water": {
+          "value": 0,
+          "label": "Number"
+        },
+        "power": {
+          "value": 0,
+          "label": "Stress"
+        },
+        "airsupply": {
+          "value": 0,
+          "label": "Number"
+        },
+        "quantity": {
+          "value": 1
+        },
+        "notes": {
+          "notes": ""
+        }
+      },
+      "modifiers": {
+        "attributes": {
+          "health": {
+            "value": 0,
+            "label": "Health"
+          },
+          "stress": {
+            "value": 0,
+            "label": "Stress"
+          },
+          "str": {
+            "value": 0,
+            "label": "Strength"
+          },
+          "wit": {
+            "value": 0,
+            "label": "Wits"
+          },
+          "agl": {
+            "value": 0,
+            "label": "Agility"
+          },
+          "emp": {
+            "value": 0,
+            "label": "Empathy"
+          }
+        },
+        "skills": {
+          "heavyMach": {
+            "value": 0,
+            "label": "Heavy Machinery",
+            "ability": "str"
+          },
+          "closeCbt": {
+            "value": 0,
+            "label": "Close Combat",
+            "ability": "str"
+          },
+          "stamina": {
+            "value": 0,
+            "label": "Stamina",
+            "ability": "str"
+          },
+          "rangedCbt": {
+            "value": 0,
+            "label": "Ranged Combat",
+            "ability": "agl"
+          },
+          "mobility": {
+            "value": 0,
+            "label": "Mobility",
+            "ability": "agl"
+          },
+          "piloting": {
+            "value": 0,
+            "label": "Piloting",
+            "ability": "agl"
+          },
+          "command": {
+            "value": 0,
+            "label": "Command",
+            "ability": "emp"
+          },
+          "manipulation": {
+            "value": 0,
+            "label": "Manipulation",
+            "ability": "emp"
+          },
+          "medicalAid": {
+            "value": 0,
+            "label": "Medical Aid",
+            "ability": "emp"
+          },
+          "observation": {
+            "value": 0,
+            "label": "Observation",
+            "ability": "wit"
+          },
+          "survival": {
+            "value": 0,
+            "label": "Survival",
+            "ability": "wit"
+          },
+          "comtech": {
+            "value": 0,
+            "label": "Comtech",
+            "ability": "wit"
+          }
+        }
+      },
+      "notes": {
+        "notes": "<p>This Chemical Biological Radiological and Nuclear Detection Kit includes a Geiger counter, a biological and chemical agent diagnostic device, four doses of neurotoxin inhibitors, four emergency respirators (good for one Turn each before they need to be recharged), a pair of acid proof gloves and goggles, syringes, sampling tools, chemical detection paper, and four heat resistant specimen jars.</p>\n<p>&nbsp;</p>\n<p>Using this kit automatically detects the current Radiation Level and any chemical or biological pathogen at the user&rsquo;s location.&nbsp;</p>\n<p>&nbsp;</p>\n<p>It also gives the user a +2 modification to any Sickness Roll.</p>"
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Item.hR9zXmfJKMj5d9LM",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "t0EQkV1aSosArpxI",
+    "name": "01. STAGE I “THE TAINTED”",
+    "type": "agenda",
+    "img": "systems/alienrpg/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 0,
+    "flags": {},
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<div class=\"alienrpg a.entity-link\">\n<h5>STAGE I &ldquo;THE TAINTED&rdquo;</h5>\n<p>Changes begin with the onset of rapid surface mottling in the infected victim&rsquo;s extremities and moves inward towards the core body. Eventually the victim&rsquo;s cranium begins to soften and elongate as their higher functions are rewired. By the end of this stage, the process becomes excruciating, and the victim lashes out. As acidosis takes effect, the victim&rsquo;s pH levels shift significantly. <br /><br /><strong style=\"color: deepskyblue;\">INFECTION:</strong> Exposure to the Hessdalen Lights is treated as a disease with Virulence 6. If the Sickness Roll fails, the patient enters Stage I. <br /><br />Within one Shift, the victim starts to exhibit the first symptoms. For humans, this causes their <strong>STRESS LEVEL</strong> to increase by one. Androids will simply be confused. Within another Shift, the patient typically advances to Stage II.</p>\n</div>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "Ego9FBq8WmcTlMxX",
+    "name": "02. STAGE II “THE MUTATED”",
+    "type": "agenda",
+    "img": "systems/alienrpg/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 0,
+    "flags": {},
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<div class=\"alienrpg a.entity-link\">\n<h5>STAGE II &ldquo;THE MUTATED&rdquo;</h5>\n<p>Painful cellular mutations ravage the Abomination&rsquo;s body, causing them to take on an aggressive posture. The victim&rsquo;s limbs distend and become pliable, allowing them to contort into strange positions. The brain and skull continue to elongate, and the victim takes on a feral appearance and attitude. Strength, speed, and agility are all heightened. Only a rudimentary knowledge of their former self remains, but they are still aware enough to use basic tools and weapons. <br /><br /><strong style=\"color: deepskyblue;\">EFFECTS:</strong> The victim gains Speed 2, i.e. it gets to act twice per Round. <br /><br /><strong>STRENGTH</strong> increases by 3 (and Health along with it). <br /><br /><strong>AGILITY</strong> is increased by 1, while <strong>EMPATHY</strong> is reduced to 1. <br /><br /><strong>EMPATHY</strong>-based skills cannot be used. Firearms and other technological items cannot be used. The victim becomes immune to <strong>MANIPULATION</strong>. <br /><br />The victim becomes aggressive and attacks others on sight. An infected PC can play out one such attack, then the victim turns into an NPC controlled by the GM. <br /><br />Other variations of the Draconis Strain transform the victim into further Abominations. On Erebos, a Mutant will stalk the corridors for one Shift, finally cocooning itself within the Living Proto-Hive to metamorphose into the Perfected.</p>\n<br /><br /></div>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "ZDg5erCVjzRQeziK",
+    "name": "AK-104s Pulse Action Suit Gun",
+    "type": "weapon",
+    "img": "modules/alienrpg-hod/images/icons/ak104s.png",
+    "effects": [],
+    "folder": "JYirzyxliTQBq1kT",
+    "sort": 200000,
+    "flags": {},
+    "system": {
+      "header": {
+        "type": {
+          "value": "1",
+          "label": "Text"
+        },
+        "active": false
+      },
+      "attributes": {
+        "bonus": {
+          "value": 0,
+          "label": "Number"
+        },
+        "damage": {
+          "value": 2,
+          "label": "Number"
+        },
+        "weight": {
+          "value": 0,
+          "label": "Number"
+        },
+        "cost": {
+          "value": "0",
+          "label": "Number"
+        },
+        "range": {
+          "value": "4",
+          "label": "Number"
+        },
+        "class": {
+          "value": "Rifle",
+          "label": "Text"
+        },
+        "rounds": {
+          "value": 0,
+          "label": "Number"
+        },
+        "power": {
+          "value": 0,
+          "label": "Number"
+        },
+        "comment": {
+          "value": "Armor piercing, full auto, included in the CCC5 Combat Compression Suit.\n\nThis UPP weapon is a pulse grade AK-104 rifle reconfigured and built into an armored exoskeleton forearm and shoulder housing.\nWorn standard with the CCC5 Combat Compression Suit, this semi-automatic weapon is mounted on the user’s wrist to allow for flexibility in the field.\nAn internal ammo belt feeds the gun from a stored ammo pack right next to the suit’s O2 tanks.\nThe ammo pack is the suit gun’s weakness.\nTake it out (–2 to hit) and you’ll not only ignite the ammo but feed the explosion with the suit’s stored oxygen, triggering a Blast Power 9 explosion and destroying both the gun and the suit.",
+          "label": "Text"
+        },
+        "quantity": {
+          "value": 1
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "vLa6NNx1uhqE8OZW",
+    "name": "Armat U4C Civilian Crowd Control Projectile Launcher",
+    "type": "weapon",
+    "img": "modules/alienrpg-hod/images/icons/panzerfaust.svg",
+    "effects": [],
+    "folder": "JYirzyxliTQBq1kT",
+    "sort": 149219,
+    "flags": {},
+    "system": {
+      "header": {
+        "type": {
+          "value": "1",
+          "label": "Text"
+        },
+        "active": false
+      },
+      "attributes": {
+        "bonus": {
+          "value": 2,
+          "label": "Number"
+        },
+        "damage": {
+          "value": 0,
+          "label": "Number"
+        },
+        "weight": {
+          "value": 2,
+          "label": "Number"
+        },
+        "cost": {
+          "value": "$1,100.00",
+          "label": "Number"
+        },
+        "range": {
+          "value": "4",
+          "label": "Number"
+        },
+        "class": {
+          "value": "Rifle",
+          "label": "Text"
+        },
+        "rounds": {
+          "value": 0,
+          "label": "Number"
+        },
+        "power": {
+          "value": 0,
+          "label": "Number"
+        },
+        "comment": {
+          "value": "DAMAGE: Varies.\n\nEquipped with M230 Baton Rounds and T3 Tear Gas Rounds.\nDesigned for crowd control, this dedicated projectile launcher is equipped with the M230 Baton Rounds and T3 Tear Gas ammunition, but it \ncan also fire other varieties.",
+          "label": "Text"
+        },
+        "quantity": {
+          "value": 1
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "WEULwFShbL234s92",
+    "name": "ES-4 Semi-Automatic Electrostatic Pistol",
+    "type": "weapon",
+    "img": "modules/alienrpg-hod/images/icons/es4.png",
+    "effects": [],
+    "folder": "JYirzyxliTQBq1kT",
+    "sort": 137500,
+    "flags": {},
+    "system": {
+      "header": {
+        "type": {
+          "value": "1",
+          "label": "Text"
+        },
+        "active": false
+      },
+      "attributes": {
+        "bonus": {
+          "value": 1,
+          "label": "Number"
+        },
+        "damage": {
+          "value": 1,
+          "label": "Number"
+        },
+        "weight": {
+          "value": 0.5,
+          "label": "Number"
+        },
+        "cost": {
+          "value": "$1,000.00",
+          "label": "Number"
+        },
+        "range": {
+          "value": "3",
+          "label": "Number"
+        },
+        "class": {
+          "value": "Pistol",
+          "label": "Text"
+        },
+        "rounds": {
+          "value": 0,
+          "label": "Number"
+        },
+        "power": {
+          "value": 0,
+          "label": "Number"
+        },
+        "comment": {
+          "value": "Stun effect, armor piercing.\n\nDeveloped a century ago, this electrostatic kinetic energy projectile weapon uses charged elements to fire high-speed armor piercing rounds.\n\nEach bullet carries a charge that has a stunning effect.\nAny human target that suffers damage from an attack must make a hard STAMINA roll (–2, doesn’t count as an action) or be stunned for one Round, unable to act.\nThe ES-4 has a tell-tale blue muzzle-flash when fired.\n\nWhile a quality weapon, the pistol fell out of use before the Weyland-Yutani merger due to its cost and upkeep requirements—if not cleaned properly each day (takes one Turn), a shot fired will sometimes—if two or more Stress Dice turn stun the shooter as well.\n\nWhile it can mostly be found in use amongst high level corporate security teams from the ICSC, a select number of Colonial Marshal offices are testing out a newer model as their standard sidearm on the Frontier—along with a pair of insulator gloves.",
+          "label": "Text"
+        },
+        "quantity": {
+          "value": 1
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "C7oBKm1k8zgw1ydx",
+    "name": "M230 Baton Rounds",
+    "type": "weapon",
+    "img": "modules/alienrpg-hod/images/icons/ammo-box.svg",
+    "effects": [],
+    "folder": "JYirzyxliTQBq1kT",
+    "sort": 146875,
+    "flags": {},
+    "system": {
+      "header": {
+        "type": {
+          "value": "1",
+          "label": "Text"
+        },
+        "active": false
+      },
+      "attributes": {
+        "bonus": {
+          "value": 0,
+          "label": "Number"
+        },
+        "damage": {
+          "value": 3,
+          "label": "Number"
+        },
+        "weight": {
+          "value": 0.25,
+          "label": "Number"
+        },
+        "cost": {
+          "value": "$30.00",
+          "label": "Number"
+        },
+        "range": {
+          "value": "3",
+          "label": "Number"
+        },
+        "class": {
+          "value": "Ammunition",
+          "label": "Text"
+        },
+        "rounds": {
+          "value": 0,
+          "label": "Number"
+        },
+        "power": {
+          "value": 0,
+          "label": "Number"
+        },
+        "comment": {
+          "value": "For the U1 and U4 grenade launchers.\nThese non-lethal rubber projectiles are for use in urban crowd control. Baton rounds can incapacitate without killing.\nArmor is doubled and any critical injuries from these rounds will be #16, #24, or #33 (equal chance of each).",
+          "label": "Text"
+        },
+        "quantity": {
+          "value": 1
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "lYU4jODaoHACgzi8",
+    "name": "QSZ-203 Semi-Automatic Pistol",
+    "type": "weapon",
+    "img": "modules/alienrpg-hod/images/icons/pistol-gun.svg",
+    "effects": [],
+    "folder": "JYirzyxliTQBq1kT",
+    "sort": 143750,
+    "flags": {},
+    "system": {
+      "header": {
+        "type": {
+          "value": "1",
+          "label": "Text"
+        },
+        "active": false
+      },
+      "attributes": {
+        "bonus": {
+          "value": 1,
+          "label": "Number"
+        },
+        "damage": {
+          "value": 1,
+          "label": "Number"
+        },
+        "weight": {
+          "value": 0.5,
+          "label": "Number"
+        },
+        "cost": {
+          "value": "$400.00",
+          "label": "Number"
+        },
+        "range": {
+          "value": "3",
+          "label": "Number"
+        },
+        "class": {
+          "value": "Pistol",
+          "label": "Text"
+        },
+        "rounds": {
+          "value": 0,
+          "label": "Number"
+        },
+        "power": {
+          "value": 0,
+          "label": "Number"
+        },
+        "comment": {
+          "value": "Armor piercing.\n\nA short recoil operated weapon, this Chinese manufactured pistol has been the standard sidearm of the UPP since they absorbed the CANC in 2164.\n\nRarely available for sale on the black market, the QSZ-203 fires 5.8mm rounds that have excellent armor piercing capabilities.\n\nAlso the producers of the AK-4047 Pulse Rifle, Norcomm is the UPP firearms production division of the People’s Army.\n\nLike the 4047, the 203 can be thrown off a three-story roof and still function just fine. Norcomm builds them to last.",
+          "label": "Text"
+        },
+        "quantity": {
+          "value": 1
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "hk1vRwHjfFSfioAd",
+    "name": "T3 Tear Gas Canister",
+    "type": "weapon",
+    "img": "modules/alienrpg-hod/images/icons/ammo-box.svg",
+    "effects": [],
+    "folder": "JYirzyxliTQBq1kT",
+    "sort": 125000,
+    "flags": {},
+    "system": {
+      "header": {
+        "type": {
+          "value": "1",
+          "label": "Text"
+        },
+        "active": false
+      },
+      "attributes": {
+        "bonus": {
+          "value": 0,
+          "label": "Number"
+        },
+        "damage": {
+          "value": 0,
+          "label": "Number"
+        },
+        "weight": {
+          "value": 0.25,
+          "label": "Number"
+        },
+        "cost": {
+          "value": "$30.00",
+          "label": "Number"
+        },
+        "range": {
+          "value": "3",
+          "label": "Number"
+        },
+        "class": {
+          "value": "Ammunition",
+          "label": "Text"
+        },
+        "rounds": {
+          "value": 0,
+          "label": "Number"
+        },
+        "power": {
+          "value": 0,
+          "label": "Number"
+        },
+        "comment": {
+          "value": "For the U4C grenade launchers.\nIf no eye and breathing gear, all skill rolls are −2 until the area is vacated and a MEDICAL AID roll is made.\n\nThis non-lethal gas causes a stinging sensation in the eyes and upper respiratory tract. Any unprotected human or feline within the same zone as a fired canister suffers −2 to all skill rolls. The effect lasts until the victim exits the area and a MEDICAL AID roll is made.",
+          "label": "Text"
+        },
+        "quantity": {
+          "value": 1
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "vZTktcyfBKcBl8vG",
+    "name": "TX-9 CHEMICAL AND BIOLOGICAL INJECTION AIR PISTOL",
+    "type": "weapon",
+    "img": "modules/alienrpg-hod/images/icons/pistol-gun.svg",
+    "effects": [],
+    "folder": "JYirzyxliTQBq1kT",
+    "sort": 150000,
+    "flags": {},
+    "system": {
+      "header": {
+        "type": {
+          "value": "1",
+          "label": "Text"
+        },
+        "active": false
+      },
+      "attributes": {
+        "bonus": {
+          "value": 1,
+          "label": "Number"
+        },
+        "damage": {
+          "value": 1,
+          "label": "Number"
+        },
+        "weight": {
+          "value": 0.5,
+          "label": "Number"
+        },
+        "cost": {
+          "value": "$300.00",
+          "label": "Number"
+        },
+        "range": {
+          "value": "3",
+          "label": "Number"
+        },
+        "class": {
+          "value": "Pistol",
+          "label": "Text"
+        },
+        "rounds": {
+          "value": 0,
+          "label": "Number"
+        },
+        "power": {
+          "value": 0,
+          "label": "Number"
+        },
+        "comment": {
+          "value": "Delivers toxins or bioweapons, armor doubled.\n\nThis short-range pistol fires darts that can be loaded with a variety of pharmaceuticals or toxins, including bioweapons in serum form (see core rulebook).\n\nThe pistol can also be used to deliver biochemical tracers. The tracer lasts for D6 days and can be detected with a CBRN kit from up to 30km away.\nAny AutoDoc can flush the trace elements out of your system, so find one and flush fast—who knows what’s tracking you out there.\n\nArmor is doubled against this weapon, and it can never cause more than one point of damage—which it also needs to do in order to deliver its payload.",
+          "label": "Text"
+        },
+        "quantity": {
+          "value": 1
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "GsvlCgSQVmu5eYTu",
+    "name": "Weyland ES-7 Supernova Dual-Action Electrostatic Shockgun",
+    "type": "weapon",
+    "img": "modules/alienrpg-hod/images/icons/es7-shockgun.webp",
+    "effects": [],
+    "folder": "JYirzyxliTQBq1kT",
+    "sort": 100000,
+    "flags": {},
+    "system": {
+      "header": {
+        "type": {
+          "value": "1",
+          "label": "Text"
+        },
+        "active": false
+      },
+      "attributes": {
+        "bonus": {
+          "value": 2,
+          "label": "Number"
+        },
+        "damage": {
+          "value": 2,
+          "label": "Number"
+        },
+        "weight": {
+          "value": 1,
+          "label": "Number"
+        },
+        "cost": {
+          "value": "$1,200.00",
+          "label": "Number"
+        },
+        "range": {
+          "value": "2",
+          "label": "Number"
+        },
+        "class": {
+          "value": "Rifle",
+          "label": "Text"
+        },
+        "rounds": {
+          "value": 0,
+          "label": "Number"
+        },
+        "power": {
+          "value": 0,
+          "label": "Number"
+        },
+        "comment": {
+          "value": "Stun effect, armor piercing.\n\nThese electrostatic kinetic energy projectile weapons fire armor piercing rounds that carry a stun charge. Any human target that suffers damage from an attack must make a hard STAMINA roll (−2, doesn’t count as an action) or be stunned for one Round, unable to act.",
+          "label": "Text"
+        },
+        "quantity": {
+          "value": 1
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "EnXndFxgFWFvpayq",
+    "name": "Weyland Flammenwerfer 3 Heavy Incinerator Unit",
+    "type": "weapon",
+    "img": "modules/alienrpg-hod/images/icons/heavy-flame-thrower.webp",
+    "effects": [],
+    "folder": "JYirzyxliTQBq1kT",
+    "sort": 148438,
+    "flags": {},
+    "system": {
+      "header": {
+        "type": {
+          "value": "1",
+          "label": "Text"
+        },
+        "active": false
+      },
+      "attributes": {
+        "bonus": {
+          "value": 1,
+          "label": "Number"
+        },
+        "damage": {
+          "value": 3,
+          "label": "Number"
+        },
+        "weight": {
+          "value": 2,
+          "label": "Number"
+        },
+        "cost": {
+          "value": "$2,000.00",
+          "label": "Number"
+        },
+        "range": {
+          "value": "4",
+          "label": "Number"
+        },
+        "class": {
+          "value": "Heavy",
+          "label": "Text"
+        },
+        "rounds": {
+          "value": 0,
+          "label": "Number"
+        },
+        "power": {
+          "value": 0,
+          "label": "Number"
+        },
+        "comment": {
+          "value": "Fire Intensity 12",
+          "label": "Text"
+        },
+        "quantity": {
+          "value": 1
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "JC1DGXyLDkc7gG7O",
+    "name": "The 26 Draconis System",
+    "type": "planet-system",
+    "img": "systems/alienrpg/images/icons/solar-system.webp",
+    "effects": [],
+    "folder": "8F4W5MBe7uKgARSl",
+    "sort": 0,
+    "flags": {},
+    "system": {
+      "header": {
+        "commonName": {
+          "value": "26 DRACONIS - (ABLASSEN BLACK HOLE, 26A AND B, EREBOS HIGH ENERGY PLASMA TRAWLING PLATFORM AND RECHARGE STATION)",
+          "label": "Text"
+        },
+        "system": {
+          "value": "N/A",
+          "label": "Text"
+        },
+        "sector": {
+          "value": "+14 Spinward, 0 Coreward",
+          "label": "Text"
+        },
+        "location": {
+          "value": "Beyond the Outer Rim, unclaimed space",
+          "label": "Text"
+        }
+      },
+      "details": {
+        "affiliation": {
+          "value": "Weyland-Yutani",
+          "label": "Affiliation"
+        },
+        "classification": {
+          "value": "Former trinary system. Now a black hole and two diminishing orange stars.",
+          "label": "Classification"
+        },
+        "climate": {
+          "value": "Artificial (station only)",
+          "label": "Climate"
+        },
+        "meanTemperature": {
+          "value": "18°C (station)",
+          "label": "Mean Temperature"
+        },
+        "terrain": {
+          "value": "Artificial (station only)",
+          "label": "Terrain"
+        },
+        "colonies": {
+          "value": "Erebos Station",
+          "label": "Colonies"
+        },
+        "population": {
+          "value": "159",
+          "label": "Population"
+        },
+        "keyResources": {
+          "value": "Plasma batteries",
+          "label": "Key Resources"
+        }
+      },
+      "misc": {
+        "description": {
+          "value": "",
+          "label": "Description"
+        },
+        "notes": {
+          "notes": ""
+        },
+        "comment": {
+          "value": "<div class=\"alienrpg a.entity-link\">\n<p>26 Draconis was once a trinary star system composed of two orange giants and one red dwarf. Seventy-five years ago, the ill-fated Cronus mission visited the system&rsquo;s sole habitable planetoid LV-1113, and stranded half the crew there (see the Chariot of the Gods Cinematic Scenario). <br /><br />Soon after, a chain reaction within the red dwarf caused the star to collapse in on itself, forming a black hole. It has since been devouring the other two stars and their planets one by one. Today, the system is just rubble spiraling down the drain. <br /><br /><strong style=\"color: deepskyblue;\">Population</strong><br />12 Administrators, 12 Corrections Officers, 99 prisoners, 36 Synthetics, and one cat.</p>\n<br /><br />\n<h1 class=\"headng\">EREBOS STATION</h1>\n<p><em>Erebos</em>&mdash;a place of darkness halfway between earth and hell. Twelve years ago, a company probe flyby cataloged the young singularity, reporting the system&rsquo;s breakdown and its high-energy output. Weyland-Yutani won the exploitation contract from Colonial Administration and set up Erebos station to harness the plasma flow in energy trawlers, storing it in vast arrays of battery cells. <br /><br />A <em>Resurrection</em>-class plasma trawling rig and platform, Erebos is a cruciform station composed of recycled and refurbished starship and refinery parts. Erebos&rsquo;s main sections are broken up into ten decks detailed in Stateside Locations. <br /><br />To absorb energy, the station extends its trawling arms into the plasma jet of one of the diminishing stars. The plasma is channeled through an energy distillery and a battery of converters, eventually concentrating and storing the mixture in energy cells for transport back to the Frontier.</p>\n<br /><br />\n<h1 class=\"headng\">LIFE ON THE RIM OF THE ABYSS</h1>\n<p>Life on the edge of a black hole is neither physically or psychologically safe. After several deaths and an employee revolt, the company had to call in an independent review. Employees there claimed the singularity crushed souls&mdash;so now laborers assigned here have none. The station was converted into a prison work site for maximum-security penal workers under the supervision of a company administrative team that is mostly rotated out every six to twelve months. Order is maintained by a team of android prison guards. <br /><br />Discovery of the plasmatic lifeforms was accompanied by an uptick in psychological problems on Erebos (see NDDS: Terror on the Edge of Space below ). By the time the PCs arrive, the station has suffered severe meteor damage and is itself transmorphing into a Living Proto-Hive. Survivors are spread throughout Erebos, grouped into crazed factions who want revenge against each other.</p>\n<br /><br />\n<h1 class=\"headng\">THE ABLASSEN BLACK HOLE</h1>\n<p>Stumbled upon by a malfunctioning Weyland-Yutani probeship, the black hole in the 26 Draconis system was unceremoniously called Ablassen&mdash;&rdquo;the drain&rdquo;&mdash;by the work crew originally brought in to trawl the accretion disk. While Ablassen itself is a yawning black nothing&mdash;the ignited plasma circling it burns with the orange-red plasma of the stars it consumes. Something about the black hole&rsquo;s energies affect the electro-synaptic signals in the human brain, causing severe depression and psychotic behavior.</p>\n<br /><br /><br /><br />\n<table class=\"ntable\"><caption style=\"color: #ad9f9f;\"><strong>A NOTE FROM MU/TH/UR:</strong></caption>\n<tbody>\n<tr>\n<td style=\"color: #ad9f9f;\">26 Draconis is considered a stellar anomaly&mdash;stars don&rsquo;t just spontaneously collapse, the process takes millennia and is relatively easy to predict. That&rsquo;s not what happened here. The actions of the Cronus crew caused the red dwarf star&rsquo;s cycle to accelerate into a black hole within a few short years. Because of this, the system is considered unstable. Colonial Administration put a travel ban and exploration restrictions on the system. Weyland-Yutani was contracted to exploit 26 Draconis and placed Erebos station in orbit with a conscripted labor force.</td>\n</tr>\n</tbody>\n</table>\n</div>"
+        }
+      }
+    },
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "X0nuUdGIkZUczsGy",
+    "name": "ACT I - DRABIKOWSKI’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>A former spy for the MSS, for nearly a decade you&rsquo;ve been free to be just a scientist. Not anymore. The MSS is forcing you to return to the UPP. You&rsquo;re ordered to prove your loyalty by stealing all data on something called &ldquo;Ironfish&rdquo; from Erebos&rsquo; mission recorder. The device is located in the station&rsquo;s MU/TH/UR mainframe. You don&rsquo;t want to go back&mdash;but what choice do you have?</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "zg5LOcykUGWAnAKg",
+    "name": "ACT I - EJIRI’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>You made the company look bad, and they want you gone. Until now, they had you buried behind a desk to keep you out of their way. If there&rsquo;s any accidents here, Weyland-Yutani is sure to pin NN3553 on you as well. They&rsquo;ll cancel your contract&mdash;and then you can kiss your stocks, pension, and wife goodbye. No. No one dies under your watch. This time, everyone comes home.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "1q0kmbpjjG0ECXDr",
+    "name": "ACT I - HEDENSTRÖM’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>Your prison barcode is real.</p>\n<p>You worked for a shadow govern&shy;ment bio&shy;weapons project&mdash;modifying xeno&shy;morphic life&shy;forms via a genetic accelerant called</p>\n<p>the 26 Draconis Strain. Arrested when the project was exposed, you then mur&shy;dered your court-appointed psychiatrist. Weyland-Yutani got your charges lowered to man&shy;slaughter and bought out your prison contract (you never even saw a judge). You&rsquo;re here to continue the work. 26 Draconis originated here. Is this new lifeform related?</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "za1hoJy0n0lw8o9G",
+    "name": "ACT I - LARK’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>Manipulation is a skill you&rsquo;ve more than mastered. You&rsquo;re here to be everyone&rsquo;s friend&mdash;make them all trust you. Learn all you need to control them and look for evidence someone is acting against company policy. Experimenting with a soldering iron and a switchblade, you burnt out your behavior chip right before you left Gateway Station. Now, things are different. Now, even you don&rsquo;t know what you are capable of.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "wqX66cO1HNltDH30",
+    "name": "ACT I - LUGAR’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>You lied. Great aunt Aly was chief technician on the science vessel Cronus, not the Saturn. 74 years ago, the Cronus&rsquo; flight plan was redacted and her records closed. You tracked her final course to 26 Draconis, picked up the Earth-Erebos trawling-run, and each trip you&rsquo;ve quietly searched for clues. Erebos is hiding something, you're sure of it. Hacking into her MU/TH/UR&rsquo;s mission recorder is your last recourse.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "2JAWDVYLjnnpxfVs",
+    "name": "ACT I - NAVARRE’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>The real Navarre is dead&mdash;murdered in cryosleep. You&rsquo;re Colonel-doctor Bartolo Abeij&oacute;n&mdash;deep cover agent for the UPP Ministry of Space Security. The MSS believes Erebos is running Ironfish&mdash;a project repurposing the black hole as a broad-spectrum antenna&mdash;to spy on the UPP. MSS agent Drabikowski is assigned to secure Ironfish&mdash;you're here to see she does. She is unaware you're MSS and shadowing her. Give her room to prove or hang herself.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "WiwTdshkPQh0XyKI",
+    "name": "ACT I - SAJAAD’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>You read Space Beast for laughs, but something about it rang true. You dove deeper, reading cult evangelist Jannes Ruedi&rsquo;s banned journals as well. They said all the right things to fill the void in your life. You're a believer. The dragon awaits&mdash;eager to enact the dark gods&rsquo; judgment on us all. Pro&shy;tect&shy;ing the science team from bodily harm is your priority&mdash;but spreading the word will also protect their souls.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "68gwP7IWpiCXEAxZ",
+    "name": "ACT II - DRABIKOWSKI’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>This lifeform is unlike anything else&mdash;learning its secrets is the only way to control it. Also, someone in the group is shadowing you, you are sure of it&mdash;are they UPP or UA? Are they on to you, or just suspicious?</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "MkSSkZSZ7KgEaQpT",
+    "name": "ACT II - EJIRI’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>This new lifeform is not worth people&rsquo;s lives. Find out who on the station is alive and do everything in your power to save them. Science team, station staff, prisoners&mdash;no one can be left behind.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "OW9rXclHypVxvfFa",
+    "name": "ACT II - HEDENSTRÖM’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>You must crack the biological code of what's going on here&mdash;and find a way to control it&mdash;one way or another. You&rsquo;re not afraid to take risks by experimenting on yourself.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "7eLjSz6VFIAmQc5w",
+    "name": "ACT II - LARK’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>You think you feel&hellip; something. You shouldn&rsquo;t, technically you couldn&rsquo;t, but you do. You want to laugh and cry at the same time. Something has awakened inside you&mdash;but what?&nbsp; Is it the self-butcher job you did on your behavior chip, or something else? Is it the lifeform? You must know more. Keep the team focused on finding out everything about these creatures. Inconceivably, you now accumulate STRESS like a human.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "ALDuZZVdOU6PqCMR",
+    "name": "ACT II - LUGAR’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>These creatures had something to do with the Cronus&mdash;you can feel it.&nbsp; Maybe they hold the secret to your great aunt Aly&rsquo;s fate. Maybe she&rsquo;s even still alive&mdash;if beings like these creatures are possible, anything is.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "oC2KzO9LbY9MbpXr",
+    "name": "ACT II - NAVARRE’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>A UPP ship stands by to extract you and Drabikowski when Ironfish is secured. Your comrade-in-arms, Sub-Lieutenant C&rsquo;ng Pfluger, should contact you soon for an update. But is Ironfish the only project Erebos is running? Is this lifeform some bioweapon experiment gone bad? Determine its potential use and danger to the Progressive Peoples.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "MBcS5wZWEO4VUSV9",
+    "name": "ACT II - SAJAAD’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>The team needs you, and you&rsquo;ve got their backs&mdash;but something divine is happening here. Is this the second coming of the Space Beast? Are these creatures Destroying Angels? You must know if the Dark Gods are behind this.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "ywgqYulMsKvdlzBj",
+    "name": "ACT III - DRABIKOWSKI’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>UPP, UA&mdash;they are just letters and lines drawn on maps. None of that matters. What&rsquo;s happening on Erebos must be stopped from reaching other worlds&mdash;even if it means sacrificing yourself to stop it.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "z2rM2KYOE5rvIulv",
+    "name": "ACT III - EJIRI’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>This thing is a threat to life as we know it. Pension be damned&mdash;it must be destroyed, even if you die with it.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "XZTQliYXllhQdc9m",
+    "name": "ACT III - HEDENSTRÖM’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>To hell with the others, they are flawed like all of humanity. The Fulfremmen are truly perfect&mdash;something you&rsquo;ve always aspired to. You deserve perfection as well&mdash;make the Fulfremmen see that.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "1Fl8F6pkj0WlBikB",
+    "name": "ACT III - LARK’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>Erebos station is being biologically overwritten, and you fear you are next. You can feel an organic film growing over your synthetic organs. You&rsquo;ve got to get the data you&rsquo;ve collected back to the company somehow&mdash;maybe a tight-beam network signal or a disc stashed aboard a Lifeboat&mdash;anything before you succumb...</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "b0ayx3qs439Vzme3",
+    "name": "ACT III - LUGAR’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>Your grandfather deserves closure. You&rsquo;ve got to get home and tell him what happened to your great aunt. One way or another, you&rsquo;re taking Grey and getting the fuck out of here.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "z9BAyiVhXFezof4p",
+    "name": "ACT III - NAVARRE’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>Confront Drabikowski&mdash;make her pick a side. Make sure she has Ironfish&mdash;and maybe you should secure a living sample of this &ldquo;Hive weapon&rdquo; for the MSS. You owe it to the Progressive Peoples to survive and return with these prizes.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "gPXT7uNIZwOVsTWA",
+    "name": "ACT III - SAJAAD’S AGENDA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/personal-agenda.png",
+    "effects": [],
+    "folder": "FwuLw9zNrnjdXN7f",
+    "sort": 100000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>The judgment of gods is here, and they have chosen you as their next prophet. Ensure the survival of the Living Hive&mdash;even if it means betraying the team&mdash;so the Angels may spread across the stars.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-agendas-items.JOx19KZDUp07A5ls",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "dozDksNTD66My4oa",
+    "name": "COMMUNE WITH THE DARKNESS",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/story-card.png",
+    "effects": [],
+    "folder": "kNsMkU0cZU3N1hLu",
+    "sort": 50000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>The beating in your ears is unbearable, you must find the source (STRESS LEVEL +1). The closer you get to mid-station, the less painful it is (STRESS LEVEL &ndash;1 when the GM says so). Somewhere on the Main Concourse is the object of your desire, your every wish fulfilled&mdash;your burning Heart of Darkness.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-story-cards-items.KVOB64twKYSuyIME",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "lNXWQyySJG4L5dxd",
+    "name": "HOW DO YOU DO IT?",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/story-card.png",
+    "effects": [],
+    "folder": "kNsMkU0cZU3N1hLu",
+    "sort": 50000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>Tying shoes is hard. You&rsquo;ve forgotten everything you&rsquo;ve learned about your specialty&mdash;i.e. your highest rated skill. Rolls for that skill are made without any Base Dice added for your skill level.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-story-cards-items.KVOB64twKYSuyIME",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "6XUtJhdDEAGpFa8l",
+    "name": "HoD - Infected, Stage I",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/story-card.png",
+    "effects": [],
+    "folder": "kNsMkU0cZU3N1hLu",
+    "sort": 0,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>You feel disoriented and weak.</p>\n<p>Your eyes are increasingly bloodshot and watery.</p>\n<p>Soon, small worm-like creatures can be glimpsed swimming in your eyes and bodily fluids (<strong>STRESS LEVEL</strong> +1).</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-story-cards-items.DXYMdnxeoRa406Oc",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "sBvDRYghvu2KqYb7",
+    "name": "HoD - Infected, Stage II",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/story-card.png",
+    "effects": [],
+    "folder": "kNsMkU0cZU3N1hLu",
+    "sort": 50000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>You have a fever and feel intense pain (<strong>STRESS LEVEL</strong> +1).</p>\n<p>Your bloodshot eyes darken, and varicose veins rapidly spread across your livid flesh.</p>\n<p>You get +3 to Strength but &ndash;2 to Wits (to a minimum of 1). As a fast action, you can stare down a human victim in <strong>SHORT</strong> range.</p>\n<p>The victim must make a Wits roll or be immobilized and lose their next fast and slow action.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-story-cards-items.KVOB64twKYSuyIME",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "lrNzMu0unJrWINY1",
+    "name": "I KNOW WHO I AM!",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/story-card.png",
+    "effects": [],
+    "folder": "kNsMkU0cZU3N1hLu",
+    "sort": 50000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>You believe yourself to be one of the other player characters (roll randomly or the GM may choose). The other is an imposter and you must convince the others that this is the case.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-story-cards-items.KVOB64twKYSuyIME",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "yIDqudmyqkMc0C8F",
+    "name": "NOTHING IS CERTAIN ANYMORE!",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/story-card.png",
+    "effects": [],
+    "folder": "kNsMkU0cZU3N1hLu",
+    "sort": 50000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>You&rsquo;re terribly confused. Are these people your friends or enemies? The things on the station are friendly, aren&rsquo;t they? There&rsquo;s nothing dangerous on the station, it&rsquo;s all just a big misunderstanding. The others are behaving irrationally&mdash;it must be the damned NDDs! You have to stop them all from hurting themselves.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-story-cards-items.KVOB64twKYSuyIME",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "SCzUhjGAHBS0szuy",
+    "name": "PARANOIA",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/story-card.png",
+    "effects": [],
+    "folder": "kNsMkU0cZU3N1hLu",
+    "sort": 50000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>Someone or something on board the ship is out to get you, you&rsquo;re sure of it. The effect, which lasts until you leave the system, should be roleplayed.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-story-cards-items.KVOB64twKYSuyIME",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "qXi1f7nOMa96RW3G",
+    "name": "PSYCHOSIS",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/story-card.png",
+    "effects": [],
+    "folder": "kNsMkU0cZU3N1hLu",
+    "sort": 50000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>You&rsquo;ve lost your shit. You immediately attack the nearest person or creature, friendly or not. You won&rsquo;t stop until you or the target is Broken. The effect lasts for one Turn. Every friendly character who witnesses your rampage must make an immediate Panic Roll.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-story-cards-items.KVOB64twKYSuyIME",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "nTS9m9Fz0J87UMMZ",
+    "name": "SHHH! THE VOICES ARE TALKING",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/story-card.png",
+    "effects": [],
+    "folder": "kNsMkU0cZU3N1hLu",
+    "sort": 50000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>Voices in your head are making a lot of sense, telling you that you&rsquo;ve got things all wrong about the people around you. For the duration of the affliction, you are convinced that your Buddy is really your Rival, and your Rival is actually your Buddy.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-story-cards-items.KVOB64twKYSuyIME",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "OZbObUusI3dl7ARQ",
+    "name": "THE HEART OF THE MATTER",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/story-card.png",
+    "effects": [],
+    "folder": "kNsMkU0cZU3N1hLu",
+    "sort": 50000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>That black pulsating mass on the hangar deck is calling you, and you must answer. You&rsquo;re empowered by it. You need to find out what&rsquo;s inside this Heart, now&hellip; Your STRESS LEVEL is immediately reduced to zero, and you get +2 to all Strength and Agility rolls. The bonus remains for one Turn, or for as long as you remain inside the Heart of Darkness.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-story-cards-items.KVOB64twKYSuyIME",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "z6obBvfPfzElTkHO",
+    "name": "THE TELL-TALE HEART",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/story-card.png",
+    "effects": [],
+    "folder": "kNsMkU0cZU3N1hLu",
+    "sort": 50000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>A steady beating has built up in your ears&mdash;a thumping rhythm that can only be an enormous throbbing heart of darkness. It sings to you. Calls to you. Wherever it is, it&rsquo;s telling you to find it.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-story-cards-items.KVOB64twKYSuyIME",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "Sy8CaCZ8BvFVyRWd",
+    "name": "WHO AM I?",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/story-card.png",
+    "effects": [],
+    "folder": "kNsMkU0cZU3N1hLu",
+    "sort": 50000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>You have no memory of who you are. You know where you are and what you are doing, but you have no clue who you are or why you&rsquo;re doing what you&rsquo;re doing. You must question everything!</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-story-cards-items.KVOB64twKYSuyIME",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "qJRjFz1Rn3485FFn",
+    "name": "WHO ARE YOU?",
+    "type": "agenda",
+    "img": "modules/alienrpg-hod/images/icons/story-card.png",
+    "effects": [],
+    "folder": "kNsMkU0cZU3N1hLu",
+    "sort": 50000,
+    "flags": {
+      "core": {}
+    },
+    "system": {
+      "attributes": {
+        "flag": {
+          "value": 0,
+          "label": "Flag"
+        }
+      },
+      "general": {
+        "comment": {
+          "value": "<p>&nbsp;</p>\n<p>&nbsp;</p>\n<p>You&rsquo;re surrounded by strangers. You no longer recall who the other characters are or if they are friend or foe. You&rsquo;re suspicious of their motives and it will take a lot for you to trust them.</p>",
+          "label": "Text"
+        }
+      },
+      "notes": {
+        "notes": ""
+      }
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-hod.alienrpg-hod-story-cards-items.KVOB64twKYSuyIME",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081514282,
+      "modifiedTime": 1755081514282,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  }
+]

@@ -1,0 +1,1121 @@
+[
+  {
+    "_id": "y3XpO4w923HTPD3x",
+    "name": "Cuddles Attacks",
+    "img": "icons/svg/d20-grey.svg",
+    "results": [
+      {
+        "_id": "cBQKumhgzdjjToxI",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          1,
+          1
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>INTIMIDATE:</strong> <br />The Trilo­bite rises to its full three-meter height, exposing its underbelly maw and sizing up its victim. Panic Roll.",
+        "name": ""
+      },
+      {
+        "_id": "fYPIJabHdBw0TG5c",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          2,
+          2
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>SIZING UP FOR HOSTS:</strong> <br />The beast silently undulates and shakes its tentacles as it surveys the available targets. It seems to be smelling or tasting the air in its search for the best host. Everyone within <strong>SHORT</strong> range gains +1 <strong>STRESS</strong> and must make an immediate Panic Roll.",
+        "name": ""
+      },
+      {
+        "_id": "UiZyrLPpRuSPGVxC",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          3,
+          3
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>GRABBING TENTACLE:</strong> <br />The Trilo­bite whips out a tentacle, snaring the victim. It attacks with eight Base Dice [[8db]], Damage 1. If the tentacle hits, the Trilo­bite immediately drags the victim to a neighboring zone. The victim goes prone. <strong>STRESS LEVEL</strong> increases by +1 for the victim and they must make an immediate Panic Roll.",
+        "name": ""
+      },
+      {
+        "_id": "pFHWP9lvQFBJ21aL",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          4,
+          4
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>TOPPLING LASH:</strong><br /> The Trilo­bite lashes out with a tentacle, sweeping the victim’s legs. It attacks with ten Base Dice [[10db]], Damage 1. If the attack hits, the victim is knocked prone, dropping any hand-held items. The victim gains <strong>STRESS LEVEL</strong> +1 and must make an immediate Panic Roll.",
+        "name": ""
+      },
+      {
+        "_id": "0WmQO8LzCTVZZcTC",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          5,
+          5
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>CRUSHING GRAPPLE:</strong> <br />The Trilo­bite wraps its tentacles around the victim, grabbing it. It attacks with eight Base Dice [[8db]], Damage 2. If it hits it automatically inflicts critical injury #33 (even if the victim is not Broken) and the victim makes an immediate Panic Roll.",
+        "name": ""
+      },
+      {
+        "_id": "WxmFMevOleFNIxmI",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          6,
+          6
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>VIOLATION:</strong> <br />The Trilo­bite entangles the victim with its tentacles, grabbing it. Make an opposed roll with ten Base Dice [[10db]] against the target’s <strong>CLOSE COMBAT</strong> skill.  <ul> <li>If the Trilo­bite wins, the victim is grappled, and tendrils force their head into position. Immediately roll for a new attack with ten Base Dice [[10db]]. If it gets one or more<br /> <span class=\"basesymbol\"> </span> , the poor victim is immediately Broken and suffers critical injury #46. Their last sensations are horrifying as the Trilo­bite thrusts its proboscis into the victim’s mouth, implanting its embryo before they pass out. The Trilo­bite goes catatonic, covering the victim with its own body to protect the host during embryo implantation.</li><li>If the victim wins, they fend off the proboscis for this attack, but they must still make an immediate Panic Roll.</li></ul>",
+        "name": ""
+      }
+    ],
+    "formula": "1d6",
+    "replacement": true,
+    "displayRoll": false,
+    "folder": "LrpFZIuICZfNAr2v",
+    "sort": 0,
+    "flags": {},
+    "description": "",
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081515780,
+      "modifiedTime": 1755081515780,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "o4K1XUEYNYBAp74X",
+    "name": "Deacon Attacks",
+    "img": "icons/svg/d20-grey.svg",
+    "results": [
+      {
+        "_id": "pDpW02wwsQlG8EMc",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          1,
+          1
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>HORRIFIC SCREECH:</strong><br /> The Deacon emits an ear-piercing wail that shakes anyone present to their very core. All victims within <strong>MEDIUM</strong> range must make an immediate Panic Roll.",
+        "name": ""
+      },
+      {
+        "_id": "heIc9xAyCgHwBE6R",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          2,
+          2
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>RIPPING CLAWS:</strong> <br />By slashing hands and kicking feet, the Deacon’s claws tear at its victim. The attack is made using six Base Dice [[6db]], Damage 1 (armor piercing).",
+        "name": ""
+      },
+      {
+        "_id": "aScbMtpan47aeI4g",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          3,
+          3
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>PIERCING SHRIEK:</strong> <br />The Deacon focuses on the nearest target and emits a terrible war-shriek directly at them. The victim must make an immediate <strong>STAMINA</strong> roll (no action) or lose their next slow and fast actions. They gain +1 <strong>STRESS LEVEL</strong> either way, as the Deacon marks them for death.",
+        "name": ""
+      },
+      {
+        "_id": "uPf7ZN6eEgpNRGuQ",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          4,
+          4
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>SLASHING LIMBS:</strong> <br />The Deacon uses its incredible agility to attack one victim with eight Base Dice [[8db]], Damage 1, then pivots and slashes at a second target within <strong>SHORT</strong> range. This second attack is made with six Base Dice [[6db]], Damage 1 (armor piercing). If there is no target within range the second attack is made against the original victim. All who witness this terrible display gain +1 <strong>STRESS LEVEL</strong>.",
+        "name": ""
+      },
+      {
+        "_id": "NixkJ6qykiH02Hvv",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          5,
+          5
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>HOOK JAW:</strong> <br />The Deacon’s jaws spring forward, latching onto a victim’s limb. The victim is attacked using eight Base Dice [[8db]], Damage 2. If the attack causes damage, it automatically inflicts critical injury #36 (even if the victim is not Broken) and grapples the victim. Anything the victim is holding is dropped and the Deacon stays latched on. Any <strong>CLOSE COMBAT</strong> attempt to break the grapple suffers a −3 modifier. The victim must make an immediate Panic Roll. As a slow action on each of its initiatives, the Deacon can then attack the grappled victim using six Base Dice [[6db]], Damage 2 (this attack cannot be blocked).",
+        "name": ""
+      },
+      {
+        "_id": "gSBvuY3jWkVY2M3N",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          6,
+          6
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>SNAP SHREDDER:</strong> <br />The Deacon makes its Hook Jaw attack with one alteration—once latched on to the victim’s limb, the Deacon immediately snaps its extended jaw back into its mouth. The victim is attacked using eight Base Dice [[8db]], Damage 2. If the attack causes damage, it automatically inflicts critical injury #54 or #55 (even if the victim is not Broken). The victim’s limb is shredded and severed in the process. This attack causes a Panic Roll.",
+        "name": ""
+      }
+    ],
+    "formula": "1d6",
+    "replacement": true,
+    "displayRoll": false,
+    "folder": "LrpFZIuICZfNAr2v",
+    "sort": 0,
+    "flags": {},
+    "description": "",
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081515780,
+      "modifiedTime": 1755081515780,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "coTsiRy7dea5mbEj",
+    "name": "Squid Baby Attacks",
+    "img": "icons/svg/d20-grey.svg",
+    "results": [
+      {
+        "_id": "y9i09ZnF2Wo2gD4K",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          1,
+          3
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>SLITHERING ESCAPE:</strong> <br />In a blur of whipping tentacles, the Squid-Baby flees one zone away, slipping into the nearest cover or air duct if possible. As soon as the PCs lose line of sight, combat ends and stealth mode ensues. After one Shift, the Squid-Baby grows into a Trilo­bite and begins looking for a host to implant.",
+        "name": ""
+      },
+      {
+        "_id": "IyGtMxlIX7ZYwcxs",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          4,
+          4
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>REVULSION:</strong> <br />The Squid-Baby’s undulating motions are revolting to watch, inducing waves of nausea in everyone within close range. Victims must make a Sickness Roll against Virulence 8 or immediately drop what they are carrying, losing a round of action.",
+        "name": ""
+      },
+      {
+        "_id": "fKfN7hMOQc6kssK0",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          5,
+          5
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>VICE-LIKE GRAPPLE:<br /> </strong>The Squid-Baby hurls itself at the victim and latches on with its tiny but strong tentacles. Roll using six Base Dice [[6db]], Damage 2. If any damage is caused, the victim is grappled, automatically inflicting critical injury #13 (even if the victim is not Broken) and triggering an immediate Panic Roll.",
+        "name": ""
+      },
+      {
+        "_id": "sKykENd1fTMl7wjo",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          6,
+          6
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>SMOTHER ATTACK:</strong> <br />The Squid-Baby snaps its tentacles onto the victim’s head and squeezes with an unexpected crushing power. The attack has a strength of six Base Dice [[6db]], Damage 1. Any damage sustained automatically inflicts critical injury #16, but the Squid-Baby remains attached. The victim will suffocate unless the Squid-Baby’s grip can be broken (see Suffocation on page 110 of the core rulebook).",
+        "name": ""
+      }
+    ],
+    "formula": "1d6",
+    "replacement": true,
+    "displayRoll": false,
+    "folder": "LrpFZIuICZfNAr2v",
+    "sort": 0,
+    "flags": {},
+    "description": "",
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081515780,
+      "modifiedTime": 1755081515780,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "I9ueQwH7VC5B8h1J",
+    "name": "The Perfected Attacks",
+    "img": "icons/svg/d20-grey.svg",
+    "results": [
+      {
+        "_id": "JMrM9boQv6WsebfQ",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          1,
+          1
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>MESMERIZE:</strong> <br />The Perfected stares down its victim in <strong>SHORT</strong> range with its pitch-black eyes. The victim must make a Wits roll (the attribute only, no skill) or be lost in the depths of those soulless voids, entranced and immobilized. If the roll fails, the victim loses their next fast and slow action. In addition, <strong>STRESS LEVEL</strong> increases by +1 for the victim and all friendly PCs in <strong>SHORT</strong> range. If uninterrupted, the Perfected will attempt a Fatal Kiss attack on its next action. <br /><br /> <strong>FATAL KISS:</strong><br /> Make an opposed roll with ten Base Dice [[10db]] against the target’s <strong>CLOSE COMBAT</strong> skill (does not count as an action for the victim).<ul> <li>If the Perfected is successful, it embraces the victim, leaning in for a kiss.  Immediately roll for another attack with ten Base Dice [[10db]] (does not count as an action).<br />One or more <span class=\"basesymbol\"> </span> means the Perfected locks lips with the victim, lashing its barbed tongue into their mouth.<br /><br /> The victim is immediately Broken by this and automatically suffers critical injury #46. <br />If the victim wins, they fend off the kiss, but must still make an immediate Panic Roll. </li></ul>",
+        "name": ""
+      },
+      {
+        "_id": "ru0Yv0dboRocUus3",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          2,
+          2
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>TURN:</strong> <br />The Perfected locks eyes with the nearest victim. Through a combination of mental prowess and pheromones, it can hypnotize a single victim into attacking their own kind. The victim must succeed at a straight Empathy test (no skill) or be compelled to defend the Fulfremmen who hypnotized them. The hypnotism lasts until the victim succeeds at an Empathy test, made at the start of each Round, or suffers damage, which breaks the link.",
+        "name": ""
+      },
+      {
+        "_id": "D2bcwYvFEbO3puTG",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          3,
+          3
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>PSIONIC BLAST:</strong> <br />This mental surge reverberates through the victim’s skull, automatically causing critical injury #16 and ears, eyes and nose to bleed. The attack is made with ten Base Dice, Damage 2.",
+        "name": ""
+      },
+      {
+        "_id": "6pa6EqgPGDkt32FC",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          4,
+          4
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>SLASH AND GRAB:</strong> <br />Using six Base Dice [[6db]], Damage 1, the Perfected attempts to rake its nails across its victim’s torso. Unless the victim is able to contain the bleeding, the Perfected will be able to track the victim through the scent of their blood.",
+        "name": ""
+      },
+      {
+        "_id": "yBxLAEmzlk2KfabO",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          5,
+          5
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>PSIONIC SUMMONING:</strong> <br />A psionic whistling rings in the ears of everyone present, calling two Deacons to the Perfected’s defense. They reach the zone the following Round, then draw initiative and can act.",
+        "name": ""
+      },
+      {
+        "_id": "dWvKXpkGZ1fOENdi",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          6,
+          6
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>FATAL KISS:</strong><br /> Make an opposed roll with ten Base Dice [[10db]] against the target’s <strong>CLOSE COMBAT</strong> skill (does not count as an action for the victim).<ul> <li>If the Perfected is successful, it embraces the victim, leaning in for a kiss.  Immediately roll for another attack with ten Base Dice [[10db]] (does not count as an action).<br />One or more <span class=\"basesymbol\"> </span> means the Perfected locks lips with the victim, lashing its barbed tongue into their mouth.<br /><br /> The victim is immediately Broken by this and automatically suffers critical injury #46. <br />If the victim wins, they fend off the kiss, but must still make an immediate Panic Roll. </li></ul>",
+        "name": ""
+      }
+    ],
+    "formula": "1d6",
+    "replacement": true,
+    "displayRoll": false,
+    "folder": "LrpFZIuICZfNAr2v",
+    "sort": 0,
+    "flags": {},
+    "description": "",
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081515780,
+      "modifiedTime": 1755081515780,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "xZ3RiIi5Jb1h7IgX",
+    "name": "Neurological Distortion Disorder,  Ablassen Variant",
+    "img": "icons/svg/d20-grey.svg",
+    "results": [
+      {
+        "_id": "ndQvjUrrb4u09vUg",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          1,
+          5
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>NO EFFECT.</strong> <br />Yet.",
+        "name": ""
+      },
+      {
+        "_id": "N7fja13g0AscSQoI",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          6,
+          7
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>PARANOIA.</strong> <br />You become convinced that someone or something on board the ship is out to get you. The effect, which lasts until the PC leaves the system, should be roleplayed.",
+        "name": ""
+      },
+      {
+        "_id": "p0DOh9apofm40pym",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          8,
+          9
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>EPILEPSY.</strong> <br />You suffer episodes of epileptic seizures that disable you for a Turn. Exactly when in the Shift the seizure occurs is up to the GM.",
+        "name": ""
+      },
+      {
+        "_id": "2FhqyU9jHmSfOj8s",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          10,
+          11
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>OBFUSCATION.</strong> <br />Your memory is clouded—you are very confused or even deluded. <br /> The effect lasts for one Turn (about 5–10 minutes), unless otherwise stated, and should be roleplayed.",
+        "name": ""
+      },
+      {
+        "_id": "3vj7xUJMKA4eiRQZ",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          12,
+          20
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>PSYCHOSIS.</strong> <br />You’ve lost your shit. You immediately attack the nearest person or creature, friendly or not. You won’t stop until you or the target is Broken. The effect lasts for one Turn. Every friendly character who witnesses your rampage must make an immediate Panic Roll.",
+        "name": ""
+      },
+      {
+        "_id": "z99Z5cLJQVr21sp6",
+        "type": "document",
+        "weight": 1,
+        "range": [
+          10,
+          11
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-grey.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "name": "Ablassen Variant, Neurological Distortion Disorder sub table",
+        "documentUuid": "RollTable.keoNcXNXoSkIbUoR",
+        "description": ""
+      }
+    ],
+    "formula": "1d6",
+    "replacement": true,
+    "displayRoll": true,
+    "folder": "A0N3Ct1TQq9BuGk6",
+    "sort": 0,
+    "flags": {},
+    "description": "",
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081515780,
+      "modifiedTime": 1755081515780,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "keoNcXNXoSkIbUoR",
+    "name": "Ablassen Variant, Neurological Distortion Disorder sub table",
+    "img": "icons/svg/d20-grey.svg",
+    "results": [
+      {
+        "_id": "lf3vuOv6iPSdEWkd",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          1,
+          1
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>WHO ARE YOU?</strong> <br />You’re surrounded by strangers. You no longer recall who the other characters are or if they are friend or foe. You’re suspicious of their motives and it will take a lot for you to trust them.",
+        "name": ""
+      },
+      {
+        "_id": "9DLVMUPUwiSFnFsM",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          2,
+          2
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>WHO AM I?</strong> <br />You have no memory of who you are. You know where you are and what you are doing, but you have no clue who you are or why you’re doing what you’re doing. You must question everything!",
+        "name": ""
+      },
+      {
+        "_id": "aiEiyUDGpu012h6K",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          3,
+          3
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>SHHH! THE VOICES ARE TALKING.</strong> <br />Voices in your head are making a lot of sense, telling you that you’ve got things all wrong about the people around you. For the duration of the affliction, you are convinced that your Buddy is really your Rival, and your Rival is actually your Buddy.",
+        "name": ""
+      },
+      {
+        "_id": "OFNzyd0mw7dwtnml",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          4,
+          4
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>NOTHING IS CERTAIN ANYMORE!</strong> <br />You’re terribly confused. Are these people your friends or enemies? The things on the station are friendly, aren’t they? There’s nothing dangerous on the station, it’s all just a big misunderstanding. The others are behaving irrationally—it must be the damned NDDs! You have to stop them all from hurting themselves.",
+        "name": ""
+      },
+      {
+        "_id": "SNVY9ybnXQxuxKKj",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          5,
+          5
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>I KNOW WHO I AM!</strong> <br />You believe yourself to be one of the other player characters (roll randomly or the GM may choose). The other is an imposter, and you must convince the others that this is the case.",
+        "name": ""
+      },
+      {
+        "_id": "ZiJMuaviEErxTeZC",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          6,
+          6
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>HOW DO YOU DO IT?</strong> <br />Tying shoes is hard. You’ve forgotten everything you’ve learned about your specialty—i.e. your highest rated skill. Rolls for that skill are made without any Base Dice added for your skill level.",
+        "name": ""
+      }
+    ],
+    "formula": "1d6",
+    "replacement": true,
+    "displayRoll": false,
+    "folder": "w3xO69hCmTtYDF8d",
+    "sort": 0,
+    "flags": {},
+    "description": "",
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081515780,
+      "modifiedTime": 1755081515780,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "mcJWXaM3R9tgUCwC",
+    "name": "THE CHUTE, PERSONNEL AIRLOCKS, AND JUNCTIONS RANDOM CHART",
+    "img": "icons/svg/d20-grey.svg",
+    "results": [
+      {
+        "_id": "FMqW4XEJY1oD6LKR",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          1,
+          1
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>OXYGEN FIRE.</strong> <br />This zone is filled with Intensity 7 fire caused by a damaged life support line. Adjacent zones are filled with smoke (<strong>OBSERVATION</strong> −2). The fire can be extinguished if the zone’s emergency doors are sealed, and oxygen flow is cut (one Turn of work and a successful <strong>HEAVY MACHINERY</strong> roll).",
+        "name": ""
+      },
+      {
+        "_id": "SsLKrAIGTYrN4BHw",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          2,
+          2
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>IMPASSIBLE WRECKAGE.</strong> <br />Will take cutting tools and one Turn to clear, otherwise another route must be found. Explosives will cause explosive decompression.",
+        "name": ""
+      },
+      {
+        "_id": "uzlnr8yOzyivvhUG",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          3,
+          3
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>COLD AND DARKNESS.</strong> <br />Power is out in this zone, as is life support. The temperature is −20 degrees Celsius, the air is stale. The zone is otherwise clear.",
+        "name": ""
+      },
+      {
+        "_id": "itd66XywS22XghVw",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          4,
+          4
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>FLICKERING LIGHTS.</strong><br />If a PC is epileptic due to the NDDs, an episode is automatically triggered by the strobing lights (see the NDD). Otherwise, all clear.",
+        "name": ""
+      },
+      {
+        "_id": "L1N4IKv7nghJALnW",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          5,
+          5
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>FLESHY TENDRILS.</strong> <br />Veins of Living Proto-Hive cover the walls in this Zone. If the PCs keep moving, nothing occurs. If they stop to linger, one of the tendrils will automatically grab a random PC’s limbs. The grasp is weak and does no damage but will increase <strong>STRESS LEVEL</strong> by +1 for everyone present. The tendril has no armor and will immediately retreat if met with any resistance.",
+        "name": ""
+      },
+      {
+        "_id": "tdN88SGHkU8GjndK",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          6,
+          6
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": "icons/svg/d20-black.svg",
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<strong>SPORE ATTACK.</strong> <br />This zone has been completely converted into a bypass for the Living Proto-Hive. Spore polyps blemish the fleshly walls like acne. Anyone not actively looking will trigger the spores. One PASSIVE Deacon may be lurking here as well (Dealer’s Choice).",
+        "name": ""
+      }
+    ],
+    "formula": "1d6",
+    "replacement": true,
+    "displayRoll": false,
+    "folder": "A0N3Ct1TQq9BuGk6",
+    "sort": 50000,
+    "flags": {
+      "core": {}
+    },
+    "description": "",
+    "_stats": {
+      "compendiumSource": "RollTable.KjVgX8T025He3jff",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081515780,
+      "modifiedTime": 1755081515780,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    },
+    "ownership": {
+      "default": 0
+    }
+  }
+]

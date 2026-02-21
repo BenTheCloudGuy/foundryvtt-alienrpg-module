@@ -1,0 +1,16 @@
+[
+  {
+    "_id": "DiMQHHjZKMDiBgdF",
+    "name": "ARPG Core Ships Update",
+    "img": "modules/alienrpg-corerules/maps/rules-cover.webp",
+    "caption": "",
+    "description": "<p><strong>Alien RPG Core Rules Starships Update</strong><br />This will import all New Starship Actors and Starship Items into your world and organise them into folders</p><p>Published by: <strong>Free League Publishing</strong><br />Foundry Visualisation by <strong>Paul Watson</strong><br />Thanks for their help and support to:<strong> Thomas Boulton and Frank Graeff</strong></p><p><a href=\"https://frialigan.se/\">Free League</a><br /></p><p><span style=\"font-size:smaller\">No part of this publication may be reproduced, distributed, stored in a retrieval system, or transmitted in any form by any means, electronic, mechanical, photocopying, recording or otherwise without the prior permission of the publishers. <br /></span><sup><span style=\"font-size:smaller\">tm</span></sup><span style=\"font-size:smaller\"> &amp; © 2021 20th Century Studios Inc. All Rights Reserved<br /></span></p><img src=\"modules/alienrpg-corerules/images/icons/fl-20cf-logo.png\" height=\"109\" width=\"193\" />"
+  },
+  {
+    "_id": "NwJ5FeyOrpMRuWpg",
+    "name": "Alien RPG Core Rules",
+    "img": "modules/alienrpg-corerules/maps/rules-cover.webp",
+    "caption": "",
+    "description": "<p><strong>Initialize Alien RPG Core Rules Module</strong><br />This will import all Journals and Scenes into your world and organise them into folders</p><p>Published by: <strong>Free League Publishing</strong><br />Foundry Visualisation by <strong>Paul Watson</strong><br />Thanks for their help and support to:<strong> Thomas Boulton and Frank Graeff</strong></p><p><a href=\"https://frialigan.se/\">Free League</a><br /></p><p><span style=\"font-size:smaller\">No part of this publication may be reproduced, distributed, stored in a retrieval system, or transmitted in any form by any means, electronic, mechanical, photocopying, recording or otherwise without the prior permission of the publishers. <br /></span><sup><span style=\"font-size:smaller\">tm</span></sup><span style=\"font-size:smaller\"> &amp; © 2021 20th Century Studios Inc. All Rights Reserved<br /></span></p><img src=\"modules/alienrpg-corerules/images/icons/fl-20cf-logo.png\" height=\"109\" width=\"193\" />"
+  }
+]

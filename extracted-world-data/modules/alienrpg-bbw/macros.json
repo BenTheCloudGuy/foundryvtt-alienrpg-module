@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Build A Better World",
+    "type": "script",
+    "scope": "global",
+    "author": "eWJUkg17P02P1Lkq",
+    "img": "icons/svg/d20-highlight.svg",
+    "command": "game.alienrpgbbw.BBWSystemCreator.build();",
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 0,
+      "wzi2yRgGxZijlQm5": 3,
+      "xqyoHSVTNBQEL1Ev": 3,
+      "c5Wiv9EkVzyOtBcB": 3,
+      "eWJUkg17P02P1Lkq": 3
+    },
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": 1727350765343,
+      "modifiedTime": 1727350765343,
+      "lastModifiedBy": "eWJUkg17P02P1Lkq",
+      "exportSource": null
+    },
+    "_id": "0wDkaFg35YuzBoBc"
+  }
+]

@@ -1,0 +1,493 @@
+[
+  {
+    "name": "Heart of Darkness - Maps",
+    "type": "Scene",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#c26161",
+    "flags": {
+      "core": {}
+    },
+    "_id": "D1SMkGrC5odf58R6",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.D1SMkGrC5odf58R6",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081515912,
+      "modifiedTime": 1755081515912,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    }
+  },
+  {
+    "name": "HoD - Token maps",
+    "type": "Scene",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#805252",
+    "flags": {},
+    "_id": "zjOQ3LuRTcyT6ZgD",
+    "folder": "D1SMkGrC5odf58R6",
+    "description": "",
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "lastModifiedBy": null
+    }
+  },
+  {
+    "name": "HoD - ToM Maps",
+    "type": "Scene",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#aa6e6e",
+    "flags": {},
+    "_id": "OyMVEsPOt4JU0pmg",
+    "folder": "D1SMkGrC5odf58R6",
+    "description": "",
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "lastModifiedBy": null
+    }
+  },
+  {
+    "name": "Alien RPG - Actors",
+    "type": "Actor",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#0000ff",
+    "flags": {
+      "core": {}
+    },
+    "_id": "huZ10NsDDLBU8Sfn",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.huZ10NsDDLBU8Sfn",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081515912,
+      "modifiedTime": 1755081515912,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    }
+  },
+  {
+    "name": "Alien RPG Vehicles",
+    "type": "Actor",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#8b0426",
+    "flags": {},
+    "_id": "Vje7ULCtxdqt4eTi",
+    "folder": "huZ10NsDDLBU8Sfn",
+    "description": "",
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "lastModifiedBy": null
+    }
+  },
+  {
+    "name": "Heart of Darkness - Actors",
+    "type": "Actor",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#c26161",
+    "flags": {
+      "core": {}
+    },
+    "_id": "85bo6u9NqMWEXjTU",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.85bo6u9NqMWEXjTU",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081515912,
+      "modifiedTime": 1755081515912,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    }
+  },
+  {
+    "name": "Heart of Darkness - Creatures",
+    "type": "Actor",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#48355f",
+    "flags": {},
+    "_id": "WTu06b1nvpP5diaE",
+    "folder": "85bo6u9NqMWEXjTU",
+    "description": "",
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "lastModifiedBy": null
+    }
+  },
+  {
+    "name": "Heart of Darkness - NPCs",
+    "type": "Actor",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#684d89",
+    "flags": {},
+    "_id": "sDwYymDNkN1K93rY",
+    "folder": "85bo6u9NqMWEXjTU",
+    "description": "",
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "lastModifiedBy": null
+    }
+  },
+  {
+    "name": "Heart of Darkness - PCs",
+    "type": "Actor",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#376d3d",
+    "flags": {},
+    "_id": "8QkeluQqSvhjYuq6",
+    "folder": "85bo6u9NqMWEXjTU",
+    "description": "",
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "lastModifiedBy": null
+    }
+  },
+  {
+    "name": "Alien RPG Armor",
+    "type": "Item",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#8b0426",
+    "flags": {
+      "core": {}
+    },
+    "_id": "oSEAUwgWvKj74IkQ",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.oSEAUwgWvKj74IkQ",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081515912,
+      "modifiedTime": 1755081515912,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    }
+  },
+  {
+    "name": "Alien RPG Equipment",
+    "type": "Item",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#341cb0",
+    "flags": {
+      "core": {}
+    },
+    "_id": "2qZt3vvdmV7PHBkQ",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.2qZt3vvdmV7PHBkQ",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081515912,
+      "modifiedTime": 1755081515912,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    }
+  },
+  {
+    "name": "Alien RPG HoD - Agendas",
+    "type": "Item",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#c26161",
+    "flags": {
+      "core": {}
+    },
+    "_id": "FwuLw9zNrnjdXN7f",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.FwuLw9zNrnjdXN7f",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081515912,
+      "modifiedTime": 1755081515912,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    }
+  },
+  {
+    "name": "Alien RPG HoD - Story Cards",
+    "type": "Item",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#c26161",
+    "flags": {
+      "core": {}
+    },
+    "_id": "kNsMkU0cZU3N1hLu",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.kNsMkU0cZU3N1hLu",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081515912,
+      "modifiedTime": 1755081515912,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    }
+  },
+  {
+    "name": "Alien RPG Weapons",
+    "type": "Item",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#917e22",
+    "flags": {
+      "core": {}
+    },
+    "_id": "JYirzyxliTQBq1kT",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.JYirzyxliTQBq1kT",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081515912,
+      "modifiedTime": 1755081515912,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    }
+  },
+  {
+    "name": "Alien RPG Systems",
+    "type": "Item",
+    "sorting": "a",
+    "sort": 300000,
+    "color": "#a24f0b",
+    "flags": {
+      "core": {}
+    },
+    "_id": "8F4W5MBe7uKgARSl",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.8F4W5MBe7uKgARSl",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081515912,
+      "modifiedTime": 1755081515912,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    }
+  },
+  {
+    "name": "Alien RPG Systems Journals",
+    "type": "JournalEntry",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#000000",
+    "flags": {
+      "core": {}
+    },
+    "_id": "VTU4S1TunmYS4wYK",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.VTU4S1TunmYS4wYK",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081515912,
+      "modifiedTime": 1755081515912,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    }
+  },
+  {
+    "name": "Heart of Darkness - Scenario",
+    "type": "JournalEntry",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#c26161",
+    "flags": {
+      "core": {}
+    },
+    "_id": "gTM7gef3i0aL8lLq",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.gTM7gef3i0aL8lLq",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081515912,
+      "modifiedTime": 1755081515912,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    }
+  },
+  {
+    "name": "HoD - Handouts",
+    "type": "JournalEntry",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#764141",
+    "flags": {},
+    "_id": "tI9ZHPdDpmELwmWJ",
+    "folder": "gTM7gef3i0aL8lLq",
+    "description": "",
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "lastModifiedBy": null
+    }
+  },
+  {
+    "name": "Alien Tables",
+    "type": "RollTable",
+    "sorting": "a",
+    "sort": 0,
+    "color": null,
+    "flags": {
+      "core": {}
+    },
+    "_id": "Btepu5tifRV0Pj7w",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.Btepu5tifRV0Pj7w",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755081479225,
+      "modifiedTime": 1755081515997,
+      "lastModifiedBy": "CmQf6fWARfzeZiZH"
+    }
+  },
+  {
+    "name": "Alien Creature Tables",
+    "type": "RollTable",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#ff0000",
+    "flags": {},
+    "_id": "LrpFZIuICZfNAr2v",
+    "folder": "Btepu5tifRV0Pj7w",
+    "description": "",
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "lastModifiedBy": "CmQf6fWARfzeZiZH",
+      "modifiedTime": 1755081515997
+    }
+  },
+  {
+    "name": "Alien Mother Tables",
+    "type": "RollTable",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#00c100",
+    "flags": {},
+    "_id": "A0N3Ct1TQq9BuGk6",
+    "folder": "Btepu5tifRV0Pj7w",
+    "description": "",
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "lastModifiedBy": "CmQf6fWARfzeZiZH",
+      "modifiedTime": 1755081515997
+    }
+  },
+  {
+    "name": "Alien Sub-Tables",
+    "type": "RollTable",
+    "sorting": "a",
+    "sort": 0,
+    "color": null,
+    "flags": {},
+    "_id": "w3xO69hCmTtYDF8d",
+    "folder": "A0N3Ct1TQq9BuGk6",
+    "description": "",
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "lastModifiedBy": "CmQf6fWARfzeZiZH",
+      "modifiedTime": 1755081515997
+    }
+  }
+]

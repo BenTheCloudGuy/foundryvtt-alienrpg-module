@@ -1,0 +1,914 @@
+[
+  {
+    "name": "Building Better Worlds - Maps",
+    "sorting": "a",
+    "folder": null,
+    "type": "Scene",
+    "description": "",
+    "sort": 0,
+    "color": "#2a971c",
+    "flags": {
+      "core": {}
+    },
+    "_stats": {
+      "compendiumSource": "Folder.zTvFqtiV8wTK0O1w",
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": 1727350765361,
+      "modifiedTime": 1727350765361,
+      "lastModifiedBy": "eWJUkg17P02P1Lkq",
+      "exportSource": null
+    },
+    "_id": "zTvFqtiV8wTK0O1w"
+  },
+  {
+    "name": "10.00 The Lost Worlds - Maps",
+    "sorting": "a",
+    "folder": "zTvFqtiV8wTK0O1w",
+    "type": "Scene",
+    "description": "",
+    "sort": 100000,
+    "color": "#1f7614",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "0lw5oyJxMhh5RibO"
+  },
+  {
+    "name": "10.01 Home Sweet Home- Maps",
+    "sorting": "a",
+    "folder": "zTvFqtiV8wTK0O1w",
+    "type": "Scene",
+    "description": "",
+    "sort": 200000,
+    "color": "#1f7614",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "RzPgunIYrpraK0EJ"
+  },
+  {
+    "name": "10.02 To Go My Own Dark Way- Maps",
+    "sorting": "a",
+    "folder": "zTvFqtiV8wTK0O1w",
+    "type": "Scene",
+    "description": "",
+    "sort": 700000,
+    "color": "#1f7614",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "OQ73oDus94fZTLM1"
+  },
+  {
+    "name": "10.03 Leave All Else To The Gods- Maps",
+    "sorting": "a",
+    "folder": "zTvFqtiV8wTK0O1w",
+    "type": "Scene",
+    "description": "",
+    "sort": 300000,
+    "color": "#1f7614",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "TKxmqMOWF4fs6gag"
+  },
+  {
+    "name": "10.04 The Devil Lives In Still Waters- Maps",
+    "sorting": "a",
+    "folder": "zTvFqtiV8wTK0O1w",
+    "type": "Scene",
+    "description": "",
+    "sort": 400000,
+    "color": "#1f7614",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "Zexwf07XchhUygBF"
+  },
+  {
+    "name": "10.05 Against A Sea Of Troubles- Maps",
+    "sorting": "a",
+    "folder": "zTvFqtiV8wTK0O1w",
+    "type": "Scene",
+    "description": "",
+    "sort": 500000,
+    "color": "#1f7614",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "smvBSjv3aECPBlzu"
+  },
+  {
+    "name": "10.06 Let Sleeping Gods Lie- Maps",
+    "sorting": "a",
+    "folder": "zTvFqtiV8wTK0O1w",
+    "type": "Scene",
+    "description": "",
+    "sort": 600000,
+    "color": "#1f7614",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "Jd9gmMFYnXkPrxCZ"
+  },
+  {
+    "name": "10.07 In The Shadow Of Perfection - Maps",
+    "sorting": "a",
+    "folder": "zTvFqtiV8wTK0O1w",
+    "type": "Scene",
+    "description": "",
+    "sort": 800000,
+    "color": "#1f7614",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "rXuIX3nRT3Lp1Ggw"
+  },
+  {
+    "name": "Building Better Worlds - Actors",
+    "sorting": "a",
+    "folder": null,
+    "type": "Actor",
+    "description": "",
+    "sort": 800000,
+    "color": "#2a971c",
+    "flags": {
+      "core": {}
+    },
+    "_stats": {
+      "compendiumSource": "Folder.PpPGHRkyUcCAOtlp",
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": 1727350765361,
+      "modifiedTime": 1727350765361,
+      "lastModifiedBy": "eWJUkg17P02P1Lkq",
+      "exportSource": null
+    },
+    "_id": "PpPGHRkyUcCAOtlp"
+  },
+  {
+    "name": "10.00 The Lost Worlds",
+    "sorting": "a",
+    "folder": "PpPGHRkyUcCAOtlp",
+    "type": "Actor",
+    "description": "",
+    "sort": 0,
+    "color": "#1f7614",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "Fi9VUCik0wz5DVG5"
+  },
+  {
+    "name": "10.00a NPCs",
+    "sorting": "a",
+    "folder": "PpPGHRkyUcCAOtlp",
+    "type": "Actor",
+    "description": "",
+    "sort": -100000,
+    "color": "#1f7614",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "B3yjBJmz7v2pOpSk"
+  },
+  {
+    "name": "10.01 Home Sweet Home",
+    "sorting": "a",
+    "folder": "PpPGHRkyUcCAOtlp",
+    "type": "Actor",
+    "description": "",
+    "sort": 0,
+    "color": "#1f7614",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "J5rDyXQJplmgDxHF"
+  },
+  {
+    "name": "10.02 To Go My Own Dark Way",
+    "sorting": "a",
+    "folder": "PpPGHRkyUcCAOtlp",
+    "type": "Actor",
+    "description": "",
+    "sort": 0,
+    "color": "#1f7614",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "eORYOCyw1BC3fs2c"
+  },
+  {
+    "name": "10.03 Leave All Else To The Gods",
+    "sorting": "a",
+    "folder": "PpPGHRkyUcCAOtlp",
+    "type": "Actor",
+    "description": "",
+    "sort": 0,
+    "color": "#1f7614",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "zJHDq7MdV40ACCLX"
+  },
+  {
+    "name": "10.04 The Devil Lives In Still Waters",
+    "sorting": "a",
+    "folder": "PpPGHRkyUcCAOtlp",
+    "type": "Actor",
+    "description": "",
+    "sort": 0,
+    "color": "#1f7614",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "zXtKg0INMZ1VJLF4"
+  },
+  {
+    "name": "10.05 Against A Sea Of Troubles",
+    "sorting": "a",
+    "folder": "PpPGHRkyUcCAOtlp",
+    "type": "Actor",
+    "description": "",
+    "sort": 0,
+    "color": "#1f7614",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "mrfdqZPVvMLZT3q6"
+  },
+  {
+    "name": "10.06 Let Sleeping Gods Lie",
+    "sorting": "a",
+    "folder": "PpPGHRkyUcCAOtlp",
+    "type": "Actor",
+    "description": "",
+    "sort": 0,
+    "color": "#1f7614",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "iz8rpSjfXYXIwAOB"
+  },
+  {
+    "name": "10.07 In The Shadow Of Perfection",
+    "sorting": "a",
+    "folder": "PpPGHRkyUcCAOtlp",
+    "type": "Actor",
+    "description": "",
+    "sort": 0,
+    "color": "#1f7614",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "HQqbhWSen5E52GvJ"
+  },
+  {
+    "name": "BBW Territories",
+    "sorting": "a",
+    "folder": "PpPGHRkyUcCAOtlp",
+    "type": "Actor",
+    "description": "",
+    "sort": -50000,
+    "color": "#2a971c",
+    "flags": {
+      "core": {}
+    },
+    "_stats": {
+      "compendiumSource": "Folder.kALjxbBzAgHvZ7Ny",
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "kALjxbBzAgHvZ7Ny"
+  },
+  {
+    "name": "Alien RPG Creatures",
+    "type": "Actor",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#048b04",
+    "flags": {
+      "core": {}
+    },
+    "_id": "9NkXaoM7te8JkDZO",
+    "folder": "huZ10NsDDLBU8Sfn",
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.9NkXaoM7te8JkDZO",
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    }
+  },
+  {
+    "name": "Alien RPG - Actors",
+    "type": "Actor",
+    "sorting": "a",
+    "sort": 100000,
+    "color": "#0000ff",
+    "flags": {
+      "core": {}
+    },
+    "_id": "huZ10NsDDLBU8Sfn",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.huZ10NsDDLBU8Sfn",
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": 1727350765361,
+      "modifiedTime": 1727350765361,
+      "lastModifiedBy": "eWJUkg17P02P1Lkq",
+      "exportSource": null
+    }
+  },
+  {
+    "name": "Alien RPG Spaceships",
+    "sorting": "a",
+    "folder": "huZ10NsDDLBU8Sfn",
+    "type": "Actor",
+    "description": "",
+    "sort": 400000,
+    "color": "#c71a45",
+    "flags": {
+      "core": {}
+    },
+    "_stats": {
+      "compendiumSource": "Folder.keixXQCEnCnhrCfl",
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "keixXQCEnCnhrCfl"
+  },
+  {
+    "name": "Alien RPG Vehicles",
+    "type": "Actor",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#8b0426",
+    "flags": {
+      "core": {}
+    },
+    "_id": "Vje7ULCtxdqt4eTi",
+    "folder": "huZ10NsDDLBU8Sfn",
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.Vje7ULCtxdqt4eTi",
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    }
+  },
+  {
+    "name": "Alien RPG Building Better Worlds",
+    "sorting": "a",
+    "folder": null,
+    "type": "Item",
+    "description": "",
+    "sort": 0,
+    "color": "#2a971c",
+    "flags": {
+      "core": {}
+    },
+    "_stats": {
+      "compendiumSource": "Folder.YQ6Aah1uFpMnLzX9",
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": 1727350765361,
+      "modifiedTime": 1727350765361,
+      "lastModifiedBy": "eWJUkg17P02P1Lkq",
+      "exportSource": null
+    },
+    "_id": "YQ6Aah1uFpMnLzX9"
+  },
+  {
+    "name": "Colony Initiatives",
+    "sorting": "a",
+    "folder": "YQ6Aah1uFpMnLzX9",
+    "type": "Item",
+    "description": "",
+    "sort": 0,
+    "color": "#2a971c",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "EJMOOCeVjT40NNkV"
+  },
+  {
+    "name": "Installations",
+    "sorting": "a",
+    "folder": "EJMOOCeVjT40NNkV",
+    "type": "Item",
+    "description": "",
+    "sort": 0,
+    "color": "#2a971c",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "D477kuYUieAV6nGv"
+  },
+  {
+    "name": "Policies",
+    "sorting": "a",
+    "folder": "EJMOOCeVjT40NNkV",
+    "type": "Item",
+    "description": "",
+    "sort": 0,
+    "color": "#2a971c",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "1QD0vNg0JQ2bVO0e"
+  },
+  {
+    "name": "Projects",
+    "sorting": "a",
+    "folder": "EJMOOCeVjT40NNkV",
+    "type": "Item",
+    "description": "",
+    "sort": 0,
+    "color": "#2a971c",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "dtzQezG3roEKdLeE"
+  },
+  {
+    "name": "Alien RPG Equipment",
+    "type": "Item",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#341cb0",
+    "flags": {
+      "core": {}
+    },
+    "_id": "2qZt3vvdmV7PHBkQ",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.2qZt3vvdmV7PHBkQ",
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": 1727350765361,
+      "modifiedTime": 1727350765361,
+      "lastModifiedBy": "eWJUkg17P02P1Lkq",
+      "exportSource": null
+    }
+  },
+  {
+    "name": "Alien RPG Weapons",
+    "type": "Item",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#917e22",
+    "flags": {
+      "core": {}
+    },
+    "_id": "JYirzyxliTQBq1kT",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.JYirzyxliTQBq1kT",
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": 1727350765361,
+      "modifiedTime": 1727350765361,
+      "lastModifiedBy": "eWJUkg17P02P1Lkq",
+      "exportSource": null
+    }
+  },
+  {
+    "name": "Alien RPG Armor",
+    "type": "Item",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#8b0426",
+    "flags": {
+      "core": {}
+    },
+    "_id": "oSEAUwgWvKj74IkQ",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.oSEAUwgWvKj74IkQ",
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": 1727350765361,
+      "modifiedTime": 1727350765361,
+      "lastModifiedBy": "eWJUkg17P02P1Lkq",
+      "exportSource": null
+    }
+  },
+  {
+    "name": "Alien RPG Talents(Career)",
+    "type": "Item",
+    "sorting": "a",
+    "sort": 400000,
+    "color": "#227591",
+    "flags": {
+      "core": {}
+    },
+    "_id": "2PpSokOh2N2RlV4M",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.2PpSokOh2N2RlV4M",
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": 1727350765361,
+      "modifiedTime": 1727350765361,
+      "lastModifiedBy": "eWJUkg17P02P1Lkq",
+      "exportSource": null
+    }
+  },
+  {
+    "name": "Alien RPG Talents(General)",
+    "type": "Item",
+    "sorting": "a",
+    "sort": 500000,
+    "color": "#22918f",
+    "flags": {
+      "core": {}
+    },
+    "_id": "7IlFd6NF2SR7RAiB",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.7IlFd6NF2SR7RAiB",
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": 1727350765361,
+      "modifiedTime": 1727350765361,
+      "lastModifiedBy": "eWJUkg17P02P1Lkq",
+      "exportSource": null
+    }
+  },
+  {
+    "name": "Alien RPG Systems",
+    "type": "Item",
+    "sorting": "a",
+    "sort": 300000,
+    "color": "#a24f0b",
+    "flags": {
+      "core": {}
+    },
+    "_id": "8F4W5MBe7uKgARSl",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.8F4W5MBe7uKgARSl",
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": 1727350765361,
+      "modifiedTime": 1727350765361,
+      "lastModifiedBy": "eWJUkg17P02P1Lkq",
+      "exportSource": null
+    }
+  },
+  {
+    "name": "Building Better Worlds - Journals",
+    "sorting": "a",
+    "folder": null,
+    "type": "JournalEntry",
+    "description": "",
+    "sort": 0,
+    "color": "#2a971c",
+    "flags": {
+      "core": {}
+    },
+    "_stats": {
+      "compendiumSource": "Folder.tViIQhLn96HKJPE8",
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": 1727350765361,
+      "modifiedTime": 1727350765361,
+      "lastModifiedBy": "eWJUkg17P02P1Lkq",
+      "exportSource": null
+    },
+    "_id": "tViIQhLn96HKJPE8"
+  },
+  {
+    "name": "Lost Worlds Campaign",
+    "sorting": "a",
+    "folder": "tViIQhLn96HKJPE8",
+    "type": "JournalEntry",
+    "description": "",
+    "sort": 0,
+    "color": "#185610",
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": null,
+      "lastModifiedBy": null,
+      "exportSource": null
+    },
+    "_id": "2f7vvHpr5uj3zBIy"
+  },
+  {
+    "name": "Alien Tables",
+    "type": "RollTable",
+    "sorting": "a",
+    "sort": 0,
+    "color": null,
+    "flags": {
+      "core": {}
+    },
+    "_id": "Btepu5tifRV0Pj7w",
+    "folder": null,
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Folder.Btepu5tifRV0Pj7w",
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": 1727350740481,
+      "modifiedTime": 1727350765415,
+      "lastModifiedBy": "eWJUkg17P02P1Lkq",
+      "exportSource": null
+    }
+  },
+  {
+    "name": "Alien Creature Tables",
+    "type": "RollTable",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#ff0000",
+    "flags": {},
+    "_id": "LrpFZIuICZfNAr2v",
+    "folder": "Btepu5tifRV0Pj7w",
+    "description": "",
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": 1727350765415,
+      "lastModifiedBy": "eWJUkg17P02P1Lkq",
+      "exportSource": null
+    }
+  },
+  {
+    "name": "Alien Mother Tables",
+    "type": "RollTable",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#00c100",
+    "flags": {},
+    "_id": "A0N3Ct1TQq9BuGk6",
+    "folder": "Btepu5tifRV0Pj7w",
+    "description": "",
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "coreVersion": "13.351",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.1",
+      "createdTime": null,
+      "modifiedTime": 1727350765415,
+      "lastModifiedBy": "eWJUkg17P02P1Lkq",
+      "exportSource": null
+    }
+  }
+]

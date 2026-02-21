@@ -1,0 +1,2037 @@
+[
+  {
+    "_id": "C741Gqau8f1b0bwz",
+    "name": "Critical Injuries on Xenomorphs",
+    "img": "icons/svg/d20-grey.svg",
+    "description": "<h2 style=\"text-align:center;color:lightblue\">Critical Injuries on Xenomorphs</h2>",
+    "results": [
+      {
+        "_id": "rPuleHzYwweytb3a",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          1,
+          1
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": null,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Rise Again:</b> The Xenomorph falls to the ground, seemingly dead, but it's a ruse. If it's attacked again, or on its next initiative, it regains one point of Health and rises-fueled by instictive hatred",
+        "name": ""
+      },
+      {
+        "_id": "RVJSO5Ue6PrmIXbS",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          2,
+          2
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": null,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Wounded:</b> The Xenomorph staggers, bleeding severely. It gets Speed -1 (down to a minimum of 1, losing the lowest initiative), but regains one point of Health. Roll a d6 at the start of each Round. on a 1-3, it tries to escape.",
+        "name": ""
+      },
+      {
+        "_id": "YcbrcSPbpF4vshc9",
+        "type": "document",
+        "weight": 1,
+        "range": [
+          3,
+          3
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": null,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "name": "Sub Table Critical Injuries on Xenomorphs",
+        "documentUuid": "RollTable.5qchUEcOe4Fxefrp",
+        "description": ""
+      },
+      {
+        "_id": "r6HTYeUYG7H7YL1V",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          4,
+          4
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": null,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Last Breath:</b> The Xenomorph is mortally wounded and contorts wildly. On its next initiative, it will try to kill the nearest victim, then the beast dies. If it's wounded again before then, it dies instantly.",
+        "name": ""
+      },
+      {
+        "_id": "Wq8N5q9DvJvSV6Qf",
+        "type": "text",
+        "weight": 1,
+        "range": [
+          5,
+          6
+        ],
+        "drawn": false,
+        "flags": {},
+        "img": null,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Torn Apart:</b> Instant death. The Xenomorph is torn apart or crushed amidst shrieks of rage. Severely mutilated, it can only be Analyzed with Observation -2.",
+        "name": ""
+      }
+    ],
+    "formula": "1d6",
+    "replacement": true,
+    "displayRoll": false,
+    "folder": "A0N3Ct1TQq9BuGk6",
+    "sort": 1200000,
+    "flags": {},
+    "_stats": {
+      "compendiumSource": null,
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755077847959,
+      "modifiedTime": 1755077847959,
+      "lastModifiedBy": "KPhrkcgoXZcK9SnP"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "PwNSORzIqERBYoHv",
+    "name": "Abomination Attacks (Stage III and IV)",
+    "img": "icons/svg/d20-grey.svg",
+    "description": "Attack table for Stage III and IV Abominations",
+    "results": [
+      {
+        "_id": "pnWkZr8epUssAeR6",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          1,
+          1
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Horrible Roar:</b> The Abomination screams in fury. All humans in Short Range must make an Immediate panic roll.",
+        "name": ""
+      },
+      {
+        "_id": "G7l4JqUPUd8cpOAl",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          2,
+          2
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Fist Strike: </b>The Abomination strikes its victim with a powerful punch. Roll for the attack with  [[10db]] Base Dice, Damage 1.",
+        "name": ""
+      },
+      {
+        "_id": "Rzp7eR5hZxITEcTS",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          3,
+          3
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Throw: </b>The abomination grabs the victim and tries to slam it into the nearest hard surface. Roll for the attack using  [[9db]] Base Dice, Damage 1. If the attack hits, the victim lands prone at Short range from the Abomination, drops any hand-held Items, and must make an immediate Panic Roll.",
+        "name": ""
+      },
+      {
+        "_id": "lIe4hd3zIYr5qOQy",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          4,
+          4
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Pounce:</b> The Abomination leaps onto its victim like a big monkey. Roll for the attack using  [[8db]] Base Dice, Damage 1. If the the attack hits, the victim is knocked to the ground, drops any hand-held Items, and must make immediate Panic Roll. The Abomination then starts pounding the victim with its powerful fists. This is resolved as an immediate bonus attack with  [[12db]] Base Dice, Damage 2.",
+        "name": ""
+      },
+      {
+        "_id": "mGBxQftCJU3YWzMw",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          5,
+          5
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Arm Pull: </b>The Abomination grabs the victim's arm and tries to pull it clean off with its bare hands. Roll for the attack using  [[6db]] Base Dice, Damage 1. If the attack causes damage, it automatically triggers critical injury #54 (even if the victim is not Broken), triggering an immediate Panic Roll",
+        "name": ""
+      },
+      {
+        "_id": "mtDHu2lOuAPLJDSY",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          6,
+          6
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Head Crush: </b>The Abomination grabs the victim's head and tries to crush it with its bare hands. Roll for the attack using  [[7db]] Base Dice, Damage 1. If the attack causes damage, it automatically triggers critical injury #64 (even if the victim is not Broken), killing the victim outright",
+        "name": ""
+      }
+    ],
+    "formula": "1d6",
+    "replacement": true,
+    "displayRoll": false,
+    "folder": "LrpFZIuICZfNAr2v",
+    "sort": 0,
+    "flags": {
+      "core": {}
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-starterset.alienrpg-starter-tables-attack.kxbGUp83ErYPisEt",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755077847959,
+      "modifiedTime": 1755077847959,
+      "lastModifiedBy": "KPhrkcgoXZcK9SnP"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "YtQBCPRpV1Tk72uh",
+    "name": "Neomorph Attacks",
+    "img": "icons/svg/d20-grey.svg",
+    "results": [
+      {
+        "_id": "38QQwtGYd2wiwzjb",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          1,
+          1
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Terrifying Hiss:</b> The Neomorph leans in close to the victim, showing its razor-sharp teeth and hissing. The victim must make an immediate Panic Roll.",
+        "name": ""
+      },
+      {
+        "_id": "cjcjJqJgOvFHhrnQ",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          2,
+          2
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Tail Slash:</b> The Neomorph pivots, slashing its victim with its sharp tail. The victim is attacked using [[10db]] Base Dice, Damage +2. The attack is armor piercing, halving any Armor Rating.",
+        "name": ""
+      },
+      {
+        "_id": "IffRPYzBLoPjSYvD",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          3,
+          3
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Deadly Grab:</b> The Neomorph jumps at its victim, grabbing it and dragging it away. Roll for the attack using [[8db]] Base Dice, Damage 1. If it hits, the Neomorph immediately drags the victim into the next zone (Medium range) before releasing it. The victim falls prone, drops any hand-held items, and must make an immediate Panic Roll.",
+        "name": ""
+      },
+      {
+        "_id": "KeNesVkGinA8rqG9",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          4,
+          4
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Leaping Attack:</b> The Neomorph jumps at the victim. Roll for the attack using [[8db]] Base Dice, Damage 1. If the attack is successful, the victim is thrown to the ground and must make an immediate Panic Roll, and the Neomorph immediately performs an extra attack with [[10db]] Base Dice, Damage 2 (does not count aas an action). The extra attack cannot be blocked.",
+        "name": ""
+      },
+      {
+        "_id": "EbbBWfmwxnrGN7hY",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          5,
+          5
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Throat Bite: </b> The Neomorph bites the victim's throat. Roll for the attack using [[8db]] Base Dice, Damage 1. If the attack causes damage, it automatically inflicts critical injury #61 (even if the victim is not Broken), triggering an immediate Panic Roll.",
+        "name": ""
+      },
+      {
+        "_id": "RR9OFjsh7eyN6wn2",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          6,
+          6
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Tail Spike:</b> The Neomorph impales the victim with its razor-sharp tail. Roll for the attack using [[7db]] Base Dice, Damage 1. The attack is armor piercing, halving any Armor Rating. If the attack causes damage, it automatically triggers critical injury #66 (even if the victim is not Broken), killing the victim outright.",
+        "name": ""
+      }
+    ],
+    "formula": "1d6",
+    "replacement": true,
+    "displayRoll": false,
+    "folder": "LrpFZIuICZfNAr2v",
+    "sort": 0,
+    "flags": {
+      "core": {}
+    },
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-starterset.alienrpg-starter-tables-attack.S6uIdPkN14yTc4Y4",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755077847959,
+      "modifiedTime": 1755077847959,
+      "lastModifiedBy": "KPhrkcgoXZcK9SnP"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "GbTLq7vkbHowxVUD",
+    "name": "Neomorphic Bloodburster Attacks",
+    "img": "icons/svg/d20-grey.svg",
+    "results": [
+      {
+        "_id": "t4Zd6RNvrwKTRYB7",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          1,
+          3
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Escape: </b>With a snarl, the Bloodburster flees, moving two zones away in a single action, into the nearest air duct if possible. As soon as the PCs lose line of sight, combat ends and stealth mode ensues. After [[1d6]] Turns, the Bloodburster grows into a Juvenile Neomorph and starts stalking the PCs.",
+        "name": ""
+      },
+      {
+        "_id": "cFh9LndhMHs4tY1A",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          4,
+          4
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Terrifying Hiss: </b> The Bloodburster jumps onto the victim, showing its razor-sharp teeth andhissing. The victim must make an immediate Panic Roll.",
+        "name": ""
+      },
+      {
+        "_id": "q9DDgxzaG12fMIns",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          5,
+          5
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Leg Bite: </b> With a snarl, the Bloodburster bites the victim’s leg. Roll for the attack using [[6db]] Base Dice, Damage 2. If the attack causes damage, it automatically inflicts critical injury  #53 (even if the victim is not Broken), triggering an immediate Panic Roll.",
+        "name": ""
+      },
+      {
+        "_id": "shYPbiSjp6LiLRQ8",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          6,
+          6
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Throat Bite: </b> The Bloodburster bites the victim’s throat. Roll for the attack using [[8db]] Base Dice, Damage 1. If the attack causes damage, it automatically inflicts critical injury #61 (even if the victim is not Broken), triggering an immediate Panic Roll.",
+        "name": ""
+      }
+    ],
+    "formula": "1d6",
+    "replacement": true,
+    "displayRoll": false,
+    "folder": "LrpFZIuICZfNAr2v",
+    "sort": 0,
+    "flags": {
+      "core": {}
+    },
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-starterset.alienrpg-starter-tables-attack.3BGmU2fxDhZhSY2N",
+      "duplicateSource": null,
+      "exportSource": {
+        "worldId": "alien2",
+        "uuid": null,
+        "coreVersion": "0.6.2",
+        "systemId": "alienrpgfull",
+        "systemVersion": "0.1.5"
+      },
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755077847959,
+      "modifiedTime": 1755077847959,
+      "lastModifiedBy": "KPhrkcgoXZcK9SnP"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "TEAWRF1Yi6UE6gxA",
+    "name": "Critical Injuries on Synthetics",
+    "img": "icons/svg/unconscious.svg",
+    "results": [
+      {
+        "_id": "X6mYmXRxAbovX8DI",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/blood.svg",
+        "weight": 1,
+        "range": [
+          1,
+          1
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Ruptured Fluid Pump: </b> The android loses its next slow acttion.",
+        "name": ""
+      },
+      {
+        "_id": "ouUlXqmdI1RxK2Mu",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/falling.svg",
+        "weight": 1,
+        "range": [
+          2,
+          2
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Destroyed Leg Servos: </b> Both legs are non-functional. The android must stay prone and can only crawl.",
+        "name": ""
+      },
+      {
+        "_id": "6nQuxafMKFL0wYBL",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/pill.svg",
+        "weight": 1,
+        "range": [
+          3,
+          3
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Destroyed Arm Servos: </b> One arm is non-functional. The android can only use one-handed gear.",
+        "name": ""
+      },
+      {
+        "_id": "UQIFed1x3e84Alxp",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/silenced.svg",
+        "weight": 1,
+        "range": [
+          4,
+          4
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Head Dislocation: </b> The android's artificial neck is severely fractured and its head placed in an unnatural position. All fast actions become slow actions.",
+        "name": ""
+      },
+      {
+        "_id": "MXLTNChnAzJRf0b5",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/ice-aura.svg",
+        "weight": 1,
+        "range": [
+          5,
+          5
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Severe Chassis Breach: </b> Internal organs spill out and the android is completely immobilized.",
+        "name": ""
+      },
+      {
+        "_id": "v5p9Q7xNn2lIToml",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/hazard.svg",
+        "weight": 1,
+        "range": [
+          6,
+          6
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>System Shutdown: </b> The android is torn to shreads or crushed. Core systems are severely damaged and a Comtech roll is required to communicate with the android.",
+        "name": ""
+      }
+    ],
+    "formula": "1d6",
+    "replacement": true,
+    "displayRoll": true,
+    "folder": "A0N3Ct1TQq9BuGk6",
+    "sort": 0,
+    "flags": {
+      "core": {}
+    },
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-starterset.alienrpg-starter-mother-tables.oIt14ursIvsfD2FW",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755077847959,
+      "modifiedTime": 1755077847959,
+      "lastModifiedBy": "KPhrkcgoXZcK9SnP"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "XmFybNUYJ4C2OQyE",
+    "name": "Critical injuries",
+    "img": "icons/svg/falling.svg",
+    "results": [
+      {
+        "_id": "Z4vYb2aKeEFTXMHt",
+        "type": "text",
+        "img": "icons/svg/acid.svg",
+        "weight": 1,
+        "range": [
+          11,
+          11
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Winded <br /><b>FATAL: </b><br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b><br /><b>HEALING TIME: </b>",
+        "name": ""
+      },
+      {
+        "_id": "rEPpvOeH5Cw0brUp",
+        "type": "text",
+        "img": "icons/svg/sleep.svg",
+        "weight": 1,
+        "range": [
+          12,
+          12
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Stunned <br /><b>FATAL: </b><br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b><br /><b>HEALING TIME: </b>",
+        "name": ""
+      },
+      {
+        "_id": "ZDivhDa0CpdBK09f",
+        "type": "text",
+        "img": "icons/svg/ice-aura.svg",
+        "weight": 1,
+        "range": [
+          13,
+          13
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Crippling pain <br /><b>FATAL: </b>No <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b> STRESS LEVEL increases one step. <br /><b>HEALING TIME: </b>",
+        "name": ""
+      },
+      {
+        "_id": "MnKKNdxBHl3tg1vS",
+        "type": "text",
+        "img": "icons/svg/falling.svg",
+        "weight": 1,
+        "range": [
+          14,
+          14
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Sprained ankle <br /><b>FATAL: </b> <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b>MOBILITY –2 and can't run until MEDICAL AID roll is made. <br /><b>HEALING TIME: </b>",
+        "name": ""
+      },
+      {
+        "_id": "7U1vvp2WKYruzN5s",
+        "type": "text",
+        "img": "icons/svg/blind.svg",
+        "weight": 1,
+        "range": [
+          15,
+          15
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Blood in eyes <br /><b>FATAL: </b> <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b>OBSERVATION and RANGED COMBAT –2 until MEDICAL AID roll is made. <br /><b>HEALING TIME: </b>",
+        "name": ""
+      },
+      {
+        "_id": "U2tHYhQXRb7MZadf",
+        "type": "text",
+        "img": "icons/svg/daze.svg",
+        "weight": 1,
+        "range": [
+          16,
+          16
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Concussion <br /><b>FATAL: </b> <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b>MOBILITY –2 <br /><b>HEALING TIME: </b>[[1d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "BbwvsIFnW5O3kvyz",
+        "type": "text",
+        "img": "icons/svg/deaf.svg",
+        "weight": 1,
+        "range": [
+          21,
+          21
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Severed ear <br /><b>FATAL: </b> <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b>OBSERVATION –2. <br /><b>HEALING TIME: </b>[[1d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "JpCVRfpNqSZQlrmd",
+        "type": "text",
+        "img": "icons/svg/ruins.svg",
+        "weight": 1,
+        "range": [
+          22,
+          22
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Broken toes <br /><b>FATAL: </b> <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b>To run becomes a slow action. <br /><b>HEALING TIME: </b>[[1d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "JymGr44boGAc3K9T",
+        "type": "text",
+        "img": "icons/svg/ruins.svg",
+        "weight": 1,
+        "range": [
+          23,
+          23
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Broken hand <br /><b>FATAL: </b> <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b>Can’t use hand. <br /><b>HEALING TIME: </b>[[1d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "e2RPzM7q9knt2ugA",
+        "type": "text",
+        "img": "icons/svg/explosion.svg",
+        "weight": 1,
+        "range": [
+          24,
+          24
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Knocked out teeth <br /><b>FATAL: </b> <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b>MANIPULATION –2. <br /><b>HEALING TIME: </b>[[1d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "BT5AzYcsonmWNlsw",
+        "type": "text",
+        "img": "icons/svg/pill.svg",
+        "weight": 1,
+        "range": [
+          25,
+          25
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Impaled thigh <br /><b>FATAL: </b> <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b>To run becomes a slow action. <br /><b>HEALING TIME: </b>[[2d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "dc3sK4M1GjGpTCoE",
+        "type": "text",
+        "img": "icons/svg/pill.svg",
+        "weight": 1,
+        "range": [
+          26,
+          26
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Slashed shoulder <br /><b>FATAL: </b> <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b>Can’t use arm. <br /><b>HEALING TIME: </b>[[2d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "zsv7GmstnQDiUOhM",
+        "type": "text",
+        "img": "icons/svg/explosion.svg",
+        "weight": 1,
+        "range": [
+          31,
+          31
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Broken nose <br /><b>FATAL: </b> <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b>MANIPULATION and OBSERVATION –1. <br /><b>HEALING TIME: </b>[[1d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "y1zxcKsDrnN5gWmg",
+        "type": "text",
+        "img": "icons/svg/target.svg",
+        "weight": 1,
+        "range": [
+          32,
+          32
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Crotch hit <br /><b>FATAL: </b> <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b>One point of damage at every roll for MOBILITY and CLOSE COMBAT. <br /><b>HEALING TIME: </b>[[1d6]]  days",
+        "name": ""
+      },
+      {
+        "_id": "tVSQmABg7tUvL4vB",
+        "type": "text",
+        "img": "icons/svg/bones.svg",
+        "weight": 1,
+        "range": [
+          33,
+          33
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Broken ribs <br /><b>FATAL: </b> <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b>MOBILITY and CLOSE COMBAT –2. <br /><b>HEALING TIME: </b>[[2d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "ptcTMQ32VLXN77Uq",
+        "type": "text",
+        "img": "icons/svg/eye.svg",
+        "weight": 1,
+        "range": [
+          34,
+          34
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Gouged eye <br /><b>FATAL: </b> <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b>RANGED COMBAT and OBSERVATION –2. <br /><b>HEALING TIME: </b>[[2d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "KpMEhArNyAhQOdae",
+        "type": "text",
+        "img": "icons/svg/bones.svg",
+        "weight": 1,
+        "range": [
+          35,
+          35
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Busted kneecap <br /><b>FATAL: </b> <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b>Can't run, only crawl. <br /><b>HEALING TIME: </b>[[2d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "w3AJ8cDxxaQnje9c",
+        "type": "text",
+        "img": "icons/svg/bones.svg",
+        "weight": 1,
+        "range": [
+          36,
+          36
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Broken arm <br /><b>FATAL: </b> <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b>Can't use arm. <br /><b>HEALING TIME: </b>[[2d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "EwscORYLky5XwrDI",
+        "type": "text",
+        "img": "icons/svg/bones.svg",
+        "weight": 1,
+        "range": [
+          41,
+          41
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Broken leg <br /><b>FATAL: </b> <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b>Can't run, only crawl. <br /><b>HEALING TIME: </b>[[2d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "8d2JQKPfz9uw3uM9",
+        "type": "text",
+        "img": "icons/svg/bones.svg",
+        "weight": 1,
+        "range": [
+          42,
+          42
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Crushed foot <br /><b>FATAL: </b> <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b>Can't run, only crawl. <br /><b>HEALING TIME: </b>[[3d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "6ZCp8LGJLPBfya7i",
+        "type": "text",
+        "img": "icons/svg/bones.svg",
+        "weight": 1,
+        "range": [
+          43,
+          43
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Crushed elbow <br /><b>FATAL: </b> <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b>Can’t use arm. <br /><b>HEALING TIME: </b>[[3d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "hT4a27t8m6Bp9ufS",
+        "type": "text",
+        "img": "icons/svg/degen.svg",
+        "weight": 1,
+        "range": [
+          44,
+          44
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Punctured lung <br /><b>FATAL: </b>Yes <br /><b>TIME LIMIT: </b>One Day <br /><b>EFFECTS: </b>STAMINA and MOBILITY –2. <br /><b>HEALING TIME: </b>[[1d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "6ts4iuSCftLHey7H",
+        "type": "text",
+        "img": "icons/svg/blood.svg",
+        "weight": 1,
+        "range": [
+          45,
+          45
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Bleeding gut <br /><b>FATAL: </b>Yes <br /><b>TIME LIMIT: </b>One Shift <br /><b>EFFECTS: </b>One point of damage at every roll for MOBILITY and CLOSE COMBAT. <br /><b>HEALING TIME: </b>[[1d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "0p8LamGbuGh8S8T8",
+        "type": "text",
+        "img": "icons/svg/blood.svg",
+        "weight": 1,
+        "range": [
+          46,
+          46
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Ruptured intestines <br /><b>FATAL: </b>Yes <br /><b>TIME LIMIT: </b>One Shift <br /><b>EFFECTS: </b>Disease with Virulence 6. [[2d6]] days <br /><b>HEALING TIME: </b>[[2d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "vEZxIM3JGPpWb2o0",
+        "type": "text",
+        "img": "icons/svg/blood.svg",
+        "weight": 1,
+        "range": [
+          51,
+          51
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Busted kidney <br /><b>FATAL: </b>Yes <br /><b>TIME LIMIT: </b>One Day <br /><b>EFFECTS: </b>Can't run, only crawl, MOBILITY –2. <br /><b>HEALING TIME: </b>[[2d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "8DEftZWkiwJqcOl3",
+        "type": "text",
+        "img": "icons/svg/trap.svg",
+        "weight": 1,
+        "range": [
+          52,
+          52
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Arm artery cut <br /><b>FATAL: </b>Yes, –1 <br /><b>TIME LIMIT: </b>One Turn <br /><b>EFFECTS: </b>Can’t use arm. <br /><b>HEALING TIME: </b>[[1d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "qT9tX4cx5wjsvtje",
+        "type": "text",
+        "img": "icons/svg/trap.svg",
+        "weight": 1,
+        "range": [
+          53,
+          53
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Leg artery cut<br /><b>FATAL: </b>Yes, –1 <br /><b>TIME LIMIT: </b>One Turn <br /><b>EFFECTS: </b>To run becomes a slow action. <br /><b>HEALING TIME: </b>[[1d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "nJaOkiCeMJopJSqL",
+        "type": "text",
+        "img": "icons/svg/trap.svg",
+        "weight": 1,
+        "range": [
+          54,
+          54
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Severed arm <br /><b>FATAL: </b>Yes, –1 <br /><b>TIME LIMIT: </b>One Shift <br /><b>EFFECTS: </b>Can’t use arm. <br /><b>HEALING TIME: </b>Permanent",
+        "name": ""
+      },
+      {
+        "_id": "0vbGaA612XdRFeiv",
+        "type": "text",
+        "img": "icons/svg/trap.svg",
+        "weight": 1,
+        "range": [
+          55,
+          55
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Severed leg <br /><b>FATAL: </b>Yes, –1 <br /><b>TIME LIMIT: </b>One Shift <br /><b>EFFECTS: </b>Can't run, only crawl. <br /><b>HEALING TIME: </b>Permanent",
+        "name": ""
+      },
+      {
+        "_id": "6UQaTxJ5U26dPElh",
+        "type": "text",
+        "img": "icons/svg/falling.svg",
+        "weight": 1,
+        "range": [
+          56,
+          56
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Cracked spine <br /><b>FATAL: </b><br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b>Paralyzed from the neck down. If not given MEDICAL AID in time, the effect is permanent.<br /><b>HEALING TIME: </b>[[3d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "ScaNRBE7wysmYt2T",
+        "type": "text",
+        "img": "icons/svg/stoned.svg",
+        "weight": 1,
+        "range": [
+          61,
+          61
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Ruptured jugular <br /><b>FATAL: </b>Yes, –1 <br /><b>TIME LIMIT: </b>One Round <br /><b>EFFECTS: </b>STAMINA –1. <br /><b>HEALING TIME: </b>[[2d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "gYQzR98mGvShAZrX",
+        "type": "text",
+        "img": "icons/svg/stoned.svg",
+        "weight": 1,
+        "range": [
+          62,
+          62
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Ruptured aorta <br /><b>FATAL: </b>Yes, –2 <br /><b>TIME LIMIT: </b>One Round <br /><b>EFFECTS: </b>STAMINA –2. <br /><b>HEALING TIME: </b>[[3d6]] days",
+        "name": ""
+      },
+      {
+        "_id": "DBGKfDGKMiuFiuCA",
+        "type": "text",
+        "img": "icons/svg/skull.svg",
+        "weight": 1,
+        "range": [
+          63,
+          63
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Disemboweled <br /><b>FATAL: </b>Yes <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b><span style=\"color:red;font-size:larger;font-weight:bold\"> Instant death. </span><br /><b>HEALING TIME: </b>",
+        "name": ""
+      },
+      {
+        "_id": "54ipeOhZa4bS3gcd",
+        "type": "text",
+        "img": "icons/svg/skull.svg",
+        "weight": 1,
+        "range": [
+          64,
+          64
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Crushed skull <br /><b>FATAL: </b>Yes <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b><span style=\"color:red;font-size:larger;font-weight:bold\"> Your story ends here. </span><br /><b>HEALING TIME: </b>",
+        "name": ""
+      },
+      {
+        "_id": "7RTWuJ4EZk1A50Z0",
+        "type": "text",
+        "img": "icons/svg/skull.svg",
+        "weight": 1,
+        "range": [
+          65,
+          65
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Pierced head <br /><b>FATAL: </b>Yes <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b><span style=\"color:red;font-size:larger;font-weight:bold\"> You die immediately. </span><br /><b>HEALING TIME: </b>",
+        "name": ""
+      },
+      {
+        "_id": "CB0K6UPeaVjSvxPM",
+        "type": "text",
+        "img": "icons/svg/skull.svg",
+        "weight": 1,
+        "range": [
+          66,
+          66
+        ],
+        "drawn": false,
+        "flags": {},
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>INJURY: </b>Impaled heart <br /><b>FATAL: </b>Yes <br /><b>TIME LIMIT: </b> <br /><b>EFFECTS: </b><span style=\"color:red;font-size:larger;font-weight:bold\"> Your heart beats for the last time.</span> <br /><b>HEALING TIME: </b>",
+        "name": ""
+      }
+    ],
+    "formula": "10*1d6+1d6",
+    "replacement": true,
+    "displayRoll": true,
+    "folder": "A0N3Ct1TQq9BuGk6",
+    "sort": 600000,
+    "flags": {
+      "core": {}
+    },
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-corerules.alienrpg-tables-gm.jjlNnXpqJ1479SEZ",
+      "duplicateSource": null,
+      "exportSource": {
+        "worldId": "1arpg81",
+        "uuid": null,
+        "coreVersion": "0.8.3",
+        "systemId": "alienrpg",
+        "systemVersion": "2.0.0"
+      },
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755077847959,
+      "modifiedTime": 1755077847959,
+      "lastModifiedBy": "KPhrkcgoXZcK9SnP"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "h3A9d9zjyCUmS10C",
+    "name": "Neurological Distortion Disorder",
+    "img": "icons/svg/d20-grey.svg",
+    "results": [
+      {
+        "_id": "673FdGCwfXVGCbFW",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          1,
+          5
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "No Effect. Yet.",
+        "name": ""
+      },
+      {
+        "_id": "L53FMlrQjXIrUblW",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          6,
+          7
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Paranoia: </b> You become convinced that someone or something on board the ship is out to get you. The effect, which lasts until the FTL travel ends, should be roleplayed.",
+        "name": ""
+      },
+      {
+        "_id": "4QALMZ76pv5TUp9e",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          8,
+          9
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Epilepsy: </b> You suffer episodes of epileptic seizures, that will disable you for a full Turn. Roll a Stress Die each Shift-rolling a Failure means a seizure occurs.",
+        "name": ""
+      },
+      {
+        "_id": "Hm53EOyUtTo8RM2Z",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          10,
+          11
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Dementia: </b> Your memory is a blank slate. You can no longer recall who you or the other characters are. The effecct lasts for d6 days after the FTL travel ends, and should be roleplayed.",
+        "name": ""
+      },
+      {
+        "_id": "vdbkNGrpmiyVuXml",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          12,
+          30
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Psychosis: </b> You must immediately attack the nearest person or creature, friendly or not. You won't stop until you or the target is Broken. Every friendly character who witnesses your rampage must make an immediate Panic Roll.",
+        "name": ""
+      }
+    ],
+    "formula": "1d6",
+    "replacement": true,
+    "displayRoll": true,
+    "folder": "A0N3Ct1TQq9BuGk6",
+    "sort": 0,
+    "flags": {
+      "core": {}
+    },
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-starterset.alienrpg-starter-mother-tables.lu5G0cLrFMoZW6EE",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755077847959,
+      "modifiedTime": 1755077847959,
+      "lastModifiedBy": "KPhrkcgoXZcK9SnP"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "WGQF60i2TQ8U14x5",
+    "name": "Permanent  Mental Trauma",
+    "img": "icons/svg/d20-grey.svg",
+    "results": [
+      {
+        "_id": "CK7uIOvBpFnzhzqH",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/daze.svg",
+        "weight": 1,
+        "range": [
+          1,
+          1
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>PHOBIA: </b>You are terrified by something related to what caused you to panic. The GM decides what it is. Your STRESS LEVEL increases by one when within SHORT range of the object of your phobia. If you stay close to it for more than a single round, make a Panic Roll.",
+        "name": ""
+      },
+      {
+        "_id": "CfpaylFcTjtk7TN7",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/daze.svg",
+        "weight": 1,
+        "range": [
+          2,
+          2
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>ALCOHOLISM: </b>You must drink alcohol every Shift, or your STRESS LEVEL increases by one. You cannot relieve stress without drinking alcohol.",
+        "name": ""
+      },
+      {
+        "_id": "fizMgyA4Ujrz8QxD",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/daze.svg",
+        "weight": 1,
+        "range": [
+          3,
+          3
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>NIGHTMARES: </b>Make an EMPATHY roll when you sleep. If the roll succeeds, you have a horrible nightmare and your STRESS LEVEL increases by one. You cannot relieve stress for a full day after such a nightmare.",
+        "name": ""
+      },
+      {
+        "_id": "Q9NxIDrbiqYevqly",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/daze.svg",
+        "weight": 1,
+        "range": [
+          4,
+          4
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>DEPRESSION: </b>You are prone to episodes of depression and moodiness. Every day, make an EMPATHY roll—if you fail, you’re having a bad day. Your STRESS LEVEL increases by one and you can’t relieve stress until the next day.",
+        "name": ""
+      },
+      {
+        "_id": "vyiRAEQxk83szAWo",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/daze.svg",
+        "weight": 1,
+        "range": [
+          5,
+          5
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>DRUG USE: </b>You must use some form of recreational drug every Shift, or your STRESS LEVEL increases by one.  You cannot relieve stress without consuming your drug of choice.",
+        "name": ""
+      },
+      {
+        "_id": "IFYvl7P6cp9tmgdL",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/daze.svg",
+        "weight": 1,
+        "range": [
+          6,
+          6
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>AMNESIA: </b>Your memory is a blank slate. You can no longer recall who you or the other characters are. The effect should be roleplayed.",
+        "name": ""
+      }
+    ],
+    "formula": "1d6",
+    "replacement": true,
+    "displayRoll": true,
+    "folder": "A0N3Ct1TQq9BuGk6",
+    "sort": 0,
+    "flags": {
+      "core": {}
+    },
+    "description": "",
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-starterset.alienrpg-starter-mother-tables.29ABovjAg3xyYrW7",
+      "duplicateSource": null,
+      "exportSource": {
+        "worldId": "alien2",
+        "uuid": null,
+        "coreVersion": "0.6.2",
+        "systemId": "alienrpgfull",
+        "systemVersion": "0.1.5"
+      },
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755077847959,
+      "modifiedTime": 1755077847959,
+      "lastModifiedBy": "KPhrkcgoXZcK9SnP"
+    },
+    "ownership": {
+      "default": 0
+    }
+  },
+  {
+    "_id": "5qchUEcOe4Fxefrp",
+    "name": "Sub Table Critical Injuries on Xenomorphs",
+    "img": "icons/svg/d20-grey.svg",
+    "description": "Sub Roll table for \"3 Desperate Action\" on Critical Injuries on Xenomorphs",
+    "results": [
+      {
+        "_id": "TrzTuZKEmsZpBHx8",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          1,
+          3
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Desperate Action:</b> The Xenomorph is severely wounded and cries out in alien fury. It immediately gets to perform a fast and a slow action, outside of the normal turn order. It tries to escape (if it succeeds it regains half its Health).",
+        "name": ""
+      },
+      {
+        "_id": "eqJW9GsJEDKEfjl7",
+        "flags": {},
+        "type": "text",
+        "img": "icons/svg/d20-black.svg",
+        "weight": 1,
+        "range": [
+          4,
+          6
+        ],
+        "drawn": false,
+        "_stats": {
+          "compendiumSource": null,
+          "duplicateSource": null,
+          "exportSource": null,
+          "coreVersion": "13.347",
+          "systemId": "alienrpg",
+          "systemVersion": "3.2.5",
+          "lastModifiedBy": null
+        },
+        "description": "<b>Desperate Action:</b> The Xenomorph is severely wounded and cries out in alien fury. It immediately gets to perform a fast and a slow action, outside of the normal turn order. It instantly attacks the closest opponent. If it fails to inflict any damage, the creature dies. If it succeeds, it regains one point of Health.",
+        "name": ""
+      }
+    ],
+    "formula": "1d6",
+    "replacement": true,
+    "displayRoll": false,
+    "folder": "w3xO69hCmTtYDF8d",
+    "sort": 0,
+    "flags": {
+      "core": {}
+    },
+    "_stats": {
+      "compendiumSource": "Compendium.alienrpg-starterset.alienrpg-starter-mother-sub-tables.oNI6c2cCtPE2DBwr",
+      "duplicateSource": null,
+      "exportSource": null,
+      "coreVersion": "13.347",
+      "systemId": "alienrpg",
+      "systemVersion": "3.2.5",
+      "createdTime": 1755077847959,
+      "modifiedTime": 1755077847959,
+      "lastModifiedBy": "KPhrkcgoXZcK9SnP"
+    },
+    "ownership": {
+      "default": 0
+    }
+  }
+]

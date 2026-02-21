@@ -1,0 +1,770 @@
+[
+  {
+    "key": "!folders!1QD0vNg0JQ2bVO0e",
+    "doc": {
+      "name": "Policies",
+      "sorting": "a",
+      "folder": "EJMOOCeVjT40NNkV",
+      "type": "Item",
+      "description": "",
+      "sort": 0,
+      "color": "#2a971c",
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "lastModifiedBy": null
+      },
+      "_id": "1QD0vNg0JQ2bVO0e"
+    }
+  },
+  {
+    "key": "!folders!2PpSokOh2N2RlV4M",
+    "doc": {
+      "name": "Alien RPG Talents(Career)",
+      "type": "Item",
+      "sorting": "a",
+      "sort": 0,
+      "color": "#227591",
+      "flags": {
+        "core": {}
+      },
+      "_id": "2PpSokOh2N2RlV4M",
+      "folder": null,
+      "description": "",
+      "_stats": {
+        "compendiumSource": "Folder.2PpSokOh2N2RlV4M",
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "createdTime": 1767587571511,
+        "modifiedTime": 1767587606418,
+        "lastModifiedBy": "H1vAw0KeNomo6NHk"
+      }
+    }
+  },
+  {
+    "key": "!folders!2WYJJEKeYhHkVXr3",
+    "doc": {
+      "name": "Alien RPG Starter Set Rules",
+      "type": "JournalEntry",
+      "sorting": "a",
+      "sort": 0,
+      "color": "#9e8900",
+      "flags": {
+        "core": {}
+      },
+      "_id": "2WYJJEKeYhHkVXr3",
+      "folder": null,
+      "description": "",
+      "_stats": {
+        "compendiumSource": "Folder.2WYJJEKeYhHkVXr3",
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "createdTime": 1767587571511,
+        "modifiedTime": 1767587606418,
+        "lastModifiedBy": "H1vAw0KeNomo6NHk"
+      }
+    }
+  },
+  {
+    "key": "!folders!2qZt3vvdmV7PHBkQ",
+    "doc": {
+      "name": "Alien RPG Equipment",
+      "type": "Item",
+      "sorting": "a",
+      "sort": 0,
+      "color": "#341cb0",
+      "flags": {
+        "core": {}
+      },
+      "_id": "2qZt3vvdmV7PHBkQ",
+      "folder": null,
+      "description": "",
+      "_stats": {
+        "compendiumSource": "Folder.2qZt3vvdmV7PHBkQ",
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "createdTime": 1767587571511,
+        "modifiedTime": 1767587606418,
+        "lastModifiedBy": "H1vAw0KeNomo6NHk"
+      }
+    }
+  },
+  {
+    "key": "!folders!3Gdz2x5Bqu3eBs4h",
+    "doc": {
+      "name": "Alien RPG CotG - Agendas",
+      "type": "Item",
+      "sorting": "a",
+      "sort": 0,
+      "color": "#d36464",
+      "flags": {
+        "core": {}
+      },
+      "_id": "3Gdz2x5Bqu3eBs4h",
+      "folder": null,
+      "description": "",
+      "_stats": {
+        "compendiumSource": "Folder.3Gdz2x5Bqu3eBs4h",
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "createdTime": 1767587571511,
+        "modifiedTime": 1767587606418,
+        "lastModifiedBy": "H1vAw0KeNomo6NHk"
+      }
+    }
+  },
+  {
+    "key": "!folders!7IlFd6NF2SR7RAiB",
+    "doc": {
+      "name": "Alien RPG Talents(General)",
+      "type": "Item",
+      "sorting": "a",
+      "sort": 500000,
+      "color": "#22918f",
+      "flags": {
+        "core": {}
+      },
+      "_id": "7IlFd6NF2SR7RAiB",
+      "folder": null,
+      "description": "",
+      "_stats": {
+        "compendiumSource": "Folder.7IlFd6NF2SR7RAiB",
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "createdTime": 1767587585866,
+        "modifiedTime": 1767587585866,
+        "lastModifiedBy": "H1vAw0KeNomo6NHk"
+      }
+    }
+  },
+  {
+    "key": "!folders!8F4W5MBe7uKgARSl",
+    "doc": {
+      "name": "Alien RPG Systems",
+      "type": "Item",
+      "sorting": "a",
+      "sort": 300000,
+      "color": "#a24f0b",
+      "flags": {
+        "core": {}
+      },
+      "_id": "8F4W5MBe7uKgARSl",
+      "folder": null,
+      "description": "",
+      "_stats": {
+        "compendiumSource": "Folder.8F4W5MBe7uKgARSl",
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "createdTime": 1767587585866,
+        "modifiedTime": 1767587585866,
+        "lastModifiedBy": "H1vAw0KeNomo6NHk"
+      }
+    }
+  },
+  {
+    "key": "!folders!9NkXaoM7te8JkDZO",
+    "doc": {
+      "name": "Alien RPG Creatures",
+      "type": "Actor",
+      "sorting": "a",
+      "sort": 400000,
+      "color": "#048b04",
+      "flags": {
+        "core": {}
+      },
+      "_id": "9NkXaoM7te8JkDZO",
+      "folder": null,
+      "description": "",
+      "_stats": {
+        "compendiumSource": "Folder.9NkXaoM7te8JkDZO",
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "lastModifiedBy": "H1vAw0KeNomo6NHk",
+        "modifiedTime": 1771091190119
+      }
+    }
+  },
+  {
+    "key": "!folders!A0N3Ct1TQq9BuGk6",
+    "doc": {
+      "name": "Alien Mother Tables",
+      "type": "RollTable",
+      "sorting": "a",
+      "sort": 0,
+      "color": "#00c100",
+      "flags": {},
+      "_id": "A0N3Ct1TQq9BuGk6",
+      "folder": "Btepu5tifRV0Pj7w",
+      "description": "",
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "lastModifiedBy": "H1vAw0KeNomo6NHk",
+        "modifiedTime": 1767587606418
+      }
+    }
+  },
+  {
+    "key": "!folders!Btepu5tifRV0Pj7w",
+    "doc": {
+      "name": "Alien Tables",
+      "type": "RollTable",
+      "sorting": "a",
+      "sort": 0,
+      "color": null,
+      "flags": {
+        "core": {}
+      },
+      "_id": "Btepu5tifRV0Pj7w",
+      "folder": null,
+      "description": "",
+      "_stats": {
+        "compendiumSource": "Folder.Btepu5tifRV0Pj7w",
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "createdTime": 1767587432097,
+        "modifiedTime": 1767587606418,
+        "lastModifiedBy": "H1vAw0KeNomo6NHk"
+      }
+    }
+  },
+  {
+    "key": "!folders!D477kuYUieAV6nGv",
+    "doc": {
+      "name": "Installations",
+      "sorting": "a",
+      "folder": "EJMOOCeVjT40NNkV",
+      "type": "Item",
+      "description": "",
+      "sort": 0,
+      "color": "#2a971c",
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "lastModifiedBy": null
+      },
+      "_id": "D477kuYUieAV6nGv"
+    }
+  },
+  {
+    "key": "!folders!D4Yb7CG643VQx0uS",
+    "doc": {
+      "type": "Item",
+      "folder": null,
+      "name": "Careers",
+      "color": null,
+      "sorting": "a",
+      "_id": "D4Yb7CG643VQx0uS",
+      "description": "",
+      "sort": 1200000,
+      "flags": {},
+      "_stats": {
+        "compendiumSource": "Folder.D4Yb7CG643VQx0uS",
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "createdTime": 1767587432097,
+        "modifiedTime": 1767587432097,
+        "lastModifiedBy": "H1vAw0KeNomo6NHk"
+      }
+    }
+  },
+  {
+    "key": "!folders!EJMOOCeVjT40NNkV",
+    "doc": {
+      "name": "Colony Initiatives",
+      "sorting": "a",
+      "folder": "YQ6Aah1uFpMnLzX9",
+      "type": "Item",
+      "description": "",
+      "sort": 0,
+      "color": "#2a971c",
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "lastModifiedBy": null
+      },
+      "_id": "EJMOOCeVjT40NNkV"
+    }
+  },
+  {
+    "key": "!folders!JYirzyxliTQBq1kT",
+    "doc": {
+      "name": "Alien RPG Weapons",
+      "type": "Item",
+      "sorting": "a",
+      "sort": 0,
+      "color": "#917e22",
+      "flags": {
+        "core": {}
+      },
+      "_id": "JYirzyxliTQBq1kT",
+      "folder": null,
+      "description": "",
+      "_stats": {
+        "compendiumSource": "Folder.JYirzyxliTQBq1kT",
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "createdTime": 1767587571511,
+        "modifiedTime": 1767587606418,
+        "lastModifiedBy": "H1vAw0KeNomo6NHk"
+      }
+    }
+  },
+  {
+    "key": "!folders!JeUr7nKX017aGgW8",
+    "doc": {
+      "name": "Alien RPG Chariot of the Gods - Maps",
+      "type": "Scene",
+      "sorting": "a",
+      "sort": 0,
+      "color": "#d36464",
+      "flags": {
+        "core": {}
+      },
+      "_id": "JeUr7nKX017aGgW8",
+      "folder": null,
+      "description": "",
+      "_stats": {
+        "compendiumSource": "Folder.JeUr7nKX017aGgW8",
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "createdTime": 1767587571511,
+        "modifiedTime": 1767587606418,
+        "lastModifiedBy": "H1vAw0KeNomo6NHk"
+      }
+    }
+  },
+  {
+    "key": "!folders!LrpFZIuICZfNAr2v",
+    "doc": {
+      "name": "Alien Creature Tables",
+      "type": "RollTable",
+      "sorting": "a",
+      "sort": 0,
+      "color": "#ff0000",
+      "flags": {},
+      "_id": "LrpFZIuICZfNAr2v",
+      "folder": "Btepu5tifRV0Pj7w",
+      "description": "",
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "lastModifiedBy": "H1vAw0KeNomo6NHk",
+        "modifiedTime": 1767587606418
+      }
+    }
+  },
+  {
+    "key": "!folders!R8mjiz4iJkZGZMIw",
+    "doc": {
+      "name": "Skill-Stunts",
+      "type": "Item",
+      "folder": null,
+      "description": "",
+      "sorting": "a",
+      "sort": 1300000,
+      "color": null,
+      "flags": {
+        "core": {}
+      },
+      "_stats": {
+        "compendiumSource": "Folder.R8mjiz4iJkZGZMIw",
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "createdTime": 1767587432097,
+        "modifiedTime": 1767587432097,
+        "lastModifiedBy": "H1vAw0KeNomo6NHk"
+      },
+      "_id": "R8mjiz4iJkZGZMIw"
+    }
+  },
+  {
+    "key": "!folders!VGNmXUSgLmAEsqNY",
+    "doc": {
+      "name": "Alien RPG CotG Creatures",
+      "type": "Actor",
+      "sorting": "a",
+      "sort": 500000,
+      "color": "#940a0a",
+      "flags": {},
+      "_id": "VGNmXUSgLmAEsqNY",
+      "folder": null,
+      "description": "",
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "lastModifiedBy": "H1vAw0KeNomo6NHk",
+        "modifiedTime": 1771091190936
+      }
+    }
+  },
+  {
+    "key": "!folders!Vje7ULCtxdqt4eTi",
+    "doc": {
+      "name": "Alien RPG Vehicles",
+      "type": "Actor",
+      "sorting": "a",
+      "sort": 200000,
+      "color": "#8b0426",
+      "flags": {
+        "core": {}
+      },
+      "_id": "Vje7ULCtxdqt4eTi",
+      "folder": null,
+      "description": "",
+      "_stats": {
+        "compendiumSource": "Folder.Vje7ULCtxdqt4eTi",
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "lastModifiedBy": "H1vAw0KeNomo6NHk",
+        "modifiedTime": 1771091188291
+      }
+    }
+  },
+  {
+    "key": "!folders!WthKRU9e3eCiU3Ww",
+    "doc": {
+      "name": "Alien RPG CotG Characters",
+      "type": "Actor",
+      "sorting": "a",
+      "sort": 600000,
+      "color": "#048b04",
+      "flags": {},
+      "_id": "WthKRU9e3eCiU3Ww",
+      "folder": null,
+      "description": "",
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "lastModifiedBy": "H1vAw0KeNomo6NHk",
+        "modifiedTime": 1771091191986
+      }
+    }
+  },
+  {
+    "key": "!folders!YQ6Aah1uFpMnLzX9",
+    "doc": {
+      "name": "Alien RPG Building Better Worlds",
+      "sorting": "a",
+      "folder": null,
+      "type": "Item",
+      "description": "",
+      "sort": 0,
+      "color": "#2a971c",
+      "flags": {
+        "core": {}
+      },
+      "_stats": {
+        "compendiumSource": "Folder.YQ6Aah1uFpMnLzX9",
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "createdTime": 1767587585866,
+        "modifiedTime": 1767587585866,
+        "lastModifiedBy": "H1vAw0KeNomo6NHk"
+      },
+      "_id": "YQ6Aah1uFpMnLzX9"
+    }
+  },
+  {
+    "key": "!folders!bjqt3ME8csX2r1wM",
+    "doc": {
+      "name": "Alien Macros",
+      "type": "Macro",
+      "folder": null,
+      "description": "",
+      "sorting": "a",
+      "sort": 0,
+      "color": null,
+      "flags": {
+        "core": {}
+      },
+      "_stats": {
+        "compendiumSource": "Folder.bjqt3ME8csX2r1wM",
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "createdTime": 1767587432097,
+        "modifiedTime": 1767587432097,
+        "lastModifiedBy": "H1vAw0KeNomo6NHk"
+      },
+      "_id": "bjqt3ME8csX2r1wM"
+    }
+  },
+  {
+    "key": "!folders!cs2JnCLDPQdwJAle",
+    "doc": {
+      "name": "CotG NPC's",
+      "type": "Actor",
+      "sorting": "a",
+      "sort": 0,
+      "color": "#ab16d4",
+      "flags": {},
+      "_id": "cs2JnCLDPQdwJAle",
+      "folder": "WthKRU9e3eCiU3Ww",
+      "description": "",
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "lastModifiedBy": "H1vAw0KeNomo6NHk",
+        "modifiedTime": 1767587606418
+      }
+    }
+  },
+  {
+    "key": "!folders!dtzQezG3roEKdLeE",
+    "doc": {
+      "name": "Projects",
+      "sorting": "a",
+      "folder": "EJMOOCeVjT40NNkV",
+      "type": "Item",
+      "description": "",
+      "sort": 0,
+      "color": "#2a971c",
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "lastModifiedBy": null
+      },
+      "_id": "dtzQezG3roEKdLeE"
+    }
+  },
+  {
+    "key": "!folders!iUInAIIDj6CN6G9J",
+    "doc": {
+      "name": "Chariot Of the Gods - Scenario",
+      "type": "JournalEntry",
+      "sorting": "a",
+      "sort": 200000,
+      "color": "#d36464",
+      "flags": {
+        "core": {}
+      },
+      "_id": "iUInAIIDj6CN6G9J",
+      "folder": null,
+      "description": "",
+      "_stats": {
+        "compendiumSource": "Folder.iUInAIIDj6CN6G9J",
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "createdTime": 1767587571511,
+        "modifiedTime": 1767587606418,
+        "lastModifiedBy": "H1vAw0KeNomo6NHk"
+      }
+    }
+  },
+  {
+    "key": "!folders!keixXQCEnCnhrCfl",
+    "doc": {
+      "name": "Alien RPG Spaceships",
+      "sorting": "a",
+      "folder": null,
+      "type": "Actor",
+      "description": "",
+      "sort": 300000,
+      "color": "#c71a45",
+      "flags": {
+        "core": {}
+      },
+      "_stats": {
+        "compendiumSource": "Folder.keixXQCEnCnhrCfl",
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "lastModifiedBy": "H1vAw0KeNomo6NHk",
+        "modifiedTime": 1771091189264
+      },
+      "_id": "keixXQCEnCnhrCfl"
+    }
+  },
+  {
+    "key": "!folders!oSEAUwgWvKj74IkQ",
+    "doc": {
+      "name": "Alien RPG Armor",
+      "type": "Item",
+      "sorting": "a",
+      "sort": 0,
+      "color": "#8b0426",
+      "flags": {
+        "core": {}
+      },
+      "_id": "oSEAUwgWvKj74IkQ",
+      "folder": null,
+      "description": "",
+      "_stats": {
+        "compendiumSource": "Folder.oSEAUwgWvKj74IkQ",
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "createdTime": 1767587571511,
+        "modifiedTime": 1767587606418,
+        "lastModifiedBy": "H1vAw0KeNomo6NHk"
+      }
+    }
+  },
+  {
+    "key": "!folders!rTYukfA6fpmlFj5h",
+    "doc": {
+      "name": "The Art of Alien",
+      "type": "JournalEntry",
+      "sorting": "a",
+      "sort": 100000,
+      "color": "#9e62da",
+      "flags": {
+        "core": {}
+      },
+      "_id": "rTYukfA6fpmlFj5h",
+      "folder": null,
+      "description": "",
+      "_stats": {
+        "compendiumSource": "Folder.rTYukfA6fpmlFj5h",
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "createdTime": 1767587571511,
+        "modifiedTime": 1767587606418,
+        "lastModifiedBy": "H1vAw0KeNomo6NHk"
+      }
+    }
+  },
+  {
+    "key": "!folders!v5ochSwdWr8xFVto",
+    "doc": {
+      "name": "CotG PC's",
+      "type": "Actor",
+      "sorting": "a",
+      "sort": 0,
+      "color": "#5bc85b",
+      "flags": {},
+      "_id": "v5ochSwdWr8xFVto",
+      "folder": "WthKRU9e3eCiU3Ww",
+      "description": "",
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "lastModifiedBy": "H1vAw0KeNomo6NHk",
+        "modifiedTime": 1767587606418
+      }
+    }
+  },
+  {
+    "key": "!folders!w3xO69hCmTtYDF8d",
+    "doc": {
+      "name": "Alien Sub-Tables",
+      "type": "RollTable",
+      "sorting": "a",
+      "sort": 0,
+      "color": null,
+      "flags": {},
+      "_id": "w3xO69hCmTtYDF8d",
+      "folder": "A0N3Ct1TQq9BuGk6",
+      "description": "",
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "alienrpg",
+        "systemVersion": "4.0.10",
+        "lastModifiedBy": "H1vAw0KeNomo6NHk",
+        "modifiedTime": 1767587606418
+      }
+    }
+  }
+]
