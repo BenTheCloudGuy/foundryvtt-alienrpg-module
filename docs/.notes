@@ -1,0 +1,41 @@
+Language: Nodejs
+
+Objectives:
+- NEVER COMMIT or PUSH CHANGES TO GIT/GITHUB..
+- Any time you are writing directions or documentation do not use LLM Emojis or formating. Keep it clean, simple, and human sounding. 
+- Create an old style green screen interactive terminal style interface for use with FoundryVTT AlienRPG game. 
+- It must support displaying digital maps.. 
+- It must be branded to look like it is part of weyland-yutani ships computer interface
+- It will have interactive buttons on either side for navigating the computer system
+- It will support touch screen
+- The frame/image in the middle should support pinch zoom and and scrolling independent of navigation buttons -- example in image.png ![alt text](image.png)
+- There must be a way to allow underlying Foundry Scenes to be display in the display frame
+- TERMINAL requires opening muthurGPT in the display frame - source code for mutherGPT found in /mutherGPT directory.
+- It needs to plug into AlienRGP for FoundryVTT found - game system found in /alienrpg directory
+- This will be used as interactive aid for my players when running Chariots of the Gods AlienRGP TTRPG
+- It will update the Status of the ship via Status Logs (JSON FILES) that muthurGPT can reference when users asks about ship status.
+
+Path/Links to keep in memory for the duration of this project:
+- Link to FoundryVTT: https://foundryvtt.com/article/system-development/
+- Link to AlienRPG: https://freeleaguepublishing.com/games/alien/
+- Link to WY-Terminal Module: https://github.com/BenTheCloudGuy/foundryvtt-alienrpg-module
+- muthurGPT: C:\Users\benthebuilder\.working\gaming\terminal\muthurGPT directory (python based)
+- mutherGPT-node: C:\Users\benthebuilder\.working\gaming\terminal\mutherGPT-node directory (nodejs based)
+- Foundry Server data path: C:\FoundryVTT\data 
+- Project Path: C:\Users\benthebuilder\.working\gaming\terminal
+- Examples of Retro Spaceship Interfaces: https://www.youtube.com/watch?v=CJ0J-Qpw9O0
+
+
+AlienRPG Modules
+- alienrpg-bbw
+- alienrpg-cmom
+- alienrpg-corerules
+- alienrpg-destroyerofworlds
+- alienrpg-hod
+- alienrpg-starterset
+
+
+
+## Issues
+- Validate AI Integration is working.. I don't think it is via LLM
+
