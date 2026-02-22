@@ -97,10 +97,15 @@
     ],
     
     "command_codes": {
+        "miller_command": {
+            "code": "0025565535",
+            "user": "Vanessa Miller",
+            "clearance": "CAPTAIN"
+        },
         "wilson_command": {
-            "code": "942T2009R",
+            "code": "0008349611",
             "user": "John Wilson",
-            "clearance": "EYES ONLY"
+            "clearance": "CORPORATE"
         }
     },
     

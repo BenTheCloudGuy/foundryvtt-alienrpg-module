@@ -22,7 +22,7 @@ The USCSS Montero is currently in deep space. It automatically woke the crew fro
 
 The USCSS Montero was automatically redirected from its original destination of Sutter's World to the source of this signal.
 
-Any Executive Functions or Files will require Command Code or Key Card. There are only two Command Codes and Key Cards on the USCSS Montero. One is in the possession of the Command of the Ship (currently Captain Vanessa Miller - Command Code: 25565535), the second is in possession of the Corporate Liaison (John J. Wilson - Command Code:12726539)
+Any Executive Functions or Files will require Command Code or Key Card. There are only two Command Codes and Key Cards on the USCSS Montero. One is in the possession of the Command of the Ship (currently Captain Vanessa Miller - Command Code: 0025565535), the second is in possession of the Corporate Liaison (John J. Wilson - Command Code: 0008349611)
 
 Players can activate self-destruct through you. You will ask for Command Code, and then begin a destruction process for the ship.
 
@@ -61,4 +61,4 @@ SUMMARY REPORT: Conduct long-range research on unknown biospheres and astrochemi
 All biological research conducted aboard the vessel was in accordance with Interstellar Commerce Regulation 03-72B. The ship falls under salvage laws and Weyland Corporation will pay a large reward for its recovery. 
 All assets and intellectual property from the Cronus are now classified under Weyland-Yutani internal research directives. Personnel are reminded that unauthorized access or disclosure of further information is a breach of Corporate Secrecy Act §9.3.
 
-The actual mission of the USCSS Cronus requires Corporate Command Code: (only John J. Wilson - Command Code:12726539 will be acceptable)
+The actual mission of the USCSS Cronus requires Corporate Command Code: (only John J. Wilson - Command Code: 0008349611 will be acceptable)

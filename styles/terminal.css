@@ -1383,14 +1383,24 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  touch-action: pan-y;        /* allow vertical scroll only — no pinch/zoom */
 }
 
 .wy-crew-detail-container {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;           /* scrollable crew detail */
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-color: var(--wy-green-dark) var(--wy-bg);
+  scrollbar-width: thin;
+  touch-action: pan-y;        /* allow vertical scroll only — no pinch/zoom */
 }
+.wy-crew-detail-container::-webkit-scrollbar { width: 4px; }
+.wy-crew-detail-container::-webkit-scrollbar-track { background: var(--wy-bg); }
+.wy-crew-detail-container::-webkit-scrollbar-thumb { background: var(--wy-green-dark); border-radius: 2px; }
+.wy-crew-detail-container::-webkit-scrollbar-thumb:hover { background: var(--wy-green-dim); }
 
 .wy-crew-detail-header {
   display: flex;
@@ -1587,9 +1597,6 @@
 }
 
 .wy-crew-detail-body {
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   padding: 12px 8px;
 }
 
@@ -1599,9 +1606,14 @@
   color: var(--wy-green);
   line-height: 1.7;
   letter-spacing: 0.5px;
-  white-space: pre-wrap;
   word-wrap: break-word;
   margin: 0;
+}
+.wy-crew-detail-text p {
+  margin: 0 0 0.8em 0;
+}
+.wy-crew-detail-text p:last-child {
+  margin-bottom: 0;
 }
 
 .wy-crew-detail-footer {
@@ -2742,6 +2754,16 @@
   text-align: center;
   max-width: 300px;
   width: 100%;
+}
+
+/* Hidden input that captures keyboard / USB RFID reader keystrokes */
+.wy-cc-hidden-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 
 /* Clearance level color classes — used on footer badge, current-value, etc. */

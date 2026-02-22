@@ -257,12 +257,20 @@ export function registerSettings() {
   });
 
   // Internal: navigation data (GM-managed)
-  // { heading, speed, fuel, eta, position, destination, shipPos, routePoints }
+  // { heading, speed, fuel, eta, position, destination, shipPos, routePoints, navMarkers }
   game.settings.register('wy-terminal', 'navData', {
     scope: 'world',
     config: false,
     type: Object,
-    default: {},
+    default: {
+      navMarkers: [
+        { id: 'DEFAULT_DEPARTURE', label: 'ANCHORPOINT STATION', type: 'DEPARTURE', x: 0.569025, y: 0.37695 },
+        { id: 'DEFAULT_WAYPOINT', label: 'COURSE CHANGE', type: 'WAYPOINT', x: 0.344688, y: 0.504533 },
+        { id: 'DEFAULT_DESTINATION', label: 'UNKNOWN SIGNAL', type: 'DESTINATION', x: 0.250803, y: 0.388964 },
+        { id: 'DEFAULT_PLANET', label: 'SUTTERS WORLD', type: 'PLANET', x: 0.207719, y: 0.560158 },
+        { id: 'DEFAULT_PLAYER', label: 'USCSS MONTERO', type: 'PLAYER', x: 0.569025, y: 0.37695, progress: 0 },
+      ],
+    },
   });
 
   // Internal: active clearance level (legacy single-value, kept for migration)
@@ -292,8 +300,8 @@ export function registerSettings() {
     default: [],
   });
 
-  // Internal: per-user command codes — { [userId]: { code: '12345678', role: 'CAPTAIN' }, ... }
-  // Each user has a unique 8-digit command code with an associated clearance role.
+  // Internal: per-user command codes — { [userId]: { code: '0012345678', role: 'CAPTAIN' }, ... }
+  // Each user has a unique 10-digit command code with an associated clearance role.
   // Valid roles: CREWMEMBER, MEDICAL, CAPTAIN, CORPORATE, MASTER_OVERRIDE
   game.settings.register('wy-terminal', 'userCommandCodes', {
     scope: 'world',

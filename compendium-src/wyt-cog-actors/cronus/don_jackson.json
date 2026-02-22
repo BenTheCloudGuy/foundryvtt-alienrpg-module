@@ -1,13 +1,11 @@
 {
-  "_id": "h5czTg41nP5UKvkh",
-  "name": "John J. Wilson",
+  "_id": "fdgNudhiwmmAcznt",
+  "name": "Don Jackson",
   "type": "character",
-  "img": "modules/alienrpg-starterset/images/avatar/john-j-wilson-avatar.png",
-  "items": [
-    "mUOrCDfn2JNSrBuc"
-  ],
+  "img": "icons/svg/mystery-man.svg",
+  "items": [],
   "effects": [],
-  "folder": "v5ochSwdWr8xFVto",
+  "folder": "cs2JnCLDPQdwJAle",
   "sort": 0,
   "flags": {
     "core": {}
@@ -15,11 +13,11 @@
   "system": {
     "header": {
       "health": {
-        "value": 2,
+        "value": 4,
         "label": "Health",
         "mod": 0,
-        "max": 2,
-        "calculatedMax": 2
+        "max": 4,
+        "calculatedMax": 4
       },
       "stress": {
         "value": 0,
@@ -37,9 +35,9 @@
     },
     "attributes": {
       "str": {
-        "value": 2,
+        "value": 4,
         "label": "Strength",
-        "mod": 2,
+        "mod": 4,
         "max": 0
       },
       "wit": {
@@ -55,9 +53,9 @@
         "max": 0
       },
       "emp": {
-        "value": 5,
+        "value": 2,
         "label": "Empathy",
-        "mod": 5,
+        "mod": 2,
         "max": 0
       }
     },
@@ -66,39 +64,39 @@
         "value": 0,
         "label": "Heavy Machinery",
         "description": "Heavy Machinery",
-        "mod": 2,
+        "mod": 4,
         "max": 0,
         "attrib": ""
       },
       "closeCbt": {
-        "value": 0,
+        "value": 2,
         "label": "Close Combat",
         "description": "Close Combat",
-        "mod": 2,
+        "mod": 6,
         "max": 0,
         "attrib": ""
       },
       "stamina": {
-        "value": 0,
+        "value": 1,
         "label": "Stamina",
         "description": "Stamina",
-        "mod": 2,
-        "max": 0,
-        "attrib": ""
-      },
-      "rangedCbt": {
-        "value": 1,
-        "label": "Ranged Combat",
-        "description": "Ranged Combat",
         "mod": 5,
         "max": 0,
         "attrib": ""
       },
-      "mobility": {
+      "rangedCbt": {
         "value": 2,
+        "label": "Ranged Combat",
+        "description": "Ranged Combat",
+        "mod": 6,
+        "max": 0,
+        "attrib": ""
+      },
+      "mobility": {
+        "value": 1,
         "label": "Mobility",
         "description": "Mobility",
-        "mod": 6,
+        "mod": 5,
         "max": 0,
         "attrib": ""
       },
@@ -114,23 +112,23 @@
         "value": 0,
         "label": "Command",
         "description": "Command",
-        "mod": 5,
+        "mod": 2,
         "max": 0,
         "attrib": ""
       },
       "manipulation": {
-        "value": 3,
+        "value": 0,
         "label": "Manipulation",
         "description": "Manipulation",
-        "mod": 8,
+        "mod": 2,
         "max": 0,
         "attrib": ""
       },
       "medicalAid": {
-        "value": 1,
+        "value": 0,
         "label": "Medical Aid",
         "description": "Medical Aid",
-        "mod": 6,
+        "mod": 2,
         "max": 0,
         "attrib": ""
       },
@@ -151,32 +149,32 @@
         "attrib": ""
       },
       "comtech": {
-        "value": 1,
+        "value": 0,
         "label": "Comtech",
         "description": "Comtech",
-        "mod": 4,
+        "mod": 3,
         "max": 0,
         "attrib": ""
       }
     },
     "general": {
       "career": {
-        "value": "3"
+        "value": "1"
       },
       "appearance": {
-        "value": "Corporate Liaison on the USCSS Montero\nAge: 43\nPersonality: Ambitious"
+        "value": "Security Officer on the USCSS Cronus\nAge: 42\nPersonality: Steady"
       },
       "sigItem": {
-        "value": "Access Keycard"
+        "value": ""
       },
       "agenda": {
-        "value": ""
+        "value": "Watch the perimeter. Report threats. Protect the crew."
       },
       "relOne": {
-        "value": ""
+        "value": "Valerie Reid"
       },
       "relTwo": {
-        "value": "Vanessa Miller"
+        "value": "Sven Eriksson"
       },
       "xp": {
         "value": 0,
@@ -254,12 +252,12 @@
         "value": 0
       }
     },
-    "notes": "<p>You've been embedded with the Montero crew for a good six months now, evaluating their performance to see if the ship and crew should be scrapped and fired, or promoted and given a new ship. You've actually come to like this motley assortment, but there is no room for advancement in this work. Now, a special order has come your way, and you finally see your chance to climb. You pull this off and you can parlay it into a fortune.</p>",
+    "notes": "<p>Don Jackson had been doing private security for Weyland for fifteen years. Steady and reliable, he was Reid's second and handled the routine security work. On August 1, he drove off the creature that attacked Ritter with two shots. On the final day, he reported contacts at the perimeter that didn't flinch from gunfire.</p><p><b>STATUS: MIA — LV-1113.</b> Last heard on radio pinned at the north ridge on August 2, 2110. Could not reach the ship.</p>",
     "adhocitems": ""
   },
   "prototypeToken": {
     "flags": {},
-    "name": "John J. Wilson",
+    "name": "Don Jackson",
     "displayName": 20,
     "width": 1,
     "height": 1,
@@ -302,7 +300,7 @@
       "priority": 0
     },
     "texture": {
-      "src": "modules/alienrpg-starterset/images/Tokens/john-j.-wilson-token.png",
+      "src": "icons/svg/mystery-man.svg",
       "tint": "#ffffff",
       "scaleX": 1,
       "scaleY": 1,
@@ -352,14 +350,14 @@
     "movementAction": null
   },
   "_stats": {
-    "compendiumSource": "Compendium.alienrpg-starterset.alienrpg-cotg-pcs.eW6gnsNTAE2lHDmE",
+    "compendiumSource": null,
     "duplicateSource": null,
     "exportSource": null,
     "coreVersion": "13.351",
     "systemId": "alienrpg",
     "systemVersion": "4.0.10",
-    "createdTime": 1767587571136,
-    "modifiedTime": 1767587606067,
+    "createdTime": 1771724792556,
+    "modifiedTime": 1771724792556,
     "lastModifiedBy": "H1vAw0KeNomo6NHk"
   },
   "ownership": {

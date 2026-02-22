@@ -51,6 +51,15 @@ export class WYTerminalApp extends Application {
     // Chat history starts empty — cleared on each send, no persistence needed
     this.chatHistory = [];
 
+    /**
+     * Local clearance cache — always reflects the latest clearance value.
+     * Avoids race conditions where game.settings hasn't synced yet after a
+     * socket-based clearance change. Updated on code submit, logout, and
+     * clearanceUpdated socket. `undefined` means "read from game.settings".
+     * @type {string|undefined}
+     */
+    this._localClearance = undefined;
+
     /** @type {string|null} Last user query sent to MU/TH/UR AI (for resubmit after code entry) */
     this._lastMuthurQuery = null;
 
@@ -625,14 +634,6 @@ export class WYTerminalApp extends Application {
       if (o.name) overrideMap[o.name.toUpperCase()] = o;
     }
 
-    // Career ID → label mapping for AlienRPG
-    const CAREERS = {
-      '0': 'COLONIAL MARSHAL', '1': 'COMPANY AGENT', '2': 'KID',
-      '3': 'MEDIC', '4': 'OFFICER', '5': 'PILOT',
-      '6': 'ROUGHNECK', '7': 'SCIENTIST', '8': 'MARINE',
-      '9': 'FREELANCER', '10': 'OPERATIVE', '11': 'SYNTHETIC',
-    };
-
     const crew = actors.map(actor => {
       const sys = actor.system || {};
       const header = sys.header || {};
@@ -649,9 +650,16 @@ export class WYTerminalApp extends Application {
       const statusTextClass = statusClass === 'online' ? 'wy-text-green' :
         statusClass === 'warning' ? 'wy-text-amber' : 'wy-text-red';
 
-      // Career/role
+      // Career/role — pull from AlienRPG system config at runtime
       const careerKey = gen.career?.value ?? '';
-      const role = over.role || CAREERS[careerKey] || careerKey || 'UNASSIGNED';
+      let careerLabel = '';
+      try {
+        const careerEntry = CONFIG.ALIENRPG?.career_list?.[careerKey];
+        if (careerEntry?.label) {
+          careerLabel = game.i18n.localize(careerEntry.label) || '';
+        }
+      } catch (_) { /* CONFIG not available */ }
+      const role = over.role || careerLabel || careerKey || 'UNASSIGNED';
 
       // Health & stress
       const health = header.health || {};
@@ -678,15 +686,28 @@ export class WYTerminalApp extends Application {
       const flagShip = actor.getFlag?.('wy-terminal', 'shipAssignment') || '';
       const shipAssignment = (flagShip || over.shipAssignment || this._inferShipFromFolder(actor) || '').toLowerCase();
 
+      // Actor folder name — used as the displayed SHIP value
+      const folderName = (actor.folder?.name || '').toUpperCase();
+
+      // Parse JOB and AGE from appearance text (looks for "JOB: value" / "AGE: value" lines)
+      const appearanceText = gen.appearance?.value || '';
+      const jobMatch = appearanceText.match(/\bJOB\s*[:—\-]\s*(.+)/i);
+      const ageMatch = appearanceText.match(/\bAGE\s*[:—\-]\s*(\S+)/i);
+      const job = jobMatch ? jobMatch[1].trim() : '';
+      const age = ageMatch ? ageMatch[1].trim() : '';
+
       return {
         actorId: actor.id,
         name: (actor.name || 'UNKNOWN').toUpperCase(),
         role: role.toUpperCase(),
+        job: job.toUpperCase() || '',
+        age: age.toUpperCase() || '',
         location: (over.location || 'UNKNOWN').toUpperCase(),
         status,
         statusClass,
         statusTextClass,
         shipAssignment,
+        folderName,
         img: actor.img || null,
         // Actor sheet data
         health: { value: health.value ?? 0, max: health.max ?? 0 },
@@ -3525,7 +3546,7 @@ export class WYTerminalApp extends Application {
     }
   }
 
-  /* ── Crew View Setup — List/Detail with clearance gate ── */
+  /* ── Crew View Setup — List visible to all, [VIEW] gated by clearance ── */
   _setupCrewView(contentEl) {
     const listView = contentEl.querySelector('#wy-crew-list-view');
     const detailView = contentEl.querySelector('#wy-crew-detail-view');
@@ -3536,31 +3557,48 @@ export class WYTerminalApp extends Application {
     // Store which crew member was clicked
     let pendingCrewIndex = null;
 
-    // [VIEW] button handler
+    // [VIEW] button handler — clearance gated
+    // CREWMEMBER / NONE (rank 0): cannot view any crew detail
+    // MEDICAL / CAPTAIN (rank 1-2): can view all crew EXCEPT career 'COMPANY AGENT'
+    // CORPORATE+ (rank 3+): can view ALL crew
+    // GM: bypasses all clearance checks
     contentEl.querySelectorAll('[data-action="view-crew"]').forEach(btn => {
       btn.addEventListener('click', () => {
         const idx = parseInt(btn.dataset.crewIndex);
         pendingCrewIndex = idx;
 
-        // GM bypasses command code
+        // GM bypasses clearance checks
         if (game.user.isGM) {
           this._showCrewDetail(contentEl, idx);
           return;
         }
 
-        // Check if current clearance grants crew access (MEDICAL or higher)
         const clearance = this._getActiveClearance();
-        if (this._getClearanceRank(clearance) >= 1) {
-          this._showCrewDetail(contentEl, idx);
+        const rank = this._getClearanceRank(clearance);
+
+        // CREWMEMBER / NONE — no access to any crew detail
+        if (rank < 1) {
+          this._showClearanceOverlay(
+            'ACCESS DENIED',
+            'MEDICAL CLEARANCE OR HIGHER REQUIRED TO VIEW CREW RECORDS',
+            { currentClearance: clearance }
+          );
           return;
         }
 
-        // No clearance — show ACCESS DENIED overlay (player must use CMD CODE view)
-        this._showClearanceOverlay(
-          'ACCESS DENIED',
-          'COMMAND CODE REQUIRED \u2014 USE CMD CODE TO AUTHORIZE',
-          { currentClearance: clearance }
-        );
+        // COMPANY AGENT crew require CORPORATE clearance (rank 3+)
+        const member = this._currentCrew[idx];
+        if (member && member.role === 'COMPANY AGENT' && rank < 3) {
+          this._showClearanceOverlay(
+            'ACCESS DENIED',
+            'CORPORATE CLASSIFIED \u2014 REQUIRES CORPORATE CLEARANCE OR HIGHER',
+            { currentClearance: clearance }
+          );
+          return;
+        }
+
+        // MEDICAL / CAPTAIN / CORPORATE+ — access granted
+        this._showCrewDetail(contentEl, idx);
       });
     });
 
@@ -3644,15 +3682,16 @@ export class WYTerminalApp extends Application {
     if (roleEl) roleEl.textContent = (crew.isSynthetic ? '[ SYNTHETIC ] ' : '') + (crew.role || 'UNASSIGNED');
     if (locationEl) locationEl.textContent = crew.location || 'UNKNOWN';
 
-    // Ship assignment display
+    // JOB and AGE fields (parsed from appearance text)
+    const jobEl = contentEl.querySelector('#wy-crew-detail-job');
+    const ageEl = contentEl.querySelector('#wy-crew-detail-age');
+    if (jobEl) jobEl.textContent = crew.job || '—';
+    if (ageEl) ageEl.textContent = crew.age || '—';
+
+    // Ship display — use Actor folder name directly
     const shipEl = contentEl.querySelector('#wy-crew-detail-ship');
     if (shipEl) {
-      if (crew.shipAssignment) {
-        const profile = SHIP_PROFILES[crew.shipAssignment];
-        shipEl.textContent = profile ? profile.name : crew.shipAssignment.toUpperCase();
-      } else {
-        shipEl.textContent = 'UNASSIGNED';
-      }
+      shipEl.textContent = crew.folderName || 'UNASSIGNED';
     }
     if (statusEl) {
       statusEl.textContent = crew.status || 'UNKNOWN';
@@ -3670,22 +3709,10 @@ export class WYTerminalApp extends Application {
       }
     }
 
-    // ── Vitals (Health / Stress / Radiation) ──
+    // ── Determine if actor has game data ──
     const hasActorData = crew.health && crew.health.max > 0;
 
-    const vitalsEl = contentEl.querySelector('#wy-crew-vitals');
-    if (vitalsEl) vitalsEl.style.display = hasActorData ? '' : 'none';
-
-    if (hasActorData) {
-      this._renderVitalBar(contentEl, '#wy-crew-health-bar', '#wy-crew-health-val',
-        crew.health.value, crew.health.max, 'wy-bar-green');
-      this._renderVitalBar(contentEl, '#wy-crew-stress-bar', '#wy-crew-stress-val',
-        crew.stress.value, crew.stress.max, 'wy-bar-amber');
-      this._renderVitalBar(contentEl, '#wy-crew-rad-bar', '#wy-crew-rad-val',
-        crew.radiation.value, crew.radiation.max, 'wy-bar-red');
-    }
-
-    // ── Conditions (rendered as individual tags) ──
+    // ── Medical Flags (rendered as individual tags) ──
     const condEl = contentEl.querySelector('#wy-crew-conditions');
     const condList = contentEl.querySelector('#wy-crew-conditions-list');
     if (condEl && condList) {
@@ -3699,7 +3726,7 @@ export class WYTerminalApp extends Application {
       }
     }
 
-    // ── Attributes ──
+    // ── Physical Assessment ──
     const statsEl = contentEl.querySelector('#wy-crew-stats');
     if (statsEl) statsEl.style.display = hasActorData ? '' : 'none';
     if (hasActorData && crew.attributes) {
@@ -3710,7 +3737,7 @@ export class WYTerminalApp extends Application {
       set('#wy-crew-attr-emp', crew.attributes.emp);
     }
 
-    // ── Skills ──
+    // ── Competency Ratings ──
     const skillsEl = contentEl.querySelector('#wy-crew-skills');
     if (skillsEl) skillsEl.style.display = hasActorData ? '' : 'none';
     if (hasActorData && crew.skills) {
@@ -3729,28 +3756,24 @@ export class WYTerminalApp extends Application {
       set('#wy-crew-sk-comtech', crew.skills.comtech);
     }
 
-    // ── Personnel file text (appearance, agenda, relationships, notes) ──
+    // ── Personnel Notes — Actor Notes field only (rendered as HTML) ──
     if (detailBody) {
-      const lines = [];
-      if (crew.appearance) lines.push(`PROFILE:\n${crew.appearance}`);
-      if (crew.agenda) lines.push(`\nPERSONAL AGENDA:\n${crew.agenda}`);
-      if (crew.buddy) lines.push(`\nBUDDY: ${crew.buddy}`);
-      if (crew.rival) lines.push(`RIVAL: ${crew.rival}`);
-      if (crew.sigItem) lines.push(`\nSIGNATURE ITEM: ${crew.sigItem}`);
-      if (crew.armor > 0) lines.push(`ARMOR RATING: ${crew.armor}`);
-      if (crew.specialization) lines.push(`SPECIALIZATION: ${crew.specialization}`);
-      if (crew.bio) lines.push(`\n${crew.bio}`);
-      // Notes — strip HTML tags if present (actor notes can contain HTML)
-      if (crew.notes) {
-        let notesText = crew.notes;
-        if (notesText.includes('<')) {
-          const tmp = document.createElement('div');
-          tmp.innerHTML = notesText;
-          notesText = tmp.textContent || tmp.innerText || '';
-        }
-        if (notesText.trim()) lines.push(`\nNOTES:\n${notesText.trim()}`);
+      const notesHtml = (crew.notes || '').trim();
+      if (notesHtml) {
+        // Sanitize: allow only safe tags, strip scripts/events
+        const tmp = document.createElement('div');
+        tmp.innerHTML = notesHtml;
+        tmp.querySelectorAll('script, style, iframe, object, embed').forEach(el => el.remove());
+        // Strip event handlers from all elements
+        tmp.querySelectorAll('*').forEach(el => {
+          for (const attr of [...el.attributes]) {
+            if (attr.name.startsWith('on')) el.removeAttribute(attr.name);
+          }
+        });
+        detailBody.innerHTML = tmp.innerHTML;
+      } else {
+        detailBody.textContent = 'NO ADDITIONAL PERSONNEL DATA ON FILE.';
       }
-      detailBody.textContent = lines.join('\n') || 'NO ADDITIONAL PERSONNEL DATA ON FILE.';
     }
 
     // GM: populate edit fields with current crew member values
@@ -4014,21 +4037,128 @@ export class WYTerminalApp extends Application {
   /* ── Command Code View Setup ── */
   _setupCommandCodeView(contentEl) {
     const display = contentEl.querySelector('#wy-cc-keypad-display');
+    const rfidInput = contentEl.querySelector('#wy-cc-rfid-input');
     let buffer = '';
-    const MAX_DIGITS = 8;
+    const MAX_DIGITS = 10;
 
-    const updateDisplay = () => {
+    // ── RFID scan detection ──
+    // RFID card readers behave as HID keyboards — they type digits rapidly
+    // then send Enter. We detect this by tracking keystroke timing:
+    // if all 10 digits arrive within RFID_SCAN_THRESHOLD_MS, it's a card scan.
+    const RFID_SCAN_THRESHOLD_MS = 500;
+    let rfidTimestamps = [];
+
+    const updateDisplay = (source = 'keypad') => {
       if (display) display.textContent = buffer;
     };
 
+    /**
+     * Submit the current buffer for validation (shared by keypad ENT, Enter key, and RFID auto-submit).
+     * @param {'keypad'|'keyboard'|'rfid'} source - Input method used
+     */
+    const submitCode = async (source = 'keypad') => {
+      if (!buffer.length) return;
+
+      const isRfid = source === 'rfid';
+
+      // Validate code against ALL user command codes.
+      // Any valid code can be entered on any terminal to elevate clearance.
+      const allCodes = this._loadAllUserCommandCodes();
+      const matchedEntry = Object.values(allCodes).find(entry => entry?.code === buffer);
+
+      if (matchedEntry) {
+        const role = (matchedEntry.role || 'CREWMEMBER').toUpperCase();
+        // Compare against the PLAYER clearance (not GM access level) so codes can elevate
+        const currentRank = this._getClearanceRank(this._getPlayerClearance());
+        const newRank = this._getClearanceRank(role);
+
+        // Only upgrade clearance, never downgrade
+        if (newRank > currentRank) {
+          // Update local cache immediately so any re-render sees the new level
+          this._localClearance = role;
+
+          if (game.user.isGM) {
+            await this._setActiveClearance(role);
+          } else {
+            // Players can't write world settings — ask GM via socket
+            game.socket.emit('module.wy-terminal', {
+              type: 'setClearance',
+              payload: { level: role, userId: game.user.id },
+            });
+          }
+        }
+
+        // Visual feedback — green flash
+        const grantLabel = isRfid ? `KEYCARD ACCEPTED — ${role}` : `ACCESS GRANTED — ${role}`;
+        if (display) {
+          display.textContent = grantLabel;
+          display.style.color = 'var(--wy-green)';
+          display.style.borderColor = 'var(--wy-green)';
+        }
+
+        // Play sound if available
+        this._playSound?.('keypad-accept');
+
+        // Update footer clearance in the main app element
+        this._updateFooterClearance(role);
+
+        // Update the current clearance display in this view
+        const valueEl = contentEl.querySelector('.wy-cc-current-value');
+        if (valueEl) {
+          // Remove old level class
+          valueEl.className = valueEl.className.replace(/wy-cc-level-\S+/g, '');
+          valueEl.classList.add(`wy-cc-level-${role}`);
+          valueEl.textContent = role;
+        }
+
+        // Broadcast to other clients
+        this._broadcastSocket?.('refreshView', { view: 'commandcode' });
+
+        // Clear buffer after delay
+        setTimeout(() => {
+          buffer = '';
+          updateDisplay();
+          if (rfidInput) rfidInput.value = '';
+          if (display) {
+            display.style.color = '';
+            display.style.borderColor = '';
+          }
+        }, 2000);
+      } else {
+        // Invalid code — red flash
+        const denyLabel = isRfid ? 'KEYCARD DENIED' : 'ACCESS DENIED';
+        if (display) {
+          display.textContent = denyLabel;
+          display.style.color = 'var(--wy-red)';
+          display.style.borderColor = 'var(--wy-red)';
+        }
+
+        this._playSound?.('keypad-deny');
+
+        setTimeout(() => {
+          buffer = '';
+          updateDisplay();
+          if (rfidInput) rfidInput.value = '';
+          if (display) {
+            display.style.color = '';
+            display.style.borderColor = '';
+          }
+        }, 1500);
+      }
+
+      rfidTimestamps = [];
+    };
+
+    // ── On-screen keypad buttons ──
     contentEl.querySelectorAll('[data-cc-keypad]').forEach(btn => {
       btn.addEventListener('click', async () => {
         const val = btn.dataset.ccKeypad;
 
         if (val === 'clear') {
           buffer = '';
+          rfidTimestamps = [];
           updateDisplay();
-          // Reset display style
+          if (rfidInput) rfidInput.value = '';
           if (display) {
             display.style.color = '';
             display.style.borderColor = '';
@@ -4037,116 +4167,145 @@ export class WYTerminalApp extends Application {
         }
 
         if (val === 'enter') {
-          if (!buffer.length) return;
-
-          // Validate code against the current user's command code (per-user)
-          const userCode = this._loadUserCommandCode();
-
-          if (userCode && userCode.code === buffer) {
-            const role = (userCode.role || 'CREWMEMBER').toUpperCase();
-            // Compare against the PLAYER clearance (not GM access level) so codes can elevate
-            const currentRank = this._getClearanceRank(this._getPlayerClearance());
-            const newRank = this._getClearanceRank(role);
-
-            // Only upgrade clearance, never downgrade
-            if (newRank > currentRank) {
-              if (game.user.isGM) {
-                await this._setActiveClearance(role);
-              } else {
-                // Players can't write world settings — ask GM via socket
-                game.socket.emit('module.wy-terminal', {
-                  type: 'setClearance',
-                  payload: { level: role, userId: game.user.id },
-                });
-              }
-            }
-
-            // Visual feedback — green flash
-            if (display) {
-              display.textContent = `ACCESS GRANTED — ${role}`;
-              display.style.color = 'var(--wy-green)';
-              display.style.borderColor = 'var(--wy-green)';
-            }
-
-            // Play sound if available
-            this._playSound?.('keypad-accept');
-
-            // Update footer clearance in the main app element
-            this._updateFooterClearance(role);
-
-            // Update the current clearance display in this view
-            const valueEl = contentEl.querySelector('.wy-cc-current-value');
-            if (valueEl) {
-              // Remove old level class
-              valueEl.className = valueEl.className.replace(/wy-cc-level-\S+/g, '');
-              valueEl.classList.add(`wy-cc-level-${role}`);
-              valueEl.textContent = role;
-            }
-
-            // Broadcast to other clients
-            this._broadcastSocket?.('refreshView', { view: 'commandcode' });
-
-            // Clear buffer after delay
-            setTimeout(() => {
-              buffer = '';
-              updateDisplay();
-              if (display) {
-                display.style.color = '';
-                display.style.borderColor = '';
-              }
-            }, 2000);
-          } else {
-            // Invalid code — red flash
-            if (display) {
-              display.textContent = 'ACCESS DENIED';
-              display.style.color = 'var(--wy-red)';
-              display.style.borderColor = 'var(--wy-red)';
-            }
-
-            this._playSound?.('keypad-deny');
-
-            setTimeout(() => {
-              buffer = '';
-              updateDisplay();
-              if (display) {
-                display.style.color = '';
-                display.style.borderColor = '';
-              }
-            }, 1500);
-          }
+          await submitCode('keypad');
           return;
         }
 
-        // Digit input
+        // Digit input from on-screen button
         if (buffer.length < MAX_DIGITS) {
           buffer += val;
-          updateDisplay();
+          updateDisplay('keypad');
         }
       });
     });
 
-    // ── Logout button — revoke clearance back to CREWMEMBER ──
-    // Uses same pattern as command code elevation: socket to GM + local DOM update
-    contentEl.querySelector('[data-action="logout-clearance"]')?.addEventListener('click', async () => {
-      // Ask GM to write the setting via socket (players can't write world settings)
-      game.socket.emit('module.wy-terminal', {
-        type: 'setClearance',
-        payload: { level: 'CREWMEMBER', userId: game.user.id },
+    // ── Keyboard / RFID input handler ──
+    // The hidden input captures physical keyboard and RFID reader input.
+    // RFID readers type all digits rapidly then send Enter — we detect
+    // this pattern by tracking how quickly digits arrive.
+    if (rfidInput) {
+      // Focus the hidden input so it captures keystrokes
+      rfidInput.focus();
+
+      // Re-focus when clicking anywhere in the keypad container
+      contentEl.querySelector('.wy-cc-keypad-container')?.addEventListener('click', (e) => {
+        if (!e.target.closest('[data-cc-keypad]') && !e.target.closest('[data-action]')) {
+          rfidInput.focus();
+        }
       });
 
-      // Update footer clearance display
-      this._updateFooterClearance('CREWMEMBER');
+      rfidInput.addEventListener('keydown', async (e) => {
+        // Enter key → submit
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          // Determine if this was an RFID scan based on timing
+          const isRfid = rfidTimestamps.length >= MAX_DIGITS &&
+            (rfidTimestamps[rfidTimestamps.length - 1] - rfidTimestamps[0]) < RFID_SCAN_THRESHOLD_MS;
+          await submitCode(isRfid ? 'rfid' : 'keyboard');
+          rfidInput.value = '';
+          return;
+        }
 
-      // Update the current clearance display in this view (direct DOM, no re-render)
-      const valueEl = contentEl.querySelector('.wy-cc-current-value');
-      if (valueEl) {
-        valueEl.className = valueEl.className.replace(/wy-cc-level-\S+/g, '');
-        valueEl.classList.add('wy-cc-level-CREWMEMBER');
-        valueEl.textContent = 'CREWMEMBER';
+        // Escape → clear
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          buffer = '';
+          rfidTimestamps = [];
+          rfidInput.value = '';
+          updateDisplay();
+          if (display) {
+            display.style.color = '';
+            display.style.borderColor = '';
+          }
+          return;
+        }
+
+        // Backspace → delete last digit
+        if (e.key === 'Backspace') {
+          e.preventDefault();
+          buffer = buffer.slice(0, -1);
+          rfidTimestamps.pop();
+          rfidInput.value = buffer;
+          updateDisplay('keyboard');
+          return;
+        }
+
+        // Only accept digits
+        if (/^\d$/.test(e.key) && buffer.length < MAX_DIGITS) {
+          e.preventDefault();
+          buffer += e.key;
+          rfidTimestamps.push(Date.now());
+          rfidInput.value = buffer;
+          updateDisplay('keyboard');
+
+          // Auto-submit if we have a full code and timestamps suggest RFID scan
+          if (buffer.length === MAX_DIGITS && rfidTimestamps.length === MAX_DIGITS) {
+            const elapsed = rfidTimestamps[MAX_DIGITS - 1] - rfidTimestamps[0];
+            if (elapsed < RFID_SCAN_THRESHOLD_MS) {
+              // RFID scan detected — auto-submit after a tiny delay
+              // (some readers send Enter after digits, some don't)
+              setTimeout(async () => {
+                if (buffer.length === MAX_DIGITS) {
+                  await submitCode('rfid');
+                  rfidInput.value = '';
+                }
+              }, 100);
+            }
+          }
+        } else if (/^\d$/.test(e.key)) {
+          e.preventDefault(); // Prevent overflow
+        }
+      });
+
+      // Prevent paste of non-numeric content
+      rfidInput.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const pasted = (e.clipboardData?.getData('text') || '').replace(/\D/g, '').slice(0, MAX_DIGITS - buffer.length);
+        if (pasted) {
+          const now = Date.now();
+          for (const ch of pasted) {
+            buffer += ch;
+            rfidTimestamps.push(now);
+          }
+          rfidInput.value = buffer;
+          updateDisplay('keyboard');
+        }
+      });
+    }
+
+    // ── Logout button — revoke clearance back to CREWMEMBER ──
+    contentEl.querySelector('[data-action="logout-clearance"]')?.addEventListener('click', async () => {
+      const level = 'CREWMEMBER';
+      const userId = game.user.id;
+      console.log('WY-Terminal | LOGOUT clicked — revoking clearance to', level);
+
+      // Update local cache FIRST so any re-render sees CREWMEMBER immediately
+      this._localClearance = level;
+
+      // Persist the setting change
+      if (game.user.isGM) {
+        await this._setActiveClearance(level);
+      } else {
+        // Players can't write world settings — ask GM via socket
+        game.socket.emit('module.wy-terminal', {
+          type: 'setClearance',
+          payload: { level, userId },
+        });
       }
 
-      // Broadcast to other clients
-      this._broadcastSocket('clearanceUpdated', { level: 'CREWMEMBER', userId: game.user.id });
+      // Notify other clients (GM, other players) of the clearance change
+      this._broadcastSocket('clearanceUpdated', { level, userId });
+
+      // Update footer
+      this._updateFooterClearance(level);
+
+      // Reset AI conversation to clear stale denial patterns
+      if (this.muthurBridge?.engine) {
+        this.muthurBridge.engine.resetConversation();
+      }
+
+      // Full re-render — reads from _localClearance, not stale game.settings
+      this._renderView('commandcode');
     });
 
     // ── GM Per-User Command Code Management ──
@@ -4173,7 +4332,7 @@ export class WYTerminalApp extends Application {
           const userId = row.dataset.userId;
           if (!userId) return;
           const role = row.querySelector('[data-field="role"]')?.value?.trim().toUpperCase() || 'CREWMEMBER';
-          const code = (row.querySelector('[data-field="code"]')?.value?.trim() || '').slice(0, 8);
+          const code = (row.querySelector('[data-field="code"]')?.value?.trim() || '').slice(0, 10);
           const clearance = row.querySelector('[data-field="clearance"]')?.value || 'CREWMEMBER';
           codes[userId] = { code, role };
           levels[userId] = clearance;
@@ -4198,7 +4357,7 @@ export class WYTerminalApp extends Application {
         rows.forEach(row => {
           const userId = row.dataset.userId;
           if (!userId) return;
-          const newCode = Array.from({ length: 8 }, () => Math.floor(Math.random() * 10)).join('');
+          const newCode = Array.from({ length: 10 }, () => Math.floor(Math.random() * 10)).join('');
           const codeInput = row.querySelector('[data-field="code"]');
           if (codeInput) codeInput.value = newCode;
           // Update in-memory map
@@ -4481,18 +4640,17 @@ export class WYTerminalApp extends Application {
 
   _getActiveClearance() {
     if (game.user.isGM) return 'MASTER_OVERRIDE';
-    try {
-      const levels = game.settings.get('wy-terminal', 'userClearanceLevels') || {};
-      return levels[game.user.id] || 'CREWMEMBER';
-    } catch { return 'CREWMEMBER'; }
+    return this._getPlayerClearance();
   }
 
   /**
-   * Get the player-facing clearance level (stored setting).
+   * Get the player-facing clearance level.
+   * Reads from the local cache first (always up-to-date after code submit,
+   * logout, or clearanceUpdated socket). Falls back to game.settings.
    * Unlike _getActiveClearance(), this does NOT auto-elevate for GM.
-   * Used for display in footer and CMD CODE view so GM sees the actual player state.
    */
   _getPlayerClearance() {
+    if (this._localClearance !== undefined) return this._localClearance;
     try {
       const levels = game.settings.get('wy-terminal', 'userClearanceLevels') || {};
       return levels[game.user.id] || 'CREWMEMBER';
@@ -4552,18 +4710,19 @@ export class WYTerminalApp extends Application {
    * @returns {string|null} response text if code matched, null otherwise
    */
   async _tryCommandCodeInMuthur(input) {
-    // Only check strings that look like command codes (8 digits)
-    if (!/^\d{8}$/.test(input)) return null;
+    // Only check strings that look like command codes (10 digits)
+    if (!/^\d{10}$/.test(input)) return null;
 
-    // Validate against the current user's command code (per-user)
-    const userCode = this._loadUserCommandCode();
+    // Validate against ALL user command codes (any valid code works on any terminal)
+    const allCodes = this._loadAllUserCommandCodes();
+    const matchedEntry = Object.values(allCodes).find(entry => entry?.code === input);
 
-    if (!userCode || userCode.code !== input) {
+    if (!matchedEntry) {
       TerminalSFX.play('buzz');
       return 'INVALID COMMAND CODE.\nACCESS DENIED.';
     }
 
-    const role = (userCode.role || 'CREWMEMBER').toUpperCase();
+    const role = (matchedEntry.role || 'CREWMEMBER').toUpperCase();
     const rank = this._getClearanceRank(role);
 
     // Only CORPORATE (3) or MASTER_OVERRIDE (4) unlocks restricted data

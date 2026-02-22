@@ -1,13 +1,11 @@
 <div class="wy-view-crew">
-  <div class="wy-section-title">CREW MANIFEST</div>
-
-  {{!-- Crew List View --}}
+  {{!-- Crew List View — visible to all clearance levels --}}
   <div class="wy-crew-list-view" id="wy-crew-list-view">
     <div class="wy-border-box wy-crew-list">
       <div class="wy-crew-row wy-crew-row-header">
         <span class="wy-crew-col-indicator"></span>
         <span class="wy-crew-col-name">NAME</span>
-        <span class="wy-crew-col-role">ROLE</span>
+        <span class="wy-crew-col-role">CAREER</span>
         <span class="wy-crew-col-location">LOCATION</span>
         <span class="wy-crew-col-status">STATUS</span>
         <span class="wy-crew-col-action"></span>
@@ -62,8 +60,16 @@
         <div class="wy-crew-detail-info">
           <div class="wy-crew-det-name" id="wy-crew-detail-name"></div>
           <div class="wy-crew-det-row">
-            <span class="wy-text-dim">ROLE:</span>
+            <span class="wy-text-dim">CAREER:</span>
             <span id="wy-crew-detail-role"></span>
+          </div>
+          <div class="wy-crew-det-row">
+            <span class="wy-text-dim">JOB:</span>
+            <span id="wy-crew-detail-job"></span>
+          </div>
+          <div class="wy-crew-det-row">
+            <span class="wy-text-dim">AGE:</span>
+            <span id="wy-crew-detail-age"></span>
           </div>
           <div class="wy-crew-det-row">
             <span class="wy-text-dim">LOCATION:</span>
@@ -80,81 +86,64 @@
         </div>
       </div>
 
-      {{!-- Health / Stress / Radiation bars --}}
-      <div class="wy-crew-vitals" id="wy-crew-vitals">
-        <div class="wy-crew-vital-row">
-          <span class="wy-text-dim">HEALTH:</span>
-          <span class="wy-crew-vital-bar" id="wy-crew-health-bar"></span>
-          <span id="wy-crew-health-val" class="wy-text-green"></span>
-        </div>
-        <div class="wy-crew-vital-row">
-          <span class="wy-text-dim">STRESS:</span>
-          <span class="wy-crew-vital-bar" id="wy-crew-stress-bar"></span>
-          <span id="wy-crew-stress-val" class="wy-text-amber"></span>
-        </div>
-        <div class="wy-crew-vital-row">
-          <span class="wy-text-dim">RADIATION:</span>
-          <span class="wy-crew-vital-bar" id="wy-crew-rad-bar"></span>
-          <span id="wy-crew-rad-val" class="wy-text-red"></span>
-        </div>
-      </div>
 
-      {{!-- Conditions --}}
+
+      {{!-- Medical Flags --}}
       <div class="wy-crew-conditions" id="wy-crew-conditions" style="display:none;">
-        <span class="wy-text-dim wy-cond-label">⚠ CONDITIONS:</span>
+        <span class="wy-text-dim wy-cond-label">⚠ MEDICAL FLAGS:</span>
         <div id="wy-crew-conditions-list" class="wy-cond-tags"></div>
       </div>
 
-      {{!-- Attributes --}}
+      {{!-- Physical Assessment --}}
       <div class="wy-crew-stats" id="wy-crew-stats">
-        <div class="wy-section-divider">ATTRIBUTES</div>
+        <div class="wy-section-divider">PHYSICAL ASSESSMENT</div>
         <div class="wy-crew-attr-grid">
           <div class="wy-crew-attr-block">
             <div class="wy-crew-attr-val" id="wy-crew-attr-str"></div>
-            <div class="wy-crew-attr-label">STR</div>
+            <div class="wy-crew-attr-label">STRENGTH</div>
           </div>
           <div class="wy-crew-attr-block">
             <div class="wy-crew-attr-val" id="wy-crew-attr-agl"></div>
-            <div class="wy-crew-attr-label">AGL</div>
+            <div class="wy-crew-attr-label">AGILITY</div>
           </div>
           <div class="wy-crew-attr-block">
             <div class="wy-crew-attr-val" id="wy-crew-attr-wit"></div>
-            <div class="wy-crew-attr-label">WIT</div>
+            <div class="wy-crew-attr-label">WITS</div>
           </div>
           <div class="wy-crew-attr-block">
             <div class="wy-crew-attr-val" id="wy-crew-attr-emp"></div>
-            <div class="wy-crew-attr-label">EMP</div>
+            <div class="wy-crew-attr-label">EMPATHY</div>
           </div>
         </div>
       </div>
 
-      {{!-- Skills grouped by attribute --}}
+      {{!-- Competency Ratings --}}
       <div class="wy-crew-skills" id="wy-crew-skills">
-        <div class="wy-section-divider">SKILLS</div>
+        <div class="wy-section-divider">COMPETENCY RATINGS — WY-EVAL</div>
         <div class="wy-crew-skill-groups">
           <div class="wy-crew-skill-group">
-            <div class="wy-crew-skill-group-hdr">STRENGTH</div>
+            <div class="wy-crew-skill-group-hdr">PHYSICAL</div>
             <div class="wy-crew-skill-row"><span class="wy-text-dim">HEAVY MACHINERY</span><span id="wy-crew-sk-heavyMach" class="wy-crew-skill-val"></span></div>
-            <div class="wy-crew-skill-row"><span class="wy-text-dim">CLOSE COMBAT</span><span id="wy-crew-sk-closeCbt" class="wy-crew-skill-val"></span></div>
-            <div class="wy-crew-skill-row"><span class="wy-text-dim">STAMINA</span><span id="wy-crew-sk-stamina" class="wy-crew-skill-val"></span></div>
+            <div class="wy-crew-skill-row"><span class="wy-text-dim">CLOSE QUARTERS</span><span id="wy-crew-sk-closeCbt" class="wy-crew-skill-val"></span></div>
+            <div class="wy-crew-skill-row"><span class="wy-text-dim">ENDURANCE</span><span id="wy-crew-sk-stamina" class="wy-crew-skill-val"></span></div>
           </div>
           <div class="wy-crew-skill-group">
-            <div class="wy-crew-skill-group-hdr">AGILITY</div>
-            <div class="wy-crew-skill-row"><span class="wy-text-dim">RANGED COMBAT</span><span id="wy-crew-sk-rangedCbt" class="wy-crew-skill-val"></span></div>
+            <div class="wy-crew-skill-group-hdr">MOTOR SKILLS</div>
+            <div class="wy-crew-skill-row"><span class="wy-text-dim">FIREARMS</span><span id="wy-crew-sk-rangedCbt" class="wy-crew-skill-val"></span></div>
             <div class="wy-crew-skill-row"><span class="wy-text-dim">MOBILITY</span><span id="wy-crew-sk-mobility" class="wy-crew-skill-val"></span></div>
             <div class="wy-crew-skill-row"><span class="wy-text-dim">PILOTING</span><span id="wy-crew-sk-piloting" class="wy-crew-skill-val"></span></div>
           </div>
           <div class="wy-crew-skill-group">
-            <div class="wy-crew-skill-group-hdr">WITS</div>
+            <div class="wy-crew-skill-group-hdr">COGNITIVE</div>
             <div class="wy-crew-skill-row"><span class="wy-text-dim">OBSERVATION</span><span id="wy-crew-sk-observation" class="wy-crew-skill-val"></span></div>
             <div class="wy-crew-skill-row"><span class="wy-text-dim">COMTECH</span><span id="wy-crew-sk-comtech" class="wy-crew-skill-val"></span></div>
-            <div class="wy-crew-skill-row"><span class="wy-text-dim">SURVIVAL</span><span id="wy-crew-sk-survival" class="wy-crew-skill-val"></span></div>
+            <div class="wy-crew-skill-row"><span class="wy-text-dim">SURVIVAL TRAINING</span><span id="wy-crew-sk-survival" class="wy-crew-skill-val"></span></div>
           </div>
           <div class="wy-crew-skill-group">
-            <div class="wy-crew-skill-group-hdr">EMPATHY</div>
-            <div class="wy-crew-skill-row"><span class="wy-text-dim">COMMAND</span><span id="wy-crew-sk-command" class="wy-crew-skill-val"></span></div>
-            <div class="wy-crew-skill-row"><span class="wy-text-dim">MANIPULATION</span><span id="wy-crew-sk-manipulation" class="wy-crew-skill-val"></span></div>
-            <div class="wy-crew-skill-row"><span class="wy-text-dim">MEDICAL AID</span><span id="wy-crew-sk-medicalAid" class="wy-crew-skill-val"></span></div>
+            <div class="wy-crew-skill-group-hdr">INTERPERSONAL</div>
+            <div class="wy-crew-skill-row"><span class="wy-text-dim">LEADERSHIP</span><span id="wy-crew-sk-command" class="wy-crew-skill-val"></span></div>
+            <div class="wy-crew-skill-row"><span class="wy-text-dim">NEGOTIATION</span><span id="wy-crew-sk-manipulation" class="wy-crew-skill-val"></span></div>
+            <div class="wy-crew-skill-row"><span class="wy-text-dim">FIELD MEDICINE</span><span id="wy-crew-sk-medicalAid" class="wy-crew-skill-val"></span></div>
           </div>
         </div>
       </div>
@@ -201,8 +190,8 @@
       {{/if}}
 
       <div class="wy-crew-detail-body" id="wy-crew-detail-body-wrap">
-        <div class="wy-section-divider">PERSONNEL FILE</div>
-        <pre class="wy-crew-detail-text" id="wy-crew-detail-body">NO ADDITIONAL PERSONNEL DATA ON FILE.</pre>
+        <div class="wy-section-divider">PERSONNEL NOTES</div>
+        <div class="wy-crew-detail-text" id="wy-crew-detail-body">NO ADDITIONAL PERSONNEL DATA ON FILE.</div>
       </div>
       <div class="wy-crew-detail-footer">
         <button class="wy-scene-btn" data-action="close-crew">[CLOSE]</button>

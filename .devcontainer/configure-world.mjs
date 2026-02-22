@@ -231,9 +231,17 @@ async function importCompendiumActors(actorsDb, foldersDb) {
 }
 
 // ── 4. Set recommended GM-Terminal default settings ─────────────────────────
-function generateCode() {
-  return Array.from({ length: 8 }, () => Math.floor(Math.random() * 10)).join('');
-}
+
+// Fixed command codes for each user — never randomly generated.
+// Codes are 10-digit numeric strings; roles determine the clearance granted on entry.
+const FIXED_COMMAND_CODES = {
+  'JOHN.WILSON':    { code: '0008349611', role: 'CORPORATE' },
+  'VANESSA_MILLER': { code: '0025565535', role: 'CAPTAIN' },
+  'KAYLA_RYE':      { code: '0041776201', role: 'CREWMEMBER' },
+  'LEAH_DAVIS':     { code: '0059130482', role: 'CREWMEMBER' },
+  'LYRON_CHAN':     { code: '0063298710', role: 'CREWMEMBER' },
+  'ship-terminal':  { code: '0000000000', role: 'CREWMEMBER' },
+};
 
 async function setDefaultSettings(settingsDb, foldersDb, userIdMap = new Map()) {
   // Collect existing setting keys
@@ -249,9 +257,10 @@ async function setDefaultSettings(settingsDb, foldersDb, userIdMap = new Map()) 
     // Skip GM users (role 4)
     const userDef = USERS_TO_CREATE.find(u => u.name === userName);
     if (userDef?.role === 4) continue;
+    const fixed = FIXED_COMMAND_CODES[userName] || { code: '0000000000', role: 'CREWMEMBER' };
     userClearanceLevels[userId] = 'CREWMEMBER';
-    userCommandCodes[userId] = { code: generateCode(), role: 'CREWMEMBER' };
-    console.log(`  ✔  Generated command code for ${userName}: ${userCommandCodes[userId].code} (role: CREWMEMBER)`);
+    userCommandCodes[userId] = { code: fixed.code, role: fixed.role };
+    console.log(`  ✔  Assigned command code for ${userName}: ${fixed.code} (role: ${fixed.role})`);
   }
 
   // Default recommended settings for development
@@ -344,26 +353,31 @@ async function setDefaultSettings(settingsDb, foldersDb, userIdMap = new Map()) 
     'wy-terminal.userCommandCodes',
   ]);
 
-  let setCount = 0;
-  for (const [settingKey, settingValue] of Object.entries(defaults)) {
-    const forceUpdate = FORCE_UPDATE_KEYS.has(settingKey);
-
-    // If key exists and is NOT force-update, skip
-    if (existingKeys.has(settingKey) && !forceUpdate) continue;
-
-    // For force-update keys that exist, find and replace in DB
-    if (existingKeys.has(settingKey) && forceUpdate) {
+  // Collect force-update entries first (cannot mutate DB while iterating)
+  const forceUpdates = [];  // [{ dbKey, dbVal, settingValue }]
+  for (const settingKey of FORCE_UPDATE_KEYS) {
+    if (existingKeys.has(settingKey) && defaults[settingKey] !== undefined) {
       for await (const [dbKey, dbVal] of settingsDb.iterator()) {
         if (dbVal.key === settingKey) {
-          dbVal.value = settingValue;
-          await settingsDb.put(dbKey, dbVal);
-          console.log(`  ✔  Force-updated ${settingKey}`);
-          setCount++;
+          forceUpdates.push({ dbKey, dbVal, settingKey, settingValue: defaults[settingKey] });
           break;
         }
       }
-      continue;
     }
+  }
+
+  // Apply force-updates outside the iterator
+  for (const { dbKey, dbVal, settingKey, settingValue } of forceUpdates) {
+    dbVal.value = settingValue;
+    await settingsDb.put(dbKey, dbVal);
+    console.log(`  ✔  Force-updated ${settingKey}`);
+  }
+
+  let setCount = forceUpdates.length;
+  for (const [settingKey, settingValue] of Object.entries(defaults)) {
+    // Skip keys already handled by force-update or that already exist
+    if (FORCE_UPDATE_KEYS.has(settingKey)) continue;
+    if (existingKeys.has(settingKey)) continue;
 
     const id = randomId();
     const doc = {

@@ -1,0 +1,366 @@
+{
+  "_id": "6nP9HjgD5OqrRkCU",
+  "name": "Grace O'Malley",
+  "type": "character",
+  "img": "icons/svg/mystery-man.svg",
+  "items": [],
+  "effects": [],
+  "folder": "cs2JnCLDPQdwJAle",
+  "sort": 0,
+  "flags": {
+    "core": {}
+  },
+  "system": {
+    "header": {
+      "health": {
+        "value": 3,
+        "label": "Health",
+        "mod": 0,
+        "max": 3,
+        "calculatedMax": 3
+      },
+      "stress": {
+        "value": 0,
+        "label": "Stress",
+        "mod": 0,
+        "max": 10
+      },
+      "npc": false,
+      "resolve": {
+        "value": 0,
+        "max": 0,
+        "mod": 0,
+        "label": "ALIENRPG.Resolve"
+      }
+    },
+    "attributes": {
+      "str": {
+        "value": 3,
+        "label": "Strength",
+        "mod": 3,
+        "max": 0
+      },
+      "wit": {
+        "value": 3,
+        "label": "Wits",
+        "mod": 3,
+        "max": 0
+      },
+      "agl": {
+        "value": 3,
+        "label": "Agility",
+        "mod": 3,
+        "max": 0
+      },
+      "emp": {
+        "value": 3,
+        "label": "Empathy",
+        "mod": 3,
+        "max": 0
+      }
+    },
+    "skills": {
+      "heavyMach": {
+        "value": 1,
+        "label": "Heavy Machinery",
+        "description": "Heavy Machinery",
+        "mod": 4,
+        "max": 0,
+        "attrib": ""
+      },
+      "closeCbt": {
+        "value": 0,
+        "label": "Close Combat",
+        "description": "Close Combat",
+        "mod": 3,
+        "max": 0,
+        "attrib": ""
+      },
+      "stamina": {
+        "value": 1,
+        "label": "Stamina",
+        "description": "Stamina",
+        "mod": 4,
+        "max": 0,
+        "attrib": ""
+      },
+      "rangedCbt": {
+        "value": 0,
+        "label": "Ranged Combat",
+        "description": "Ranged Combat",
+        "mod": 3,
+        "max": 0,
+        "attrib": ""
+      },
+      "mobility": {
+        "value": 0,
+        "label": "Mobility",
+        "description": "Mobility",
+        "mod": 3,
+        "max": 0,
+        "attrib": ""
+      },
+      "piloting": {
+        "value": 0,
+        "label": "Piloting",
+        "description": "Piloting",
+        "mod": 3,
+        "max": 0,
+        "attrib": ""
+      },
+      "command": {
+        "value": 0,
+        "label": "Command",
+        "description": "Command",
+        "mod": 3,
+        "max": 0,
+        "attrib": ""
+      },
+      "manipulation": {
+        "value": 1,
+        "label": "Manipulation",
+        "description": "Manipulation",
+        "mod": 4,
+        "max": 0,
+        "attrib": ""
+      },
+      "medicalAid": {
+        "value": 0,
+        "label": "Medical Aid",
+        "description": "Medical Aid",
+        "mod": 3,
+        "max": 0,
+        "attrib": ""
+      },
+      "observation": {
+        "value": 2,
+        "label": "Observation",
+        "description": "Observation",
+        "mod": 5,
+        "max": 0,
+        "attrib": ""
+      },
+      "survival": {
+        "value": 0,
+        "label": "Survival",
+        "description": "Survival",
+        "mod": 3,
+        "max": 0,
+        "attrib": ""
+      },
+      "comtech": {
+        "value": 1,
+        "label": "Comtech",
+        "description": "Comtech",
+        "mod": 4,
+        "max": 0,
+        "attrib": ""
+      }
+    },
+    "general": {
+      "career": {
+        "value": "8"
+      },
+      "appearance": {
+        "value": "Quartermaster on the USCSS Cronus\nAge: 41\nPersonality: Practical"
+      },
+      "sigItem": {
+        "value": ""
+      },
+      "agenda": {
+        "value": "Track every calorie and spare part. If someone needs something, find it."
+      },
+      "relOne": {
+        "value": "Jasper Thomson"
+      },
+      "relTwo": {
+        "value": ""
+      },
+      "xp": {
+        "value": 0,
+        "max": 20
+      },
+      "sp": {
+        "value": 0,
+        "max": 3
+      },
+      "radiation": {
+        "value": 0,
+        "max": 10,
+        "calculatedMax": 10,
+        "permanent": 0
+      },
+      "starving": false,
+      "dehydrated": false,
+      "exhausted": false,
+      "freezing": false,
+      "hypoxia": false,
+      "gravitydyspraxia": false,
+      "critInj": {
+        "value": 0
+      },
+      "armor": {
+        "value": 0
+      },
+      "panic": {
+        "value": 0,
+        "lastRoll": 0
+      },
+      "cash": {
+        "value": "0"
+      },
+      "encumbrance": {
+        "value": 0,
+        "max": 0,
+        "pct": 0,
+        "encumbered": false
+      },
+      "overwatch": false,
+      "fatigued": false,
+      "jumpy": false,
+      "tunnelvision": false,
+      "aggravated": false,
+      "shakes": false,
+      "frantic": false,
+      "deflated": false,
+      "paranoid": false,
+      "hesitant": false,
+      "freeze": false,
+      "seekcover": false,
+      "scream": false,
+      "flee": false,
+      "frenzy": false,
+      "catatonic": false,
+      "addpanic": {
+        "value": 1
+      },
+      "stressresponse": {
+        "value": -1
+      }
+    },
+    "consumables": {
+      "air": {
+        "value": 0
+      },
+      "power": {
+        "value": 0
+      },
+      "food": {
+        "value": 0
+      },
+      "water": {
+        "value": 0
+      }
+    },
+    "notes": "<p>Grace O'Malley managed supplies, provisions, and logistics with an iron fist. She was the crew's unofficial problem-solver — need something, ask Grace. After the evacuation, she noted supply status was good for 90 days but reported unease about LV-1113.</p><p><b>STATUS: KIA — USCSS CRONUS.</b> Survived the emergency launch from LV-1113 but was killed during the creature incursion aboard the ship. Did not reach the cryo vault.</p>",
+    "adhocitems": ""
+  },
+  "prototypeToken": {
+    "flags": {},
+    "name": "Grace O'Malley",
+    "displayName": 20,
+    "width": 1,
+    "height": 1,
+    "lockRotation": false,
+    "rotation": 0,
+    "actorLink": true,
+    "disposition": 1,
+    "displayBars": 20,
+    "bar1": {
+      "attribute": "header.health"
+    },
+    "bar2": {
+      "attribute": "header.stress"
+    },
+    "randomImg": false,
+    "alpha": 1,
+    "light": {
+      "alpha": 1,
+      "angle": 360,
+      "bright": 0,
+      "coloration": 1,
+      "dim": 0,
+      "luminosity": 0.5,
+      "saturation": 0,
+      "contrast": 0,
+      "shadows": 0,
+      "animation": {
+        "speed": 5,
+        "intensity": 5,
+        "type": null,
+        "reverse": false
+      },
+      "darkness": {
+        "min": 0,
+        "max": 1
+      },
+      "color": null,
+      "attenuation": 0.5,
+      "negative": false,
+      "priority": 0
+    },
+    "texture": {
+      "src": "icons/svg/mystery-man.svg",
+      "tint": "#ffffff",
+      "scaleX": 1,
+      "scaleY": 1,
+      "offsetX": 0,
+      "offsetY": 0,
+      "rotation": 0,
+      "anchorX": 0.5,
+      "anchorY": 0.5,
+      "fit": "contain",
+      "alphaThreshold": 0.75
+    },
+    "sight": {
+      "angle": 360,
+      "enabled": true,
+      "range": 12,
+      "brightness": 0,
+      "color": null,
+      "attenuation": 0.1,
+      "saturation": 0,
+      "contrast": 0,
+      "visionMode": "basic"
+    },
+    "detectionModes": [],
+    "appendNumber": false,
+    "prependAdjective": false,
+    "occludable": {
+      "radius": 0
+    },
+    "ring": {
+      "enabled": false,
+      "colors": {
+        "ring": null,
+        "background": null
+      },
+      "effects": 1,
+      "subject": {
+        "scale": 1,
+        "texture": null
+      }
+    },
+    "turnMarker": {
+      "mode": 1,
+      "animation": null,
+      "src": null,
+      "disposition": false
+    },
+    "movementAction": null
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "alienrpg",
+    "systemVersion": "4.0.10",
+    "createdTime": 1771724792566,
+    "modifiedTime": 1771724792566,
+    "lastModifiedBy": "H1vAw0KeNomo6NHk"
+  },
+  "ownership": {
+    "default": 0
+  }
+}

@@ -73,7 +73,6 @@ LOGFILE: MISSION 721/A:
 2110-10-12 {21:22:55} Initiating general distress signal on frequency 8713.41
 2111-04-12 {22:39:15} Initiating Powersaving Mode
 2111-04-19 {22:38:27} Initiating MU/TH/UR Core shutdown.
-2185-03-09 {12:52:22} Initiating MU/TH/UR Core system restart.
 { END OF LOG }
 
 If the user attempts to print the log, prompt them to choose between you either displaying the full log or filtering by date or event.

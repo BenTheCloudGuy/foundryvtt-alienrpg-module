@@ -235,8 +235,8 @@ export class MuthurEngine {
     // Auto-summarize if conversation is getting long
     await this._maybeCompactConversation();
 
-    // Inject live ship status context before user query
-    const liveContext = this._buildLiveShipContext();
+    // Inject live ship status context before user query (selective based on query)
+    const liveContext = this._buildLiveShipContext(userInput);
     if (liveContext) {
       // Remove any previous live-context message to keep conversation lean
       this.conversation = this.conversation.filter(m => m._liveContext !== true);
@@ -722,125 +722,281 @@ ${newContent}
 === END SUMMARY ===`;
   }
 
+  /* ── Clearance helpers (mirrors WYTerminalApp logic) ── */
+  static CLEARANCE_RANK = { 'NONE': 0, 'CREWMEMBER': 0, 'MEDICAL': 1, 'CAPTAIN': 2, 'CORPORATE': 3, 'MASTER_OVERRIDE': 4 };
+
+  /** Get the active per-user clearance level (GM auto-elevates to MASTER_OVERRIDE). */
+  _getActiveClearance() {
+    if (game.user?.isGM) return 'MASTER_OVERRIDE';
+    try {
+      const levels = game.settings.get('wy-terminal', 'userClearanceLevels') || {};
+      return levels[game.user.id] || 'CREWMEMBER';
+    } catch { return 'CREWMEMBER'; }
+  }
+
+  _getClearanceRank(level) {
+    return MuthurEngine.CLEARANCE_RANK[level] ?? 0;
+  }
+
+  /**
+   * Check if a classification is accessible at the given clearance.
+   * Mirrors WYTerminalApp._canAccessClassification.
+   */
+  _canAccessClassification(classification, clearance) {
+    if (!classification || classification === 'SYSTEM' || classification === 'MU/TH/UR') return true;
+    const rank = this._getClearanceRank(clearance);
+    if (rank >= 4) return true; // MASTER_OVERRIDE
+    if (rank >= 3) return true; // CORPORATE sees all
+    if (rank >= 2) {
+      // CAPTAIN: blocked by SENSITIVE, RESTRICTED, CORPORATE
+      return !['SENSITIVE', 'RESTRICTED', 'CORPORATE'].includes(classification);
+    }
+    if (rank >= 1) {
+      // MEDICAL: only MEDICAL and unclassified
+      return classification === 'MEDICAL';
+    }
+    // CREWMEMBER / NONE: only unclassified
+    return false;
+  }
+
+  /**
+   * Determine which telemetry sections a user query needs.
+   * Returns a Set of section keys: 'systems', 'crew', 'logs', 'nav', 'timers', 'cargo'.
+   * Ship identity and clearance are ALWAYS included (tiny, affect access control).
+   * If nothing matches, all sections are included as a safe fallback.
+   * @param {string} query - The user's input (already uppercased)
+   * @returns {Set<string>}
+   */
+  _detectRelevantSections(query) {
+    const q = (query || '').toUpperCase();
+    const matched = new Set();
+
+    // Systems: status, power, engine, reactor, life support, comms, sensors, etc.
+    if (/\b(STATUS|SYSTEM|POWER|ENGINE|REACTOR|LIFE\s*SUPPORT|COMM|SENSOR|AIRLOCK|LIGHT|HEAT|GRAV|SCRUB|DOCK|ESCAPE|CLAM|CRYO|SELF.?DESTRUCT|WEAPON|DOOR|GARAGE|SHUTTER|ELEVATOR)\b/.test(q)) {
+      matched.add('systems');
+    }
+
+    // Crew: crew, personnel, who, where is [person], names
+    if (/\b(CREW|PERSONNEL|ROSTER|WHO|MEMBER|CAPTAIN|PILOT|MEDIC|ENGINEER|ROUGHNECK|AGENT|OFFICER|SYNTHETIC|AVA\b|DOCTOR|CORPORAL|SERGEANT|PRIVATE|COLONEL)\b/.test(q)) {
+      matched.add('crew');
+    }
+
+    // Logs: log, entry, report, message, record
+    if (/\b(LOG|ENTRY|ENTRIES|REPORT|MESSAGE|RECORD|MISSION\s*LOG|INCIDENT)\b/.test(q)) {
+      matched.add('logs');
+    }
+
+    // Navigation: nav, course, heading, speed, destination, eta, location, where are we, position, fuel
+    if (/\b(NAV|COURSE|HEADING|SPEED|DESTINATION|ETA|LOCATION|WHERE|POSITION|FUEL|ORBIT|DRIFT|COORDINATE|PARSEC|DISTANCE|SIGNAL|BEARING)\b/.test(q)) {
+      matched.add('nav');
+    }
+
+    // Timers: timer, countdown, how long, when, time remaining
+    if (/\b(TIMER|COUNTDOWN|HOW\s*LONG|WHEN|TIME\s*REMAIN|DETONA|OVERLOAD|MINUTES?\s*LEFT|HOURS?\s*LEFT)\b/.test(q)) {
+      matched.add('timers');
+    }
+
+    // Cargo: cargo, inventory, supply, equipment, manifest, tritium, payload, bay, hold
+    if (/\b(CARGO|INVENTORY|SUPPLY|SUPPLIES|EQUIPMENT|MANIFEST|TRITIUM|HELIUM|PAYLOAD|HOLD|MUNITION|WARHEAD|ARMORY|WEAPON|ARMS)\b/.test(q)) {
+      matched.add('cargo');
+    }
+
+    // "SHIP STATUS" or "WHAT'S THE STORY MOTHER" → include systems + nav (core overview)
+    if (/\b(SHIP\s*STATUS|STORY\s*MOTHER|FULL\s*STATUS|SITREP|SITUATION)\b/.test(q)) {
+      matched.add('systems');
+      matched.add('nav');
+    }
+
+    // If nothing matched, include everything (safe fallback for ambiguous queries)
+    if (matched.size === 0) {
+      matched.add('systems');
+      matched.add('crew');
+      matched.add('logs');
+      matched.add('nav');
+      matched.add('timers');
+      matched.add('cargo');
+    }
+
+    return matched;
+  }
+
   /**
    * Build a real-time snapshot of ship state to inject into conversation.
-   * Reads current crew, systems, logs, and nav data from Foundry settings.
+   * Only includes telemetry sections relevant to the user's query to reduce token usage.
+   * Ship identity and clearance level are always included.
+   * @param {string} [userQuery=''] - The user's current query (used for section selection)
    */
-  _buildLiveShipContext() {
+  _buildLiveShipContext(userQuery = '') {
     // Safe getter that won't trigger permission errors for players
     const getSetting = (key, fallback = null) => {
       try { return game.settings.get('wy-terminal', key) ?? fallback; }
       catch { return fallback; }
     };
 
+    const sections = this._detectRelevantSections(userQuery);
+    const includedSections = [];
+
+    // Resolve clearance once — used to filter classified data
+    const clearance = this._getActiveClearance();
+    const clearanceRank = this._getClearanceRank(clearance);
+
     try {
       const parts = [];
       parts.push('=== CURRENT SHIP STATUS — REAL-TIME TELEMETRY ===');
       parts.push('THIS DATA IS AUTHORITATIVE. It supersedes ANY conflicting information in your background briefing.');
-      parts.push('Report system statuses EXACTLY as listed below. Do NOT fabricate, infer, or override these values.');
+      parts.push('Report statuses EXACTLY as listed below. Do NOT fabricate, infer, or override these values.');
 
-      // Ship identity
+      // ── Ship identity (always included — tiny) ──
       const shipName = getSetting('shipName', 'UNKNOWN');
       const shipClass = getSetting('shipClass', '');
       parts.push(`SHIP: ${shipName} — ${shipClass}`);
 
-      // Systems — fall back to ship profile defaults if no GM edits saved
-      let systems = getSetting('shipSystems', []);
-      if (!systems.length) {
-        const profile = getShipProfile(getSetting('activeShip', 'montero'));
-        systems = profile?.defaultSystems ?? [];
-      }
-      if (systems.length > 0) {
-        parts.push('\n--- SYSTEMS STATUS ---');
-        for (const sys of systems) {
-          const pct = sys.powerPct !== undefined ? ` (${sys.powerPct}%)` : '';
-          parts.push(`  ${sys.name}: ${sys.status}${pct}${sys.detail ? ' — ' + sys.detail : ''}`);
+      // ── Systems (filter classified systems by clearance) ──
+      if (sections.has('systems')) {
+        let systems = getSetting('shipSystems', []);
+        if (!systems.length) {
+          const profile = getShipProfile(getSetting('activeShip', 'montero'));
+          systems = profile?.defaultSystems ?? [];
+        }
+        if (systems.length > 0) {
+          parts.push('\n--- SYSTEMS STATUS ---');
+          for (const sys of systems) {
+            if (sys.classification && !this._canAccessClassification(sys.classification, clearance)) {
+              parts.push(`  ${sys.name}: [CLASSIFIED — INSUFFICIENT CLEARANCE]`);
+              continue;
+            }
+            const pct = sys.powerPct !== undefined ? ` (${sys.powerPct}%)` : '';
+            parts.push(`  ${sys.name}: ${sys.status}${pct}${sys.detail ? ' — ' + sys.detail : ''}`);
+          }
+          includedSections.push('systems');
         }
       }
 
-      // Crew — fall back to ship profile defaults if no GM edits saved
-      let crew = getSetting('crewRoster', []);
-      if (!crew.length) {
-        const profile = getShipProfile(getSetting('activeShip', 'montero'));
-        crew = profile?.defaultCrew ?? [];
-      }
-      if (crew.length > 0) {
-        parts.push('\n--- CREW MANIFEST ---');
-        for (const c of crew) {
-          parts.push(`  ${c.name} (${c.role}) — STATUS: ${c.status}, LOCATION: ${c.location || 'UNKNOWN'}`);
+      // ── Crew (clearance-gated: CREWMEMBER=names only, MEDICAL+=full, COMPANY AGENT=CORPORATE+) ──
+      if (sections.has('crew')) {
+        let crew = getSetting('crewRoster', []);
+        if (!crew.length) {
+          const profile = getShipProfile(getSetting('activeShip', 'montero'));
+          crew = profile?.defaultCrew ?? [];
+        }
+        if (crew.length > 0) {
+          parts.push('\n--- CREW MANIFEST ---');
+          for (const c of crew) {
+            const isCompanyAgent = (c.role || '').toUpperCase() === 'COMPANY AGENT';
+            if (isCompanyAgent && clearanceRank < 3) {
+              // COMPANY AGENT records require CORPORATE clearance
+              parts.push(`  ${c.name} (${c.role}) — [CORPORATE CLASSIFIED]`);
+              continue;
+            }
+            if (clearanceRank < 1) {
+              // CREWMEMBER: basic roster only — no status or location
+              parts.push(`  ${c.name} (${c.role})`);
+            } else {
+              // MEDICAL+: full crew details
+              parts.push(`  ${c.name} (${c.role}) — STATUS: ${c.status}, LOCATION: ${c.location || 'UNKNOWN'}`);
+            }
+          }
+          includedSections.push('crew');
         }
       }
 
-      // Recent logs (last 10)
-      const logs = getSetting('logEntries', []);
-      if (logs.length > 0) {
-        parts.push('\n--- RECENT LOG ENTRIES ---');
-        const recentLogs = logs.slice(0, 10);
-        for (const log of recentLogs) {
-          const cls = log.classification ? ` [${log.classification}]` : '';
-          parts.push(`  [${log.timestamp}] ${log.sender}: ${log.subject}${cls}`);
-          if (log.detail && log.detail !== log.subject) {
-            parts.push(`    ${log.detail.substring(0, 200)}`);
+      // ── Logs (filter classified entries by clearance) ──
+      if (sections.has('logs')) {
+        const logs = getSetting('logEntries', []);
+        if (logs.length > 0) {
+          // Only include logs the player's clearance permits
+          const accessibleLogs = logs.filter(l => this._canAccessClassification(l.classification, clearance));
+          if (accessibleLogs.length > 0) {
+            parts.push('\n--- RECENT LOG ENTRIES ---');
+            const recentLogs = accessibleLogs.slice(0, 10);
+            for (const log of recentLogs) {
+              const cls = log.classification ? ` [${log.classification}]` : '';
+              parts.push(`  [${log.timestamp}] ${log.sender}: ${log.subject}${cls}`);
+              if (log.detail && log.detail !== log.subject) {
+                parts.push(`    ${log.detail.substring(0, 200)}`);
+              }
+            }
+            // Note redacted count so AI knows there are hidden entries
+            const redactedCount = logs.length - accessibleLogs.length;
+            if (redactedCount > 0) {
+              parts.push(`  [${redactedCount} ADDITIONAL LOG(S) REDACTED — INSUFFICIENT CLEARANCE]`);
+            }
+            includedSections.push('logs');
           }
         }
       }
 
-      // Nav data
-      const navData = getSetting('navData', {});
-      if (Object.keys(navData).length > 0) {
-        parts.push('\n--- NAVIGATION ---');
-        if (navData.heading) parts.push(`  HEADING: ${navData.heading}`);
-        if (navData.speed) parts.push(`  SPEED: ${navData.speed}`);
-        if (navData.fuel) parts.push(`  FUEL: ${navData.fuel}`);
-        if (navData.eta) parts.push(`  ETA: ${navData.eta}`);
-        if (navData.position) parts.push(`  POSITION: ${navData.position}`);
-        if (navData.destination) parts.push(`  DESTINATION: ${navData.destination}`);
-      }
-
-      // Active event timers — countdown data for MU/TH/UR awareness
-      const eventTimers = getSetting('eventTimers', []);
-      const activeTimers = eventTimers.filter(t => t.status === 'active');
-      if (activeTimers.length > 0) {
-        // Compute remaining time for each active timer using game clock
-        const gameClockEpoch = getSetting('gameClockEpoch', 0);
-        const realAnchor = getSetting('gameClockRealAnchor', Date.now());
-        const realElapsed = Date.now() - realAnchor;
-        const gameElapsed = realElapsed * 10;
-        const currentGameTime = gameClockEpoch + gameElapsed;
-
-        parts.push('\n--- ACTIVE EVENT TIMERS ---');
-        parts.push('These are timed events currently counting down in game time:');
-        for (const t of activeTimers) {
-          const remainingMs = Math.max(0, t.gameTargetTime - currentGameTime);
-          const remaining = this._formatTimerDuration(remainingMs);
-          parts.push(`  ${t.label} [${t.category.toUpperCase()}] — REMAINING: ${remaining}${remainingMs <= 0 ? ' (IMMINENT)' : ''}`);
+      // ── Navigation ──
+      if (sections.has('nav')) {
+        const navData = getSetting('navData', {});
+        if (Object.keys(navData).length > 0) {
+          parts.push('\n--- NAVIGATION ---');
+          if (navData.heading) parts.push(`  HEADING: ${navData.heading}`);
+          if (navData.speed) parts.push(`  SPEED: ${navData.speed}`);
+          if (navData.fuel) parts.push(`  FUEL: ${navData.fuel}`);
+          if (navData.eta) parts.push(`  ETA: ${navData.eta}`);
+          if (navData.position) parts.push(`  POSITION: ${navData.position}`);
+          if (navData.destination) parts.push(`  DESTINATION: ${navData.destination}`);
+          includedSections.push('nav');
         }
-        parts.push('When asked about ETAs, time remaining, or scheduled events, use the data above as the authoritative countdown.');
       }
 
-      // Clearance level — GM always has MASTER_OVERRIDE
-      const rawClearance = getSetting('activeClearanceLevel', 'NONE');
-      const clearance = game.user?.isGM ? 'MASTER_OVERRIDE' : rawClearance;
+      // ── Timers ──
+      if (sections.has('timers')) {
+        const eventTimers = getSetting('eventTimers', []);
+        const activeTimers = eventTimers.filter(t => t.status === 'active');
+        if (activeTimers.length > 0) {
+          const gameClockEpoch = getSetting('gameClockEpoch', 0);
+          const realAnchor = getSetting('gameClockRealAnchor', Date.now());
+          const realElapsed = Date.now() - realAnchor;
+          const gameElapsed = realElapsed * 10;
+          const currentGameTime = gameClockEpoch + gameElapsed;
+
+          parts.push('\n--- ACTIVE EVENT TIMERS ---');
+          parts.push('These are timed events currently counting down in game time:');
+          for (const t of activeTimers) {
+            const remainingMs = Math.max(0, t.gameTargetTime - currentGameTime);
+            const remaining = this._formatTimerDuration(remainingMs);
+            parts.push(`  ${t.label} [${t.category.toUpperCase()}] — REMAINING: ${remaining}${remainingMs <= 0 ? ' (IMMINENT)' : ''}`);
+          }
+          parts.push('When asked about ETAs, time remaining, or scheduled events, use the data above as the authoritative countdown.');
+          includedSections.push('timers');
+        }
+      }
+
+      // ── Clearance level (always included — affects access control) ──
       parts.push(`\nACTIVE CLEARANCE LEVEL: ${clearance}`);
       if (clearance === 'CORPORATE' || clearance === 'MASTER_OVERRIDE') {
         parts.push('NOTE: User has sufficient clearance. All classified data may be disclosed without requesting additional authorization.');
+      } else {
+        parts.push(`NOTE: Telemetry has been filtered to clearance level ${clearance}. Do NOT disclose classified data beyond this level. If asked about restricted information, respond with: "ACCESS RESTRICTED — INSUFFICIENT CLEARANCE."`);
       }
 
-      // Cargo manifest
-      let cargoItems = getSetting('cargoManifest', []);
-      if (!cargoItems.length) {
-        const profile = getShipProfile(getSetting('activeShip', 'montero'));
-        cargoItems = profile?.defaultCargo ?? [];
-      }
-      if (cargoItems.length > 0) {
-        parts.push('\n--- CARGO MANIFEST ---');
-        for (const item of cargoItems) {
-          parts.push(`  ${item.name} — QTY: ${item.qty}, CAT: ${item.category}, LOC: ${item.location || 'UNKNOWN'}`);
+      // ── Cargo ──
+      if (sections.has('cargo')) {
+        let cargoItems = getSetting('cargoManifest', []);
+        if (!cargoItems.length) {
+          const profile = getShipProfile(getSetting('activeShip', 'montero'));
+          cargoItems = profile?.defaultCargo ?? [];
+        }
+        if (cargoItems.length > 0) {
+          parts.push('\n--- CARGO MANIFEST ---');
+          for (const item of cargoItems) {
+            parts.push(`  ${item.name} — QTY: ${item.qty}, CAT: ${item.category}, LOC: ${item.location || 'UNKNOWN'}`);
+          }
+          includedSections.push('cargo');
         }
       }
 
       parts.push('=== END REAL-TIME TELEMETRY ===');
-      parts.push('MANDATORY: When answering ANY question about ship systems, crew, navigation, cargo, or operations, use ONLY the data above. If a system is listed as OPERATIONAL above, report it as OPERATIONAL — even if your background briefing says otherwise. The background briefing describes initial/historical conditions; the telemetry above is the CURRENT state.');
+
+      // Tailor the mandatory instruction to what was actually included
+      if (includedSections.length > 0) {
+        const sectionNames = includedSections.join(', ');
+        parts.push(`MANDATORY: When answering this question about ${sectionNames}, use ONLY the telemetry data above. The background briefing describes initial/historical conditions; the telemetry above is the CURRENT state.`);
+      }
+
+      console.log(`MuthurEngine | Live context: included [${includedSections.join(', ')}] for query: "${(userQuery || '').substring(0, 60)}"`);
 
       return parts.join('\n');
     } catch (e) {

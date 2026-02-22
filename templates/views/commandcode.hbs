@@ -21,7 +21,7 @@
   <div class="wy-section-title" style="margin-top: 16px;">USER CLEARANCE &amp; COMMAND CODES</div>
   <div class="wy-border-box" id="wy-user-codes-section">
     <div style="color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px; margin-bottom: 12px;">
-      EACH USER HAS AN INDEPENDENT CLEARANCE LEVEL AND UNIQUE 8-DIGIT COMMAND CODE.
+      EACH USER HAS AN INDEPENDENT CLEARANCE LEVEL AND UNIQUE 10-DIGIT COMMAND CODE.
     </div>
 
     {{#each userList}}
@@ -51,7 +51,7 @@
         </div>
         <div class="wy-user-field-group">
           <label class="wy-user-field-label">CMD CODE</label>
-          <input class="wy-setting-input" type="text" data-field="code" value="{{this.code}}" placeholder="8-DIGIT CODE" maxlength="8" style="font-family: monospace; letter-spacing: 2px;" />
+          <input class="wy-setting-input" type="text" data-field="code" value="{{this.code}}" placeholder="10-DIGIT CODE" maxlength="10" style="font-family: monospace; letter-spacing: 2px;" />
         </div>
       </div>
     </div>
@@ -77,6 +77,12 @@
   <div class="wy-cc-keypad-container">
     <div class="wy-keypad-title">ENTER COMMAND CODE</div>
     <div class="wy-keypad-subtitle">AUTHORIZATION REQUIRED FOR CLASSIFIED ACCESS</div>
+
+    {{!-- Hidden input captures keyboard / USB RFID reader input (HID device) --}}
+    <input type="text" id="wy-cc-rfid-input" class="wy-cc-hidden-input"
+           autocomplete="off" autocorrect="off" autocapitalize="off"
+           inputmode="numeric" maxlength="10" />
+
     <div class="wy-keypad-display" id="wy-cc-keypad-display"></div>
     <div class="wy-keypad-grid">
       <button class="wy-keypad-btn" data-cc-keypad="1">1</button>

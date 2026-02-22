@@ -367,11 +367,12 @@ Hooks.once('ready', () => {
         }
       }
     }
-    // Clearance was updated by GM — target user updates their footer and re-renders
+    // Clearance was updated (by GM write or broadcast) — update cache, footer, and re-render
     if (data.type === 'clearanceUpdated' && terminalApp?.rendered) {
       const { level, userId } = data.payload;
-      // Only update footer if this clearance change is for the current user
       if (userId === game.user.id) {
+        // Update local clearance cache so any re-render sees the authoritative value
+        terminalApp._localClearance = level;
         terminalApp._updateFooterClearance(level);
       }
       // Re-render current view (player sees updated access, GM sees updated user list)
@@ -544,6 +545,31 @@ function _broadcastTokenRefresh(scene) {
     terminalApp.scheduleTokenUpdate(null);
   }
 }
+
+/* ──────────────────────────────────────────────────────────────────
+   Actor Hooks — Auto-refresh crew view when an Actor document changes
+   ────────────────────────────────────────────────────────────────── */
+
+Hooks.on('updateActor', (actor) => {
+  if (!terminalApp?.rendered) return;
+  // Only refresh if the crew view is currently active
+  if (terminalApp.activeView !== 'crew') return;
+  // Only care about character/synthetic actors (same filter as _getCrewData)
+  if (actor.type !== 'character' && actor.type !== 'synthetic') return;
+
+  console.log('WY-Terminal | Actor updated, refreshing crew view:', actor.name);
+
+  // GM broadcasts the refresh to display clients
+  if (game.user.isGM) {
+    game.socket.emit('module.wy-terminal', {
+      type: 'refreshView',
+      payload: { view: 'crew' },
+    });
+  }
+
+  // Re-render locally
+  terminalApp._renderView('crew');
+});
 
 /* ──────────────────────────────────────────────────────────────────
    Handlebars Helpers

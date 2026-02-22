@@ -114,7 +114,7 @@ If no API endpoint is configured, MU/TH/UR falls back to **GM Relay** mode where
 
 ## GM Commands
 
-These can be run from the browser console or Foundry macros:
+These can be run from the browser console or Foundry macros. For the full command reference and macro examples, see **[Customization Guide — GM Command Macros](docs/customization.md#gm-command-macros)**.
 
 ```javascript
 // Open/close/toggle the terminal
@@ -125,7 +125,7 @@ game.wyTerminal.toggle();
 // Broadcast an alert to all player terminals
 game.wyTerminal.sendGmCommand({ type: 'broadcast', message: 'HULL BREACH DETECTED', sound: 'horn' });
 
-// Inject a scripted MU/TH/UR response
+// Inject a scripted MU/TH/UR response (bypasses AI)
 game.wyTerminal.sendGmCommand({ type: 'inject_response', message: 'ACCESS DENIED.' });
 
 // Toggle a story flag (rebuilds the AI system prompt)
@@ -133,17 +133,67 @@ game.wyTerminal.sendGmCommand({ type: 'update_flag', flag: 'docked_with_cronus' 
 
 // Switch scenario plugin mid-game
 game.wyTerminal.sendGmCommand({ type: 'switch_plugin', plugin: 'cronus_life_support' });
+
+// Add a dynamic condition to the AI context
+game.wyTerminal.sendGmCommand({ type: 'add_prompt_context', alert_type: 'fire', location: 'Engineering', context: 'Active fire detected.' });
+
+// Play a sound on all terminals
+game.wyTerminal.sendGmCommand({ type: 'play_sound', sound: 'horn' });
 ```
 
 ---
 
+## Documentation
 
-## BUG ##
-- If ACTOR Sheets are missing - CREW setting defaults to standand layout.. 
-  - Need to package ACTORS with Module so they align with SHIP
-  - Need to make sure ACTORs sheets are correct and upto date.
+Detailed technical documentation for developers and GMs who want to understand, customize, or extend the module:
 
+| Document | Description |
+|----------|-------------|
+| **[Architecture Overview](docs/architecture.md)** | File map, runtime lifecycle, component diagram, data flow, socket communication, clearance system |
+| **[WYTerminalApp Reference](docs/terminal-app.md)** | Complete class reference — all 141 methods, view system, data providers, adding new views |
+| **[MU/TH/UR Engine](docs/muthur-engine.md)** | AI engine internals — prompt assembly, OpenAI API calls, selective telemetry injection, conversation management, GM commands |
+| **[Settings Reference](docs/settings.md)** | All ~40 registered settings with types, defaults, and schemas |
+| **[Plugin System](docs/plugins.md)** | Scenario plugin architecture and step-by-step guide to creating new plugins |
+| **[Customization Guide](docs/customization.md)** | How to customize ship identity, add views, modify AI prompts, override styles, write GM macros |
+| **[Local AI Setup](local-ai/README.md)** | Docker-based Ollama + Whisper for free offline AI |
 
+---
+
+## Customization Quick Start
+
+### Change Ship Identity
+```javascript
+await game.settings.set('wy-terminal', 'shipName', 'USCSS EUROPA');
+await game.settings.set('wy-terminal', 'shipClass', 'R-CLASS RESEARCH VESSEL');
+await game.settings.set('wy-terminal', 'shipRegistry', 'REG# 440-1234567');
+```
+
+### GM Commands (Console or Macros)
+```javascript
+// Broadcast alert to all player terminals
+game.wyTerminal.sendGmCommand({ type: 'broadcast', message: 'HULL BREACH DETECTED', sound: 'horn' });
+
+// Inject a scripted MU/TH/UR response (next query returns this instead of AI)
+game.wyTerminal.sendGmCommand({ type: 'inject_response', message: 'ACCESS DENIED.' });
+
+// Toggle a story flag (changes what the AI knows)
+game.wyTerminal.sendGmCommand({ type: 'update_flag', flag: 'docked_with_cronus' });
+
+// Switch scenario mid-game
+game.wyTerminal.sendGmCommand({ type: 'switch_plugin', plugin: 'cronus' });
+```
+
+### Create Your Own Scenario
+
+1. Create `muthur/plugins/my_ship/config.json` with story flags
+2. Create `muthur/plugins/my_ship/prompts/my_ship_prompt.txt` with lore
+3. Register in `PLUGIN_REGISTRY` and settings — see **[Plugin Guide](docs/plugins.md)**
+
+### Override Styles
+
+Load a CSS file after WY-Terminal in a custom module, or edit `styles/terminal.css` directly. See **[Customization Guide](docs/customization.md#overriding-styles)**.
+
+---
 
 ## Compatibility
 

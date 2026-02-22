@@ -16,7 +16,9 @@ She had four decks. Deck A housed the cryogenic chambers and the MU/TH/UR 2000 M
 
 The Cronus was a variant of her class. On standard Heliades ships, the Class D module served as a lifeboat. On the Cronus, it had been redesigned as a classified, specially-equipped science laboratory that could be jettisoned in case of emergency. This modification was not in the general crew briefing materials.
 
-Her armory carried six Weyland Storm Rifles, six M4A3 Service Pistols, and two Armat Model 37A2 12-gauge pump-action shotguns. For a science vessel, she was well-armed. Nobody asked why.
+Her armory carried six Weyland Storm Rifles, six M4A3 Service Pistols, and two Armat Model 37A2 12-gauge pump-action shotguns. For a science vessel, she was well-armed. 
+
+
 
 ---
 
@@ -1139,8 +1141,8 @@ Remaining inventory requires physical inspection.
 *      ANNE'S FAMOUS CONGEE     *
 *      (Modified for space)     *
 *                               *
-*  For when the recycled protein  *
-*  just isn't cutting it.        *
+*  For when the recycled protein*
+*  just isn't cutting it.       *
 *                               *
 *  1. Rice ration (double)      *
 *  2. Water (6x volume)         *
@@ -1153,7 +1155,7 @@ Remaining inventory requires physical inspection.
 *  6. Simmer 2 hrs on low       *
 *                               *
 *  Feeds 8. Do not tell Thomson *
-*  where the soy sauce is.     *
+*  where the soy sauce is.      *
 *                               *
 *                  -- A. Chen   *
 *********************************
