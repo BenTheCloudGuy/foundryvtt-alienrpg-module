@@ -1,0 +1,42 @@
+# FoundryVTT + Alien RPG — one-command, zero-interaction stack.
+#
+# Provide your FoundryVTT credentials (used once, at start-up, to download and
+# license the proprietary FoundryVTT application). Everything else — the Alien
+# RPG system, the wy-terminal module, world creation, and launching the world —
+# is fully automatic.
+#
+# Usage:
+#   1. Copy .env.example to .env and fill in your credentials, OR export the
+#      FOUNDRY_* variables in your shell.
+#   2. docker compose -f docker/compose.yml up --build
+#   3. Open http://localhost:30000
+#
+# A stable hostname is set because FoundryVTT binds its license to the
+# container hostname; without it, license verification fails after a restart.
+
+services:
+  foundry:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: benthebuilder/foundryvtt-alienrpg:local
+    hostname: foundry-alienrpg
+    environment:
+      # --- Required: your foundryvtt.com account (download + license) ---------
+      FOUNDRY_USERNAME: ${FOUNDRY_USERNAME:?set FOUNDRY_USERNAME}
+      FOUNDRY_PASSWORD: ${FOUNDRY_PASSWORD:?set FOUNDRY_PASSWORD}
+      # --- Optional: pin a specific license key (else one is chosen for you) --
+      FOUNDRY_LICENSE_KEY: ${FOUNDRY_LICENSE_KEY:-}
+      # --- Optional: admin (setup) password; blank = no password -------------
+      FOUNDRY_ADMIN_KEY: ${FOUNDRY_ADMIN_KEY:-}
+      # --- Automation (already baked into the image; shown here for clarity) --
+      FOUNDRY_WORLD: alienrpg-cog
+      FOUNDRY_TELEMETRY: "false"
+    ports:
+      - "30000:30000/tcp"
+    volumes:
+      - foundry-data:/data
+    restart: unless-stopped
+
+volumes:
+  foundry-data:
