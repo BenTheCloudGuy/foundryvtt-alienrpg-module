@@ -1,0 +1,12 @@
+#!/bin/sh
+# labwc autostart — the MU/TH/UR kiosk session.
+#
+# squeekboard provides the (fully themed) on-screen keyboard used inside the
+# FoundryVTT Chromium kiosk. The launcher is the permanent shell; when it is
+# running, Foundry opens in a Chromium kiosk over the top of it.
+
+# On-screen keyboard daemon (in-Foundry typing).
+squeekboard &
+
+# MU/TH/UR launcher — never exits (reboot-to-return).
+exec /usr/bin/alienpi-launcher

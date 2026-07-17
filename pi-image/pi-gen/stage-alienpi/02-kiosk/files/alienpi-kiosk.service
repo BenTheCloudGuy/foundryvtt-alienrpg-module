@@ -1,0 +1,27 @@
+[Unit]
+Description=AlienPi MU/TH/UR Kiosk (labwc)
+After=systemd-user-sessions.service network-online.target NetworkManager.service seatd.service
+Wants=network-online.target seatd.service
+Conflicts=getty@tty1.service
+After=getty@tty1.service
+
+[Service]
+Type=simple
+User=alienpi
+PAMName=login
+TTYPath=/dev/tty1
+TTYReset=yes
+TTYVHangup=yes
+StandardInput=tty
+StandardOutput=journal
+StandardError=journal
+Environment=XDG_SESSION_TYPE=wayland
+Environment=XDG_CURRENT_DESKTOP=labwc
+# labwc reads ~/.config/labwc/autostart, which starts squeekboard and execs
+# the launcher. WEBKIT_DISABLE_COMPOSITING_MODE is also set by the launcher.
+ExecStart=/usr/bin/labwc
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

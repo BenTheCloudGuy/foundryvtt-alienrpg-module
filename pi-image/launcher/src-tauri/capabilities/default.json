@@ -1,0 +1,6 @@
+{
+  "identifier": "default",
+  "description": "Default capabilities for the AlienPi launcher window.",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

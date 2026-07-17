@@ -1,0 +1,14 @@
+labwc
+seatd
+xwayland
+chromium
+network-manager
+avahi-daemon
+avahi-utils
+libnss-mdns
+squeekboard
+libwebkit2gtk-4.1-0
+policykit-1
+dbus
+fonts-dejavu
+fontconfig

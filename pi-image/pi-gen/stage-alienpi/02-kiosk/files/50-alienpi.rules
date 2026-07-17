@@ -1,0 +1,8 @@
+// Allow the AlienPi kiosk user to manage WiFi/networking without a password
+// prompt (there is no keyboard-driven auth on a locked touch kiosk).
+polkit.addRule(function (action, subject) {
+    if (subject.user === "alienpi" &&
+        action.id.indexOf("org.freedesktop.NetworkManager.") === 0) {
+        return polkit.Result.YES;
+    }
+});

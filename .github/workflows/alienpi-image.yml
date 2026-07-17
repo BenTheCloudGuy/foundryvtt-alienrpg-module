@@ -1,0 +1,136 @@
+name: Build AlienPi Image
+
+# Builds the MU/TH/UR launcher .deb and the flashable AlienPi .img on native
+# arm64 runners (no QEMU cross-compile).
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "alienpi-v*"
+
+permissions:
+  contents: read
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1. Build the Tauri launcher .deb (native arm64)
+  # ---------------------------------------------------------------------------
+  build-launcher:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Tauri system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            build-essential \
+            libssl-dev \
+            libxdo-dev \
+            patchelf \
+            file \
+            wget \
+            curl \
+            imagemagick
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            pi-image/launcher/src-tauri/target
+          key: ${{ runner.os }}-arm64-cargo-${{ hashFiles('pi-image/launcher/src-tauri/Cargo.toml') }}
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version "^2" --locked
+
+      - name: Bundle MU/TH/UR sound effects
+        run: |
+          mkdir -p pi-image/launcher/ui/sounds
+          cp muthur/sounds/*.wav pi-image/launcher/ui/sounds/
+
+      - name: Generate app icons
+        working-directory: pi-image/launcher
+        run: |
+          if [ ! -f src-tauri/icons/icon.png ]; then
+            convert -size 512x512 xc:'#050805' \
+              -fill '#7fff00' -gravity center -pointsize 140 \
+              -annotate 0 'M9K' /tmp/alienpi-icon.png
+            cargo tauri icon /tmp/alienpi-icon.png
+          fi
+
+      - name: Build launcher (.deb)
+        working-directory: pi-image/launcher
+        run: cargo tauri build --bundles deb
+
+      - name: Upload launcher artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: alienpi-launcher-deb
+          path: pi-image/launcher/src-tauri/target/release/bundle/deb/*.deb
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # 2. Build the flashable .img with pi-gen (native arm64)
+  # ---------------------------------------------------------------------------
+  build-image:
+    runs-on: ubuntu-24.04-arm
+    needs: build-launcher
+    steps:
+      - name: Checkout (AlienPi repo)
+        uses: actions/checkout@v4
+        with:
+          path: alienpi
+
+      - name: Checkout pi-gen
+        uses: actions/checkout@v4
+        with:
+          repository: RPi-Distro/pi-gen
+          ref: arm64
+          path: pi-gen
+
+      - name: Download launcher .deb
+        uses: actions/download-artifact@v4
+        with:
+          name: alienpi-launcher-deb
+          path: launcher-deb
+
+      - name: Assemble pi-gen stage
+        run: |
+          # Copy our custom stage into pi-gen and drop the launcher .deb in.
+          cp -r alienpi/pi-image/pi-gen/stage-alienpi pi-gen/stage-alienpi
+          mkdir -p pi-gen/stage-alienpi/01-launcher/files
+          cp launcher-deb/*.deb pi-gen/stage-alienpi/01-launcher/files/
+          # Ensure sub-stage scripts are executable.
+          find pi-gen/stage-alienpi -name '*.sh' -exec chmod +x {} +
+          # Use the example config.
+          cp alienpi/pi-image/pi-gen/config.example pi-gen/config
+
+      - name: Install pi-gen dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            coreutils quilt parted qemu-user-binfmt debootstrap zerofree zip \
+            dosfstools e2fsprogs libarchive-tools libcap2-bin grep rsync \
+            xz-utils file git curl bc gpg pigz xxd arch-test bmap-tools kmod
+
+      - name: Build image
+        working-directory: pi-gen
+        run: sudo ./build.sh
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: alienpi-image
+          path: pi-gen/deploy/*.img.xz
+          if-no-files-found: error

@@ -38,5 +38,27 @@ services:
       - foundry-data:/data
     restart: unless-stopped
 
+  # --- mDNS advertiser (optional) -------------------------------------------
+  # Advertises this server as _foundryvtt._tcp so the AlienPi launcher lists it
+  # by name. Uses host networking because mDNS multicast does not cross Docker's
+  # bridge network. Linux hosts only — on Docker Desktop this is a no-op and the
+  # launcher's port-scan fallback discovers the server instead.
+  #
+  # Enable with:  docker compose -f docker/compose.yml --profile mdns up --build
+  foundry-mdns:
+    build:
+      context: ..
+      dockerfile: docker/mdns/Dockerfile
+    image: benthebuilder/foundryvtt-alienrpg-mdns:local
+    profiles: ["mdns"]
+    network_mode: host
+    environment:
+      FOUNDRY_STATUS_URL: ${FOUNDRY_STATUS_URL:-http://127.0.0.1:30000/api/status}
+      FOUNDRY_ADVERTISE_PORT: ${FOUNDRY_ADVERTISE_PORT:-30000}
+      FOUNDRY_WORLD_TITLE: ${ALIENRPG_WORLD_TITLE:-Alien RPG — Chariot of the Gods}
+    depends_on:
+      - foundry
+    restart: unless-stopped
+
 volumes:
   foundry-data:

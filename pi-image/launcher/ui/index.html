@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>MU/TH/UR 9000</title>
+    <link rel="stylesheet" href="theme.css" />
+  </head>
+  <body>
+    <!-- CRT overlays -->
+    <div class="crt-scanlines" aria-hidden="true"></div>
+    <div class="crt-vignette" aria-hidden="true"></div>
+    <div class="crt-flicker" aria-hidden="true"></div>
+
+    <main class="terminal">
+      <!-- ================= BOOT ================= -->
+      <section class="view view--boot is-active" data-view="boot">
+        <pre class="boot-log" id="boot-log"></pre>
+      </section>
+
+      <!-- ================= MAIN MENU ================= -->
+      <section class="view view--menu" data-view="menu">
+        <header class="term-header">
+          <div class="term-title">WEYLAND-YUTANI // MU-TH-UR 9000</div>
+          <div class="term-status">
+            <span id="net-indicator" class="net net--down">◍ NO LINK</span>
+            <span id="clock" class="clock">--:--:--</span>
+          </div>
+        </header>
+
+        <div class="menu-body">
+          <pre class="brand-logo" id="brand-logo"></pre>
+          <nav class="menu-grid">
+            <button class="btn btn--xl" data-action="goto" data-target="games">
+              <span class="btn-key">01</span> INTERFACE / CONNECT TO GAME
+            </button>
+            <button class="btn btn--xl" data-action="goto" data-target="wifi">
+              <span class="btn-key">02</span> NETWORK / WIFI UPLINK
+            </button>
+            <button class="btn btn--xl" data-action="goto" data-target="manual">
+              <span class="btn-key">03</span> MANUAL / DIRECT ADDRESS
+            </button>
+            <button class="btn btn--xl" data-action="goto" data-target="touch">
+              <span class="btn-key">04</span> DIAGNOSTIC / TOUCH TEST
+            </button>
+            <button class="btn btn--xl btn--danger" data-action="restart">
+              <span class="btn-key">!!</span> RESTART TERMINAL
+            </button>
+          </nav>
+        </div>
+      </section>
+
+      <!-- ================= GAMES ================= -->
+      <section class="view view--games" data-view="games">
+        <header class="term-header">
+          <button class="btn btn--back" data-action="goto" data-target="menu">◄ BACK</button>
+          <div class="term-title">AVAILABLE INTERFACES</div>
+          <button class="btn btn--refresh" data-action="discover">⟳ SCAN</button>
+        </header>
+        <div class="scan-status" id="games-status">STANDBY — PRESS SCAN TO LOCATE ACTIVE SESSIONS</div>
+        <ul class="list" id="games-list"></ul>
+      </section>
+
+      <!-- ================= WIFI ================= -->
+      <section class="view view--wifi" data-view="wifi">
+        <header class="term-header">
+          <button class="btn btn--back" data-action="goto" data-target="menu">◄ BACK</button>
+          <div class="term-title">NETWORK UPLINK</div>
+          <button class="btn btn--refresh" data-action="wifi-scan">⟳ SCAN</button>
+        </header>
+        <div class="scan-status" id="wifi-status">STANDBY</div>
+        <ul class="list" id="wifi-list"></ul>
+      </section>
+
+      <!-- ================= MANUAL ================= -->
+      <section class="view view--manual" data-view="manual">
+        <header class="term-header">
+          <button class="btn btn--back" data-action="goto" data-target="menu">◄ BACK</button>
+          <div class="term-title">DIRECT ADDRESS INPUT</div>
+          <span></span>
+        </header>
+        <form class="form" id="manual-form" autocomplete="off">
+          <label class="field">
+            <span class="field-label">HOST / IP</span>
+            <input class="field-input" id="manual-host" name="host" inputmode="none" placeholder="192.168.1.10" />
+          </label>
+          <label class="field">
+            <span class="field-label">PORT</span>
+            <input class="field-input" id="manual-port" name="port" inputmode="none" value="30000" />
+          </label>
+          <div class="scan-status" id="manual-status"></div>
+          <button class="btn btn--xl" type="submit">◆ CONNECT</button>
+        </form>
+      </section>
+
+      <!-- ================= TOUCH TEST ================= -->
+      <section class="view view--touch" data-view="touch">
+        <header class="term-header">
+          <button class="btn btn--back" data-action="goto" data-target="menu">◄ BACK</button>
+          <div class="term-title">TOUCH DIAGNOSTIC</div>
+          <span></span>
+        </header>
+        <div class="scan-status" id="touch-status">TOUCH THE PANEL — EACH CONTACT POINT IS TRACKED</div>
+        <div class="touch-pad" id="touch-pad"></div>
+      </section>
+    </main>
+
+    <!-- ================= ON-SCREEN KEYBOARD ================= -->
+    <div class="osk" id="osk" aria-hidden="true"></div>
+
+    <!-- ================= MODAL (wifi password / confirm) ================= -->
+    <div class="modal" id="modal" aria-hidden="true">
+      <div class="modal-box">
+        <div class="modal-title" id="modal-title">TITLE</div>
+        <div class="modal-body" id="modal-body"></div>
+        <div class="modal-actions" id="modal-actions"></div>
+      </div>
+    </div>
+
+    <script src="audio.js"></script>
+    <script src="osk.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

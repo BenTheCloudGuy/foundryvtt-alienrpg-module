@@ -1,0 +1,27 @@
+# AlienPi pi-gen config (example)
+#
+# Copy to your pi-gen checkout as `config` and adjust. Builds a Lite-based
+# (no desktop) 64-bit image that boots into the MU/TH/UR kiosk.
+
+IMG_NAME='AlienPi'
+RELEASE='trixie'
+DEPLOY_COMPRESSION='xz'
+LOCALE_DEFAULT='en_US.UTF-8'
+TARGET_HOSTNAME='alienpi'
+KEYBOARD_KEYMAP='us'
+KEYBOARD_LAYOUT='English (US)'
+TIMEZONE_DEFAULT='Etc/UTC'
+
+# Dedicated kiosk user (owns the labwc session).
+FIRST_USER_NAME='alienpi'
+FIRST_USER_PASS='alienpi'
+DISABLE_FIRST_BOOT_USER_RENAME=1
+
+# SSH is handy for field debugging; disable for a locked appliance.
+ENABLE_SSH=1
+
+# Lite base (stage0-2) + our custom kiosk stage. No stage3+ desktop.
+STAGE_LIST="stage0 stage1 stage2 ./stage-alienpi"
+
+# 64-bit userland (Pi 5). Build from pi-gen's `arm64` branch, which targets
+# Trixie by default and sets the arm64 arch.

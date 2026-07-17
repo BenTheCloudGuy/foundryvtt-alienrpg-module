@@ -1,0 +1,5 @@
+# labwc environment for the AlienPi kiosk.
+# libinput auto-detects the touch panel; no per-device config needed here.
+XDG_CURRENT_DESKTOP=labwc
+# Stabilise WebKitGTK compositing on Pi/Wayland (launcher also sets this).
+WEBKIT_DISABLE_COMPOSITING_MODE=1

@@ -1,0 +1,11 @@
+
+# --- AlienPi kiosk (Raspberry Pi 5, 1080p) ---------------------------------
+# KMS driver for Wayland/labwc compositing.
+dtoverlay=vc4-kms-v3d
+max_framebuffers=2
+# No rainbow splash, no overscan borders.
+disable_splash=1
+disable_overscan=1
+# Uncomment to force 1080p60 if the panel's EDID is unreliable:
+#hdmi_group=1
+#hdmi_mode=16

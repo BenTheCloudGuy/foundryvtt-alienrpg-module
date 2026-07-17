@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- Minimal labwc config for a single-app kiosk. No window decorations,
+     no gaps; the launcher and Chromium run maximised/fullscreen. -->
+<labwc_config>
+  <core>
+    <gap>0</gap>
+  </core>
+  <theme>
+    <cornerRadius>0</cornerRadius>
+  </theme>
+  <placement>
+    <policy>center</policy>
+  </placement>
+</labwc_config>
