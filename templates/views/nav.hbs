@@ -5,13 +5,13 @@
     <table class="wy-data-table wy-nav-status-table">
       <tr>
         <td class="wy-text-dim">HEADING:</td>
-        <td>{{heading}}°</td>
+        <td id="wy-nav-heading">{{heading}}°</td>
         <td class="wy-text-dim">SPEED:</td>
-        <td>{{speed}}</td>
+        <td id="wy-nav-speed">{{speed}}</td>
       </tr>
       <tr>
         <td class="wy-text-dim">FUEL RESERVES:</td>
-        <td class="{{fuelClass}}">{{fuelLevel}}</td>
+        <td class="{{fuelClass}}" id="wy-nav-fuel">{{fuelLevel}}</td>
         <td class="wy-text-dim">ETA:</td>
         <td class="wy-text-amber" id="wy-nav-eta-display">{{eta}}{{#if etaCountdownMs}} <span style="font-size: 10px; color: {{#if clockPaused}}var(--wy-amber){{else}}var(--wy-green-dim){{/if}};">{{#if clockPaused}}[PAUSED]{{else}}[LIVE]{{/if}}</span>{{/if}}</td>
       </tr>
@@ -23,17 +23,26 @@
       </tr>
       <tr>
         <td class="wy-text-dim">POSITION:</td>
-        <td>{{currentPosition}}</td>
+        <td id="wy-nav-position">{{currentPosition}}</td>
         <td class="wy-text-dim">DESTINATION:</td>
-        <td>{{destination}}</td>
+        <td id="wy-nav-destination">{{destination}}</td>
       </tr>
       <tr>
         <td class="wy-text-dim">DST COORDINATES:</td>
-        <td class="wy-text-amber">{{dstCoordinates}}</td>
+        <td class="wy-text-amber" id="wy-nav-dstcoords">{{dstCoordinates}}</td>
         <td></td>
         <td></td>
       </tr>
     </table>
+    {{#if showThrottle}}
+    <div class="wy-nav-throttle" id="wy-nav-throttle">
+      <span class="wy-text-dim">ENGINE:</span>
+      <button class="wy-nav-throttle-btn" data-action="nav-full-stop" title="All stop">[ FULL STOP ]</button>
+      <button class="wy-nav-throttle-btn" data-action="nav-speed-down" title="Reduce speed 0.1 AU/day">[ − 0.1 ]</button>
+      <button class="wy-nav-throttle-btn" data-action="nav-speed-up" title="Increase speed 0.1 AU/day">[ + 0.1 ]</button>
+      <button class="wy-nav-throttle-btn" data-action="nav-full-speed" title="Maximum speed">[ FULL SPEED ]</button>
+    </div>
+    {{/if}}
   </div>
 
   <div class="wy-nav-map-layout">
@@ -42,19 +51,17 @@
       <div class="wy-nav-map-empty">
         {{#if isGM}}
         NO <span class="wy-text-amber">"NAV"</span> SCENE FOUND.<br>
-        CREATE A FOUNDRY SCENE NAMED <span class="wy-text-amber">NAV</span> (OR NAVIGATION), SET ITS BACKGROUND TO YOUR STAR CHART,
-        THEN DROP <span class="wy-text-green">STATION</span> / <span class="wy-text-green">SYSTEM</span> / <span class="wy-text-green">SHIP</span> TOKENS ONTO IT.<br>
-        SPACECRAFT ACTORS AUTO-CLASSIFY AS SHIPS; SET OTHERS VIA THE NAV TYPE SELECTOR AFTER SELECTING A CONTACT.
+        CREATE A FOUNDRY SCENE NAMED <span class="wy-text-amber">NAV</span> (OR NAVIGATION), THEN RUN
+        <span class="wy-text-green">GM CONTROLS ▸ CONFIGURE NAV SCENE</span> TO APPLY THE STAR-CHART GRID.<br>
+        DROP <span class="wy-text-green">STATION</span> / <span class="wy-text-green">SYSTEM</span> / <span class="wy-text-green">SHIP</span> TOKENS ONTO IT — SOL SITS AT 0,0 (CENTRE).
         {{else}}
         AWAITING STELLAR TELEMETRY FROM NAV COMPUTER…
         {{/if}}
       </div>
       {{else}}
       <div class="wy-nav-map-label">STELLAR NAVIGATION CHART — {{navSceneName}}</div>
-      <div class="wy-nav-viewport" id="wy-nav-viewport">
-        <img src="{{navSceneImg}}" alt="NAV CHART" class="wy-nav-map-img" id="wy-nav-map-img" />
-        <div class="wy-nav-token-layer" id="wy-nav-token-layer"></div>
-      </div>
+      <canvas class="wy-nav-grid" id="wy-nav-grid"></canvas>
+      <div class="wy-nav-token-layer" id="wy-nav-token-layer"></div>
       {{/if}}
     </div>
     <div class="wy-nav-readout" id="wy-nav-readout">

@@ -22,13 +22,15 @@ export const SHIP_PROFILES = {
     muthurModel: '6000 SERIES',
     mission: 'CHARIOTS OF THE GODS',
     defaultPlugin: 'montero',
+    // NAV time-to-arrival rate (light years per in-game day). Tunable.
+    ftlSpeedLyPerDay: 0.10,
 
     defaultSystems: [
       { name: 'REACTOR',         status: 'ONLINE',  detail: 'PWR OUTPUT NOMINAL',  powerPct: 100 },
       { name: 'LIFE SUPPORT',    status: 'ONLINE',  detail: 'O2/CO2 NOMINAL',      powerPct: 100 },
       { name: 'ENGINES',         status: 'ONLINE',  detail: 'FEL DRIVE STANDBY',   powerPct: 100 },
       { name: 'COMMS ARRAY',     status: 'ONLINE',  detail: 'FREQ: STANDARD',      powerPct: 100 },
-      { name: 'SENSORS',         status: 'ONLINE',  detail: 'RANGE: 100 AU',       powerPct: 100 },
+      { name: 'SENSORS',         status: 'ONLINE',  detail: 'RANGE: 100 M',        powerPct: 100 },
       { name: 'HULL INTEGRITY',  status: 'NOMINAL', detail: '100%',                powerPct: 100 },
       { name: 'MU/TH/UR UPLINK', status: 'ONLINE',  detail: '6000 SERIES',         powerPct: 100 },
     ],
@@ -76,13 +78,15 @@ export const SHIP_PROFILES = {
     muthurModel: '2000 SERIES',
     mission: 'CLASSIFIED — LV-1113',
     defaultPlugin: 'cronus',
+    // NAV time-to-arrival rate (light years per in-game day). Tunable.
+    ftlSpeedLyPerDay: 0.14,
 
     defaultSystems: [
       { name: 'REACTOR',            status: 'ONLINE',  detail: 'PWR OUTPUT NOMINAL',     powerPct: 100 },
       { name: 'LIFE SUPPORT',       status: 'ONLINE',  detail: 'O2/CO2 NOMINAL',         powerPct: 100 },
       { name: 'ENGINES',            status: 'ONLINE',  detail: 'FTL DRIVE STANDBY',      powerPct: 100 },
       { name: 'COMMS ARRAY',        status: 'ONLINE',  detail: 'MIL-SPEC ENCRYPTED',     powerPct: 100 },
-      { name: 'SENSORS',            status: 'ONLINE',  detail: 'RANGE: 200 AU',          powerPct: 100 },
+      { name: 'SENSORS',            status: 'ONLINE',  detail: 'RANGE: 200 M',           powerPct: 100 },
       { name: 'HULL INTEGRITY',     status: 'NOMINAL', detail: '100%',                   powerPct: 100 },
       { name: 'RAIL GUN',           status: 'ONLINE',  detail: 'ARMED — SAFE',           powerPct: 100 },
       { name: 'MISSILE BATTERY',    status: 'ONLINE',  detail: '12 RDS LOADED',          powerPct: 100 },

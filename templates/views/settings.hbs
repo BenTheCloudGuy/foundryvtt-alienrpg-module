@@ -276,6 +276,23 @@
     <button class="wy-muthur-send" data-action="setup-radar-scene" style="width: 100%;">CONFIGURE RADAR SCENE BACKGROUND</button>
   </div>
 
+  <div class="wy-section-title" style="margin-top: 16px;">NAV STAR CHART</div>
+  <div class="wy-border-box" id="wy-nav-scene-section">
+    <div style="color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px; margin-bottom: 8px; line-height: 1.6;">
+      THE NAV CHART RENDERS A GREEN GRID WITH <span style="color: var(--wy-amber);">SOL AT 0,0</span> (CENTRE). SYSTEMS SCENE = &plusmn;50 AU · CHART ZOOMS OUT TO &plusmn;400 AU.<br>
+      1. CREATE AN EMPTY SCENE CALLED <span style="color: var(--wy-amber);">NAV</span>.<br>
+      2. CONFIGURE IT (APPLIES THE GRID + STAR-CHART BACKGROUND).<br>
+      3. PLOT KNOWN SYSTEMS FROM THE CARTOGRAPHY DATABASE, OR DROP YOUR OWN STATION / SYSTEM / SHIP TOKENS.
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button class="wy-muthur-send" data-action="setup-nav-scene" style="flex: 1;">CONFIGURE NAV SCENE</button>
+      <button class="wy-muthur-send" data-action="plot-nav-systems" style="flex: 1;">PLOT KNOWN SYSTEMS</button>
+    </div>
+    <button class="wy-muthur-send" data-action="import-items-stardb" style="width: 100%; margin-top: 8px;">IMPORT PLANET-SYSTEM ITEMS → STAR DB</button>
+    <button class="wy-muthur-send" data-action="build-system-actors" style="width: 100%; margin-top: 8px;">BUILD SYSTEM ACTORS (FROM STAR DB)</button>
+    <button class="wy-muthur-send" data-action="generate-planet-images" style="width: 100%; margin-top: 8px;">GENERATE PLANET IMAGES</button>
+  </div>
+
   <div class="wy-section-title" style="margin-top: 16px;">DOOR CONTROL</div>
   <div class="wy-border-box" id="wy-door-control-section">
     <div style="color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px; margin-bottom: 8px; line-height: 1.6;">
@@ -298,6 +315,7 @@
       <button class="wy-muthur-send" data-action="import-spacecraft" style="flex: 1;">IMPORT SPACECRAFT ONLY</button>
       <button class="wy-muthur-send" data-action="import-all-content" style="flex: 1;">IMPORT ALL ALIENRPG CONTENT</button>
     </div>
+    <button class="wy-muthur-send" data-action="build-ship-actors" style="width: 100%; margin-top: 8px;">BUILD MONTERO &amp; CRONUS SHIP ACTORS</button>
   </div>
 
   <div class="wy-section-title" style="margin-top: 16px;">INTERNAL SENSOR CREW LABELS</div>

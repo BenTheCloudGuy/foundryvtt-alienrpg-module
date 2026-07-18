@@ -8,6 +8,7 @@ import { PinchZoomHandler } from './pinch-zoom.mjs';
 import { MuthurBridge } from './muthur-bridge.mjs';
 import { MuthurEngine } from './muthur-engine.mjs';
 import { getShipProfile, getAvailableProfiles, SHIP_PROFILES } from './ship-profiles.mjs';
+import { NAV_CHART, NAV_VIEW, drawNavGrid, generateNavStars, formatNavCoord } from './nav-chart.mjs';
 import { TerminalSFX } from './terminal-sounds.mjs';
 
 /** Well-known ID for the permanent NAV ETA timer (cannot be deleted). */
@@ -178,11 +179,20 @@ export class WYTerminalApp extends Application {
       });
     });
 
-    // Zoom buttons — use per-scene zoom when in schematics, nav zoom on the NAV
-    // chart, else fall back to the global display zoom
-    el.querySelector('[data-action="zoom-in"]')?.addEventListener('click', () => (this._sceneZoom || this._navZoom || this.zoomHandler)?.zoomIn());
-    el.querySelector('[data-action="zoom-out"]')?.addEventListener('click', () => (this._sceneZoom || this._navZoom || this.zoomHandler)?.zoomOut());
-    el.querySelector('[data-action="zoom-reset"]')?.addEventListener('click', () => (this._sceneZoom || this._navZoom || this.zoomHandler)?.reset());
+    // Zoom buttons — NAV chart uses its own AU view; schematics use per-scene
+    // zoom; otherwise fall back to the global display zoom.
+    el.querySelector('[data-action="zoom-in"]')?.addEventListener('click', () => {
+      if (this.activeView === 'nav' && this._navApplyZoom) this._navApplyZoom(1.25);
+      else (this._sceneZoom || this.zoomHandler)?.zoomIn();
+    });
+    el.querySelector('[data-action="zoom-out"]')?.addEventListener('click', () => {
+      if (this.activeView === 'nav' && this._navApplyZoom) this._navApplyZoom(1 / 1.25);
+      else (this._sceneZoom || this.zoomHandler)?.zoomOut();
+    });
+    el.querySelector('[data-action="zoom-reset"]')?.addEventListener('click', () => {
+      if (this.activeView === 'nav' && this._navResetView) this._navResetView();
+      else (this._sceneZoom || this.zoomHandler)?.reset();
+    });
 
     // Initialize pinch-zoom on the display frame (disabled until scenes view)
     const displayFrame = el.querySelector('#wy-display-frame');
@@ -252,6 +262,10 @@ export class WYTerminalApp extends Application {
     if (this._navResizeObserver) {
       this._navResizeObserver.disconnect();
       this._navResizeObserver = null;
+    }
+    if (this._navGestureCleanup) {
+      try { this._navGestureCleanup(); } catch (_) { /* noop */ }
+      this._navGestureCleanup = null;
     }
     if (this._navZoom) {
       this._navZoom.destroy();
@@ -1153,10 +1167,13 @@ export class WYTerminalApp extends Application {
     if (!status) return 'offline';
     const s = status.toUpperCase();
     if (['ACTIVE', 'REBUILDING', 'RECONTACTED'].includes(s)) return 'online';
-    if (['SURVEYED', 'SURVEY', 'UNKNOWN', 'UNEXPLORED'].includes(s)) return 'warning';
-    if (['QUARANTINE', 'ABANDONED', 'DECOMMISSIONED', 'CLASSIFIED'].includes(s)) return 'critical';
+    if (['SURVEYED', 'SURVEY', 'UNKNOWN', 'UNEXPLORED', 'RESTRICTED'].includes(s)) return 'warning';
+    if (['QUARANTINE', 'QUARANTINED', 'ABANDONED', 'DECOM', 'DECOMMISSIONED', 'CLASSIFIED'].includes(s)) return 'critical';
     return 'offline';
   }
+
+  /** Canonical NAV/System status list (GM-selectable). */
+  static SYSTEM_STATUSES = ['ACTIVE', 'SURVEYED', 'UNEXPLORED', 'RESTRICTED', 'QUARANTINED', 'ABANDONED', 'DECOM', 'CLASSIFIED'];
 
   async _loadStarSystemsData() {
     try {
@@ -1312,13 +1329,7 @@ export class WYTerminalApp extends Application {
     const engineStatus = engSys?.status || 'ONLINE';
     const thrusterStatus = thrSys?.status || 'NOMINAL';
 
-    const fuel = nav.fuel || '87%';
-    const fuelNum = parseInt(fuel) || 87;
-    let fuelClass = 'wy-text-green';
-    if (fuelNum <= 25) fuelClass = 'wy-text-red';
-    else if (fuelNum <= 50) fuelClass = 'wy-text-amber';
-
-    // Check the default NAV ETA timer for live countdown
+    let fuel = nav.fuel || '87%';
     let etaDisplay = nav.eta || 'N/A';
     let etaCountdownMs = 0;
     const etaTimer = this._getActiveTimers().find(t => t.id === DEFAULT_NAV_ETA_ID);
@@ -1327,52 +1338,54 @@ export class WYTerminalApp extends Application {
       etaDisplay = this._formatDuration(etaCountdownMs);
     }
 
-    // NAV markers with formatted coord labels for the table
-    const rawMarkers = nav.navMarkers || [];
-    const navMarkers = rawMarkers.map(m => ({
-      ...m,
-      coordLabel: m.type === 'PLAYER' && m.progress !== undefined
-        ? `TRANSIT: ${Math.round(m.progress * 100)}%`
-        : `${(m.x * 100).toFixed(1)}%, ${(m.y * 100).toFixed(1)}%`,
-    }));
-
-    // Derive position and destination from markers when available
-    const destMarker = rawMarkers.find(m => m.type === 'DESTINATION');
-    const playerMarker = rawMarkers.find(m => m.type === 'PLAYER');
-    const routePath = this._buildRoutePath(rawMarkers);
-
-    // POSITION: use PLAYER marker coordinates on route path
-    let currentPosition = nav.position || 'SECTOR 87-C / ZETA RETICULI';
-    if (playerMarker) {
-      let px = playerMarker.x, py = playerMarker.y;
-      if (routePath.length >= 2 && playerMarker.progress !== undefined) {
-        const pos = this._positionOnRoute(routePath, playerMarker.progress);
-        px = pos.x;
-        py = pos.y;
-      }
-      currentPosition = `${playerMarker.label} — ${(px * 100).toFixed(1)}%, ${(py * 100).toFixed(1)}%`;
-    }
-
-    // DESTINATION: use DESTINATION marker label + coords
+    let currentPosition = nav.position || 'STATION KEEPING';
     let destination = nav.destination || 'NOT SET';
     let dstCoordinates = 'N/A';
-    if (destMarker) {
-      destination = destMarker.label;
-      dstCoordinates = `${(destMarker.x * 100).toFixed(1)}%, ${(destMarker.y * 100).toFixed(1)}%`;
+    let heading = nav.heading || '000';
+    // Commanded cruise speed (AU/day) — set via the ENGINE throttle; defaults to
+    // the ship's max FTL speed. Max is limited live by ENGINE status (offline →
+    // 0). SPEED display uses the effective (engine-limited) value when idle.
+    const maxSpeed = this._navMaxSpeed();
+    const commandedSpeed = (nav.commandedSpeed != null) ? Number(nav.commandedSpeed) : this._navShipSpeedLyPerDay();
+    let speed = this._fmtNavSpeed(Math.min(commandedSpeed, maxSpeed));
+
+    // An active course drives the whole status readout in real time.
+    const course = this._getNavCourse();
+    if (course.active) {
+      currentPosition = formatNavCoord(course.curSpin, course.curCore);
+      destination = course.destName || 'NOT SET';
+      dstCoordinates = formatNavCoord(course.destSpin, course.destCore);
+      heading = String(course.headingDeg).padStart(3, '0');
+      speed = this._fmtNavSpeed(course.speed);
+      fuel = `${Math.round(course.fuelNow)}%`;
+      etaDisplay = course.arrived ? 'ARRIVED'
+        : (course.outOfFuel ? 'OUT OF FUEL'
+          : (course.speed <= 0 ? 'HOLDING' : this._formatEtaDays(course.etaDays)));
+      etaCountdownMs = 0;
+    }
+
+    const fuelNum = parseInt(fuel);
+    let fuelClass = 'wy-text-green';
+    if (!isNaN(fuelNum)) {
+      if (fuelNum <= 25) fuelClass = 'wy-text-red';
+      else if (fuelNum <= 50) fuelClass = 'wy-text-amber';
     }
 
     // Scene-driven NAV chart (tokens read from a Foundry scene named NAV)
     const navSceneInfo = this._getNavSceneData();
+    const navShipPresent = !!this._getNavPlayerShipId(navSceneInfo.navTokens || []);
 
     return {
       currentPosition,
       destination,
       dstCoordinates,
-      heading: nav.heading || '042.7',
+      heading,
       eta: etaDisplay,
       etaCountdownMs,
       clockPaused: game.settings.get('wy-terminal', 'gameClockPaused') ?? false,
-      speed: nav.speed || 'STATION KEEPING',
+      speed,
+      commandedSpeed,
+      maxSpeed,
       fuelLevel: fuel,
       fuelClass,
       engineStatus,
@@ -1380,9 +1393,62 @@ export class WYTerminalApp extends Application {
       thrusterStatus,
       thrusterClass: (thrusterStatus === 'OFFLINE') ? 'wy-text-red' : 'wy-text-green',
       navPoints: nav.navPoints || [],
-      navMarkers,
+      navMarkers: nav.navMarkers || [],
+      courseActive: course.active,
+      navShipPresent,
+      showThrottle: !navSceneInfo.navSceneMissing,
       isGM: game.user.isGM,
       ...navSceneInfo,
+    };
+  }
+
+  /** Default fuel burn rate — % of reserves consumed per AU travelled. */
+  static NAV_FUEL_PER_AU = 0.5;
+
+  /**
+   * Compute the live state of the active NAV course from the persisted
+   * `navData.course` and the game clock. Position, fuel and ETA are all derived
+   * from elapsed game time × speed so every client agrees without extra syncing.
+   * @returns {{active:boolean, curSpin?:number, curCore?:number, destSpin?:number,
+   *   destCore?:number, destName?:string, speed?:number, fuelNow?:number,
+   *   remain?:number, etaDays?:number, headingDeg?:number, frac?:number,
+   *   arrived?:boolean, outOfFuel?:boolean}}
+   */
+  _getNavCourse() {
+    const nav = this._loadSetting('navData') || {};
+    const c = nav.course;
+    if (!c || !c.active) return { active: false };
+
+    const nowMs = this._getGameClockDate().date.getTime();
+    const days = Math.max(0, (nowMs - (c.startGameMs ?? nowMs)) / 86400000);
+    const total = c.totalDistAu ?? Math.hypot(c.destSpin - c.startSpin, c.destCore - c.startCore);
+    const speed = c.speedAuPerDay || 0;
+    const fuelPerAu = c.fuelPerAu ?? WYTerminalApp.NAV_FUEL_PER_AU;
+    const fuelStart = (c.fuelStart != null) ? c.fuelStart : 87;
+    const maxByFuel = fuelPerAu > 0 ? (fuelStart / fuelPerAu) : Infinity;
+
+    let dist = Math.min(total, speed * days, maxByFuel);
+    if (!isFinite(dist) || dist < 0) dist = 0;
+    const frac = total > 0 ? dist / total : 1;
+    const curSpin = c.startSpin + (c.destSpin - c.startSpin) * frac;
+    const curCore = c.startCore + (c.destCore - c.startCore) * frac;
+    const fuelNow = Math.max(0, fuelStart - dist * fuelPerAu);
+    const remain = Math.max(0, total - dist);
+    const etaDays = speed > 0 ? remain / speed : Infinity;
+    const arrived = frac >= 1 - 1e-9;
+    const outOfFuel = !arrived && fuelPerAu > 0 && dist >= maxByFuel - 1e-9;
+
+    // Heading: spinward = +X (east), coreward = +Y (north/up). 0° = coreward, clockwise.
+    const dx = c.destSpin - c.startSpin;
+    const dy = c.destCore - c.startCore;
+    const headingDeg = Math.round((((Math.atan2(dx, dy) * 180 / Math.PI) % 360) + 360) % 360);
+
+    return {
+      active: true,
+      destName: c.destName,
+      destSpin: c.destSpin, destCore: c.destCore,
+      startSpin: c.startSpin, startCore: c.startCore,
+      speed, total, curSpin, curCore, fuelNow, remain, etaDays, frac, headingDeg, arrived, outOfFuel,
     };
   }
 
@@ -1424,7 +1490,17 @@ export class WYTerminalApp extends Application {
     const base = this._getSceneTokens(scene);
     const navTokens = base.map(b => {
       const doc = scene.tokens?.get(b.id);
-      return { ...b, navType: this._getNavTokenType(doc, b.actorType) };
+      // Middle Heavens light-year coordinates: Sol = scene centre (50%,50%),
+      // chart spans ±halfLy across each axis. +Coreward is up (lower y%).
+      const spinward = ((parseFloat(b.x) - 50) / 100) * NAV_CHART.spanLy;
+      const coreward = ((50 - parseFloat(b.y)) / 100) * NAV_CHART.spanLy;
+      return {
+        ...b,
+        navType: this._getNavTokenType(doc, b.actorType),
+        systemId: doc?.flags?.['wy-terminal']?.systemId || null,
+        spinward,
+        coreward,
+      };
     });
     this._lastNavTokens = navTokens;
     return {
@@ -1437,15 +1513,51 @@ export class WYTerminalApp extends Application {
   }
 
   /**
-   * Build the right-hand NAV readout HTML for a selected token, pulling data
-   * straight from its linked Foundry actor (spacecraft attributes + notes).
+   * Build the right-hand NAV readout HTML for a selected token. Pulls data from
+   * the linked Foundry actor (spacecraft), or the stellar-cartography database
+   * (SYSTEM tokens), and shows Middle Heavens coordinates plus live distance /
+   * time-to-arrival relative to the active player ship.
    */
   _buildNavReadoutHtml(t) {
     const actor = t.actorId ? game.actors?.get(t.actorId) : null;
     const sys = actor?.system || {};
-    const row = (k, v) => ((v === '' || v == null) ? '' : `<div class="wy-nav-readout-row"><span class="wy-text-dim">${k}</span><span>${v}</span></div>`);
+    const row = (k, v, id) => ((v === '' || v == null) ? '' : `<div class="wy-nav-readout-row"><span class="wy-text-dim">${k}</span><span${id ? ` id="${id}"` : ''}>${v}</span></div>`);
     const gv = (x) => (x && typeof x === 'object' ? (x.value ?? '') : (x ?? ''));
+
     let rows = row('DESIGNATION', t.name) + row('CLASSIFICATION', t.navType);
+    rows += row('COORDINATES', formatNavCoord(t.spinward, t.coreward));
+
+    // Live distance + ETA relative to the player ship (not shown for the ship itself)
+    const shipId = this._getNavPlayerShipId(this._lastNavTokens || []);
+    if (shipId && shipId !== t.id) {
+      const dyn = this._navDistanceEta(t);
+      rows += row('DISTANCE', dyn.distanceLabel, 'wy-nav-dist')
+        + row('ETA', dyn.etaLabel, 'wy-nav-eta');
+    }
+
+    // SYSTEM tokens: sector from the linked actor flag, else the cartography DB
+    if (t.navType === 'SYSTEM') {
+      const secFlag = actor?.getFlag?.('wy-terminal', 'sector');
+      const sysInfo = secFlag ? null : this._getNavSystemInfo(t);
+      if (secFlag) {
+        rows += row('SECTOR', String(secFlag).toUpperCase());
+        const terr = actor?.getFlag?.('wy-terminal', 'territory');
+        if (terr) rows += row('TERRITORY', String(terr).toUpperCase());
+      } else if (sysInfo) {
+        rows += row('SECTOR', (sysInfo.sector || '').toUpperCase())
+          + row('TERRITORY', (sysInfo.territory || '').toUpperCase())
+          + row('AFFILIATION', (sysInfo.affiliation || '').toUpperCase());
+      }
+    }
+
+    // STATUS (color-coded) — from the linked actor flag, else the cartography DB
+    const statusVal = (actor?.getFlag?.('wy-terminal', 'status')
+      || this._getNavSystemInfo(t)?.status || '').toUpperCase();
+    if (statusVal) {
+      const cls = { online: 'wy-text-green', warning: 'wy-text-amber', critical: 'wy-text-red' }[this._starSystemStatusToClass(statusVal)] || 'wy-text-dim';
+      rows += row('STATUS', `<span class="${cls}">${statusVal}</span>`);
+    }
+
     if (t.actorType === 'spacecraft') {
       const a = sys.attributes || {};
       const len = gv(a.length);
@@ -1456,20 +1568,133 @@ export class WYTerminalApp extends Application {
         + row('HULL', gv(a.hull))
         + row('ARMOR', gv(a.armor));
     }
-    const notes = this._extractText(sys.notes)
+
+    // Cartography-DB dossier (only for SYSTEM tokens without a linked actor)
+    const dbInfo = (t.navType === 'SYSTEM' && !actor) ? this._getNavSystemInfo(t) : null;
+
+    let notes = this._extractText(sys.notes)
       || this._extractText(sys.general?.notes)
       || this._extractText(sys.description)
       || this._extractText(sys.biography);
+    if (!notes && dbInfo) notes = this._extractText(dbInfo.description);
     const notesHtml = notes
       ? `<div class="wy-nav-readout-notes"><span class="wy-text-dim">NOTES</span><br>${notes}</div>`
-      : (actor ? '' : '<div class="wy-nav-readout-notes wy-text-dim">NO LINKED ACTOR DATA ON FILE.</div>');
+      : ((actor || dbInfo) ? '' : '<div class="wy-nav-readout-notes wy-text-dim">NO LINKED DATA ON FILE.</div>');
+
+    // SET COURSE control — available for any target that isn't the player ship.
+    let courseCtl = '';
+    const navShipId = this._getNavPlayerShipId(this._lastNavTokens || []);
+    if (navShipId && navShipId !== t.id) {
+      const nav = this._loadSetting('navData') || {};
+      const defSpeed = (nav.commandedSpeed != null) ? Number(nav.commandedSpeed) : this._navShipSpeedLyPerDay();
+      courseCtl = `<div class="wy-nav-course">`
+        + `<div class="wy-nav-course-row"><span class="wy-text-dim">SPEED (AU/DAY)</span>`
+        + `<input type="number" min="0" step="0.1" class="wy-setting-input" id="wy-nav-course-speed" value="${defSpeed}" /></div>`
+        + `<div class="wy-nav-course-row"><span class="wy-text-dim">EST. ETA</span><span id="wy-nav-course-eta">—</span></div>`
+        + `<button class="wy-muthur-send" data-action="set-course" style="width:100%;margin-top:6px;">◈ SET COURSE</button>`
+        + `</div>`;
+    }
+
     let gmCtl = '';
     if (game.user.isGM) {
       const opt = (v) => `<option value="${v}" ${t.navType === v ? 'selected' : ''}>${v}</option>`;
       gmCtl = `<div class="wy-nav-readout-gm"><span class="wy-text-dim">NAV TYPE</span>`
         + `<select class="wy-setting-input" data-action="set-nav-type">${opt('SHIP')}${opt('STATION')}${opt('SYSTEM')}</select></div>`;
+      const cur = statusVal;
+      const sopt = WYTerminalApp.SYSTEM_STATUSES.map(v => `<option value="${v}" ${cur === v ? 'selected' : ''}>${v}</option>`).join('');
+      gmCtl += `<div class="wy-nav-readout-gm"><span class="wy-text-dim">STATUS</span>`
+        + `<select class="wy-setting-input" data-action="set-nav-status">${sopt}</select></div>`;
+      const isPlayerShip = (this._loadSetting('navData') || {}).playerShipTokenId === t.id;
+      gmCtl += `<div class="wy-nav-readout-gm"><button class="wy-muthur-send" data-action="set-player-ship" style="width:100%;">`
+        + `${isPlayerShip ? '★ PLAYER SHIP — CLICK TO CLEAR' : '☆ SET AS PLAYER SHIP'}</button></div>`;
     }
-    return rows + notesHtml + gmCtl;
+    return rows + notesHtml + courseCtl + gmCtl;
+  }
+
+  /**
+   * Active ship FTL travel rate in AU per in-game day (NAV ETA / course speed).
+   * Derived from the ship actor's FTL RATING (rating ÷ 10 = AU/day, e.g. a
+   * rating of 12 → 1.2 AU/day). Falls back to the ship profile, then 0.1.
+   */
+  _navShipSpeedLyPerDay() {
+    let key = 'montero';
+    try { key = (game.settings.get('wy-terminal', 'activeShip') || 'montero').toLowerCase(); } catch { /* pre-init */ }
+    try {
+      const ship = game.actors?.find(a => a.type === 'spacecraft' && a.getFlag('wy-terminal', 'shipId') === key);
+      const rating = Number(ship?.system?.attributes?.ftlrating?.value);
+      if (rating > 0) return rating / 10;
+    } catch { /* actor lookup unavailable */ }
+    return SHIP_PROFILES[key]?.ftlSpeedLyPerDay || 0.1;
+  }
+
+  /**
+   * Propulsion factor (0–1) from the ENGINES ship-system: OFFLINE/DESTROYED → 0
+   * (no movement), otherwise the engine's power level (WARNING ≈ 0.6, CRITICAL ≈
+   * 0.3), defaulting to full. Lets engine damage throttle NAV movement live.
+   */
+  _navEngineFactor() {
+    const eng = this._getSystemsData().find(s => s.name === 'ENGINES');
+    if (!eng) return 1;
+    const st = String(eng.status || '').toUpperCase();
+    if (st === 'OFFLINE' || st === 'DESTROYED') return 0;
+    const pct = Number(eng.powerPct);
+    if (!isNaN(pct)) return Math.max(0, Math.min(1, pct / 100));
+    return ({ ONLINE: 1, NOMINAL: 1, STANDBY: 1, WARNING: 0.6, CRITICAL: 0.3 })[st] ?? 1;
+  }
+
+  /** Engine-limited max NAV speed (AU/day): rated FTL speed × engine factor. */
+  _navMaxSpeed() {
+    return this._navShipSpeedLyPerDay() * this._navEngineFactor();
+  }
+
+  /**
+   * Format a day count as a MONTHS / DAYS / HOURS / MINUTES breakdown, dropping
+   * any leading zero units (30-day months). e.g. "2MO 05D 12H 30M".
+   */
+  _formatEtaDays(days) {
+    if (!isFinite(days) || days <= 0) return '—';
+    let mins = Math.round(days * 24 * 60);
+    const MIN_PER_MONTH = 30 * 24 * 60;
+    const MIN_PER_DAY = 24 * 60;
+    const MIN_PER_HOUR = 60;
+    const months = Math.floor(mins / MIN_PER_MONTH); mins -= months * MIN_PER_MONTH;
+    const d = Math.floor(mins / MIN_PER_DAY); mins -= d * MIN_PER_DAY;
+    const h = Math.floor(mins / MIN_PER_HOUR); mins -= h * MIN_PER_HOUR;
+    const m = mins;
+    const parts = [];
+    if (months) parts.push(`${months}MO`);
+    if (d || parts.length) parts.push(`${String(d).padStart(2, '0')}D`);
+    if (h || parts.length) parts.push(`${String(h).padStart(2, '0')}H`);
+    parts.push(`${String(m).padStart(2, '0')}M`);
+    return parts.join(' ');
+  }
+
+  /** Format a NAV speed for display (AU/day), showing FULL STOP at zero. */
+  _fmtNavSpeed(speed) {
+    if (!speed || speed <= 0) return 'FULL STOP';
+    return `${+speed.toFixed(3)} AU/DAY`;
+  }
+
+  /** Distance (AU) + ETA from the active player ship to a NAV token. */
+  _navDistanceEta(t) {
+    const tokens = this._lastNavTokens || [];
+    const shipId = this._getNavPlayerShipId(tokens);
+    const ship = tokens.find(x => x.id === shipId);
+    if (!ship || !t) return { distanceLy: 0, distanceLabel: '—', etaLabel: '—' };
+    const d = Math.hypot((t.spinward - ship.spinward), (t.coreward - ship.coreward));
+    const days = d / this._navShipSpeedLyPerDay();
+    return { distanceLy: d, distanceLabel: `${d.toFixed(1)} AU`, etaLabel: this._formatEtaDays(days) };
+  }
+
+  /** Look up a SYSTEM token's dossier in the stellar-cartography database. */
+  _getNavSystemInfo(t) {
+    const systems = this._starSystemsCache?.systems || [];
+    if (!systems.length || !t) return null;
+    const upper = (t.name || '').toUpperCase();
+    return (t.systemId && systems.find(s => s.id === t.systemId))
+      || systems.find(s => (s.name || '').toUpperCase() === upper)
+      || systems.find(s => (s.name || '').toUpperCase().includes(upper))
+      || null;
   }
 
   /* ── Sensors data (INTERNAL bio-scan + EXTERNAL radar) ── */
@@ -1663,7 +1888,7 @@ export class WYTerminalApp extends Application {
     const statusClass = sensor ? this._statusToClass(sensor.status) : 'online';
     const offline = statusClass === 'offline';
     const parseAU = (str) => {
-      const m = /(\d+(?:\.\d+)?)\s*AU/i.exec(str || '');
+      const m = /(\d+(?:\.\d+)?)\s*(?:AU|M)\b/i.exec(str || '');
       return m ? parseFloat(m[1]) : null;
     };
     const currentAU = parseAU(sensor?.detail);
@@ -2225,7 +2450,7 @@ export class WYTerminalApp extends Application {
         row('ARMOR', d.armor) +
         row('DAMAGE', d.damage) +
         row('BEARING', `${c.bearing}°`) +
-        row('RANGE', `${c.range} AU`) +
+        row('RANGE', `${c.range} M`) +
         row('SIZE', `${c.size}/10`) +
         (c.notes
           ? `<div class="wy-radar-readout-notes"><span class="wy-text-dim">NOTES</span><br>${c.notes}</div>`
@@ -2286,8 +2511,8 @@ export class WYTerminalApp extends Application {
       ctx.moveTo(cx, cy - R); ctx.lineTo(cx, cy + R);
       ctx.stroke();
 
-      // Range-ring labels in AU (outer ring = max sensor range) so the scope
-      // reads as a meaningful distance scale.
+      // Range-ring labels in metres (outer ring = max sensor range) — EXTERNAL
+      // sensors are close-range ship scanning, so distances read in M (NAV = AU).
       const fullAU = st.fullAU || 100;
       ctx.save();
       ctx.fillStyle = 'rgba(127,255,0,0.5)';
@@ -2299,7 +2524,7 @@ export class WYTerminalApp extends Application {
         ctx.fillText(`${au}`, cx + 3, cy - ringR + 9);
       }
       ctx.fillStyle = 'rgba(127,255,0,0.7)';
-      ctx.fillText('AU', cx + 3, cy - R + 20);
+      ctx.fillText('M', cx + 3, cy - R + 20);
       ctx.restore();
 
       // Reduced effective-range ring when sensors are diminished
@@ -2315,7 +2540,7 @@ export class WYTerminalApp extends Application {
         ctx.fillStyle = 'rgba(255,191,0,0.8)';
         ctx.font = '8px monospace';
         ctx.textAlign = 'left';
-        ctx.fillText(`EFF ${Math.round((st.rangeAU ?? st.rangeRatio * fullAU))} AU`, cx + 3, cy - R * st.rangeRatio - 3);
+        ctx.fillText(`EFF ${Math.round((st.rangeAU ?? st.rangeRatio * fullAU))} M`, cx + 3, cy - R * st.rangeRatio - 3);
         ctx.restore();
       }
 
@@ -3542,8 +3767,9 @@ export class WYTerminalApp extends Application {
    */
   _fitTokenLayer(img, tokenLayer) {
     if (!img || !tokenLayer) return;
-    const natW = img.naturalWidth;
-    const natH = img.naturalHeight;
+    // Works for <img> (naturalWidth) and <canvas> (width) hosts.
+    const natW = img.naturalWidth || img.width;
+    const natH = img.naturalHeight || img.height;
     if (!natW || !natH) return;
 
     const boxW = img.clientWidth;
@@ -4030,60 +4256,135 @@ export class WYTerminalApp extends Application {
   }
 
   /**
-   * Scene-driven NAV chart: renders the NAV scene background with selectable
-   * STATION / SYSTEM / SHIP token blips; tapping a blip populates the right-hand
-   * info panel from the token's linked Foundry actor. Positions poll live so a
-   * GM moving a token tracks in real time on player terminals.
+   * Scene-driven NAV chart with a level-of-detail (LOD) view. The Foundry scene
+   * holds the core worlds at ±coreHalfAu, but the terminal renders a much larger
+   * navigable field (±chartHalfAu) that pans/zooms, redrawing the grid at each
+   * zoom so it stays crisp. Tokens are plotted by their AU coordinate; SOL sits
+   * at 0,0. Opens zoomed into the core on the active ship; zoom out to reach the
+   * edge of charted space.
    */
   _setupNavSceneMap(contentEl) {
     const mapEl = contentEl.querySelector('#wy-nav-map');
-    const img = contentEl.querySelector('#wy-nav-map-img');
-    const viewport = contentEl.querySelector('#wy-nav-viewport');
+    const canvas = contentEl.querySelector('#wy-nav-grid');
     const tokenLayer = contentEl.querySelector('#wy-nav-token-layer');
     const readoutBody = contentEl.querySelector('#wy-nav-readout-body');
 
-    // Reset any previous poller / observer / zoom before (re)binding.
+    // Tear down previous poller / observer / gesture bindings before rebinding.
     if (this._navPollInterval) { clearInterval(this._navPollInterval); this._navPollInterval = null; }
     if (this._navResizeObserver) { this._navResizeObserver.disconnect(); this._navResizeObserver = null; }
-    if (this._navZoom) { try { this._navZoom.destroy(); } catch (_) { /* noop */ } this._navZoom = null; }
+    if (this._navGestureCleanup) { try { this._navGestureCleanup(); } catch (_) { /* noop */ } this._navGestureCleanup = null; }
 
     const scene = this._getNavScene();
-    if (!mapEl || !img || !tokenLayer || !scene) return;
+    if (!mapEl || !canvas || !tokenLayer || !scene) return;
 
-    // Contained pinch / wheel / drag-pan — only the NAV chart viewport (image +
-    // token layer) transforms; the rest of the terminal stays static.
-    if (viewport) {
-      this._navZoom = new PinchZoomHandler(mapEl, viewport);
-    }
+    const ctx = canvas.getContext('2d');
+    const stars = (this._navStars ||= generateNavStars());
+    // Zoom-out reaches 200 beyond the farthest plotted system (recomputed as
+    // tokens load/refresh); floors at the core extent so an empty chart still
+    // has a sane range.
+    const NAV_ZOOM_MARGIN = 200;
+    const computeChartHalf = () => {
+      let far = 0;
+      for (const t of (this._lastNavTokens || [])) {
+        const d = Math.hypot(t.spinward || 0, t.coreward || 0);
+        if (d > far) far = d;
+      }
+      return Math.max(NAV_VIEW.coreHalfAu, Math.ceil(far) + NAV_ZOOM_MARGIN);
+    };
+    let CHART_HALF = computeChartHalf() || NAV_VIEW.chartHalfAu;
+    const NAV_ICONS = { SHIP: '▲', STATION: '■', SYSTEM: '●' };
 
-    const NAV_ICONS = { SHIP: '▲', STATION: '■', SYSTEM: '◉' };
+    // Persistent view state: chart centre (AU) + zoom (screen px per AU).
+    const view = (this._navViewState ||= { cx: 0, cy: 0, pxPerAu: 0 });
+    let blipMap = new Map();
+    let lastIds = null;
 
-    // Size each blip icon to the token's real footprint on the NAV scene
-    // (wPct = token width as a % of the scene). Uses the fitted layer width so
-    // blips track the map scale; the viewport transform handles zoom on top.
-    const sizeBlips = () => {
-      const layerW = tokenLayer.clientWidth || 0;
-      if (!layerW) return;
-      blipMap.forEach(el => {
-        const wpct = parseFloat(el.dataset.wpct) || 0;
-        const px = Math.max(7, Math.min(40, (wpct / 100) * layerW));
+    // ── geometry helpers ─────────────────────────────────────────────
+    let W = 0, H = 0, dpr = 1;
+    const sizeCanvas = () => {
+      W = mapEl.clientWidth || 1;
+      H = mapEl.clientHeight || 1;
+      dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      canvas.style.width = `${W}px`;
+      canvas.style.height = `${H}px`;
+    };
+    const minPxPerAu = () => Math.max(W, H) / (2 * CHART_HALF);  // fit ±chartHalf to the larger axis (never overscan)
+    const MAX_PX_PER_AU = 160;                                    // deepest zoom-in
+    const clampZoom = (z) => Math.max(minPxPerAu(), Math.min(MAX_PX_PER_AU, z));
+    const clampCenter = () => {
+      view.cx = Math.max(-CHART_HALF, Math.min(CHART_HALF, view.cx));
+      view.cy = Math.max(-CHART_HALF, Math.min(CHART_HALF, view.cy));
+    };
+    const auToScreen = (auX, auY) => ({
+      x: W / 2 + (auX - view.cx) * view.pxPerAu,
+      y: H / 2 - (auY - view.cy) * view.pxPerAu,
+    });
+
+    // ── render (throttled to animation frames) ───────────────────────
+    const renderGrid = () => {
+      if (!ctx) return;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      drawNavGrid(ctx, { w: W, h: H, cx: view.cx, cy: view.cy, pxPerAu: view.pxPerAu, stars, chartHalfAu: CHART_HALF });
+    };
+    const positionBlips = () => {
+      blipMap.forEach((el, id) => {
+        const t = (this._lastNavTokens || []).find(x => x.id === id);
+        if (!t) return;
+        const p = auToScreen(t.spinward, t.coreward);
+        el.style.left = `${p.x}px`;
+        el.style.top = `${p.y}px`;
+        // Icon size tracks the token's real footprint (AU) at the current zoom.
+        const auSize = ((parseFloat(el.dataset.wpct) || 0) / 100) * NAV_CHART.spanLy;
+        const px = Math.max(4.5, Math.min(27, auSize * view.pxPerAu * 1.5));
         const icon = el.querySelector('.wy-nav-token-icon');
         if (icon) icon.style.fontSize = `${px}px`;
       });
     };
-    const fit = () => { this._fitTokenLayer(img, tokenLayer); sizeBlips(); };
+    let renderQueued = false;
+    const scheduleRender = () => {
+      if (renderQueued) return;
+      renderQueued = true;
+      requestAnimationFrame(() => { renderQueued = false; renderGrid(); positionBlips(); });
+    };
 
+    // ── readout ───────────────────────────────────────────────────────
     const defaultReadout = () =>
       '<div class="wy-text-dim">NO CONTACT SELECTED.<br>TOUCH A STATION, SYSTEM, OR SHIP ON THE CHART.</div>';
-
     const updateReadout = () => {
       if (!readoutBody) return;
       const t = (this._lastNavTokens || []).find(x => x.id === this._navSelectedId);
       readoutBody.innerHTML = t ? this._buildNavReadoutHtml(t) : defaultReadout();
+      updateCoursePreview();
+    };
+    const updateDynamic = () => {
+      if (!readoutBody || !this._navSelectedId) return;
+      const distEl = readoutBody.querySelector('#wy-nav-dist');
+      const etaEl = readoutBody.querySelector('#wy-nav-eta');
+      if (!distEl && !etaEl) return;
+      const sel = (this._lastNavTokens || []).find(x => x.id === this._navSelectedId);
+      if (!sel) return;
+      const dyn = this._navDistanceEta(sel);
+      if (distEl) distEl.textContent = dyn.distanceLabel;
+      if (etaEl) etaEl.textContent = dyn.etaLabel;
+    };
+    // Live SET COURSE preview: recompute ETA from ship→target distance / speed.
+    const updateCoursePreview = () => {
+      if (!readoutBody) return;
+      const speedInput = readoutBody.querySelector('#wy-nav-course-speed');
+      const etaOut = readoutBody.querySelector('#wy-nav-course-eta');
+      if (!speedInput || !etaOut) return;
+      const tokens = this._lastNavTokens || [];
+      const ship = tokens.find(x => x.id === this._getNavPlayerShipId(tokens));
+      const target = tokens.find(x => x.id === this._navSelectedId);
+      if (!ship || !target) { etaOut.textContent = '—'; return; }
+      const dist = Math.hypot(target.spinward - ship.spinward, target.coreward - ship.coreward);
+      const spd = parseFloat(speedInput.value) || 0;
+      etaOut.textContent = spd > 0 ? `${this._formatEtaDays(dist / spd)} · ${dist.toFixed(1)} AU` : '—';
     };
 
-    let blipMap = new Map();
-    let lastIds = null;
+    // ── blips ───────────────────────────────────────────────────────
     const buildBlips = (tokens) => {
       tokenLayer.innerHTML = '';
       blipMap = new Map();
@@ -4092,13 +4393,10 @@ export class WYTerminalApp extends Application {
         el.className = `wy-nav-token wy-nav-token-${t.navType.toLowerCase()}`;
         el.dataset.tokenId = t.id;
         el.dataset.wpct = String(t.wPct ?? 0);
-        el.style.left = `${t.x}%`;
-        el.style.top = `${t.y}%`;
         if (t.id === this._navSelectedId) el.classList.add('wy-selected');
         el.innerHTML =
           `<span class="wy-nav-token-icon">${NAV_ICONS[t.navType] || '◆'}</span>` +
           `<span class="wy-nav-token-label">${t.name}</span>`;
-        // Keep a press on a token from starting a chart pan; a click still selects.
         el.addEventListener('mousedown', (e) => e.stopPropagation());
         el.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
         el.addEventListener('click', (e) => {
@@ -4112,69 +4410,258 @@ export class WYTerminalApp extends Application {
         tokenLayer.appendChild(el);
         blipMap.set(t.id, el);
       });
-      sizeBlips();
     };
-
     const refresh = () => {
       const tokens = this._getNavSceneData().navTokens || [];
       const ids = tokens.map(t => t.id).join(',');
       if (ids !== lastIds) {
         lastIds = ids;
+        CHART_HALF = computeChartHalf();   // fit zoom-out to the farthest system + margin
         buildBlips(tokens);
         updateReadout();
-      } else {
-        tokens.forEach(t => {
-          const el = blipMap.get(t.id);
-          if (el) { el.style.left = `${t.x}%`; el.style.top = `${t.y}%`; }
-        });
       }
-      fit();
+      positionBlips();
+      updateDynamic();
     };
 
+    // ── centre / zoom (exposed for the zoom buttons) ─────────────────
+    const centerOnShip = () => {
+      const tokens = this._lastNavTokens || [];
+      const ship = tokens.find(x => x.id === this._getNavPlayerShipId(tokens));
+      view.pxPerAu = clampZoom(Math.min(W, H) / (2 * 18)); // ~±18 AU visible
+      view.cx = ship ? ship.spinward : 0;
+      view.cy = ship ? ship.coreward : 0;
+      clampCenter();
+      scheduleRender();
+    };
+    this._navApplyZoom = (factor) => { view.pxPerAu = clampZoom(view.pxPerAu * factor); clampCenter(); scheduleRender(); };
+    this._navResetView = centerOnShip;
+
+    // ── gestures: wheel zoom-to-cursor, drag pan, pinch ──────────────
+    const rect = () => mapEl.getBoundingClientRect();
+    const onWheel = (e) => {
+      e.preventDefault();
+      const r = rect();
+      const mx = e.clientX - r.left, my = e.clientY - r.top;
+      const auX = view.cx + (mx - W / 2) / view.pxPerAu;
+      const auY = view.cy - (my - H / 2) / view.pxPerAu;
+      view.pxPerAu = clampZoom(view.pxPerAu * (e.deltaY < 0 ? 1.15 : 1 / 1.15));
+      view.cx = auX - (mx - W / 2) / view.pxPerAu;
+      view.cy = auY + (my - H / 2) / view.pxPerAu;
+      clampCenter();
+      scheduleRender();
+    };
+    let dragging = false, lastX = 0, lastY = 0, pinchDist = 0, pinchCx = 0, pinchCy = 0;
+    const onDown = (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; };
+    const onMove = (e) => {
+      if (!dragging) return;
+      view.cx -= (e.clientX - lastX) / view.pxPerAu;
+      view.cy += (e.clientY - lastY) / view.pxPerAu;
+      lastX = e.clientX; lastY = e.clientY;
+      clampCenter(); scheduleRender();
+    };
+    const onUp = () => { dragging = false; };
+    const onTouchStart = (e) => {
+      if (e.touches.length === 1) { dragging = true; lastX = e.touches[0].clientX; lastY = e.touches[0].clientY; }
+      else if (e.touches.length === 2) {
+        dragging = false;
+        const a = e.touches[0], b = e.touches[1], r = rect();
+        pinchDist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+        pinchCx = (a.clientX + b.clientX) / 2 - r.left;
+        pinchCy = (a.clientY + b.clientY) / 2 - r.top;
+      }
+    };
+    const onTouchMove = (e) => {
+      if (e.touches.length === 1 && dragging) {
+        e.preventDefault();
+        view.cx -= (e.touches[0].clientX - lastX) / view.pxPerAu;
+        view.cy += (e.touches[0].clientY - lastY) / view.pxPerAu;
+        lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+        clampCenter(); scheduleRender();
+      } else if (e.touches.length === 2) {
+        e.preventDefault();
+        const a = e.touches[0], b = e.touches[1];
+        const d = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+        if (pinchDist > 0) {
+          const auX = view.cx + (pinchCx - W / 2) / view.pxPerAu;
+          const auY = view.cy - (pinchCy - H / 2) / view.pxPerAu;
+          view.pxPerAu = clampZoom(view.pxPerAu * (d / pinchDist));
+          view.cx = auX - (pinchCx - W / 2) / view.pxPerAu;
+          view.cy = auY + (pinchCy - H / 2) / view.pxPerAu;
+          clampCenter(); scheduleRender();
+        }
+        pinchDist = d;
+      }
+    };
+    const onTouchEnd = (e) => { if ((e.touches?.length ?? 0) === 0) { dragging = false; pinchDist = 0; } };
+
+    mapEl.addEventListener('wheel', onWheel, { passive: false });
+    mapEl.addEventListener('mousedown', onDown);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    mapEl.addEventListener('touchstart', onTouchStart, { passive: false });
+    mapEl.addEventListener('touchmove', onTouchMove, { passive: false });
+    mapEl.addEventListener('touchend', onTouchEnd);
+    mapEl.addEventListener('touchcancel', onTouchEnd);
+    this._navGestureCleanup = () => {
+      mapEl.removeEventListener('wheel', onWheel);
+      mapEl.removeEventListener('mousedown', onDown);
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      mapEl.removeEventListener('touchstart', onTouchStart);
+      mapEl.removeEventListener('touchmove', onTouchMove);
+      mapEl.removeEventListener('touchend', onTouchEnd);
+      mapEl.removeEventListener('touchcancel', onTouchEnd);
+    };
+
+    // ── initial render (default view: core, on the ship) ─────────────
     const onReady = () => {
-      fit();
-      refresh();
-      // Lock the chart onto the active player ship: centre + zoom in on it.
-      requestAnimationFrame(() => this._navCenterOnPlayerShip(mapEl, tokenLayer));
+      sizeCanvas();
+      const tokens = this._getNavSceneData().navTokens || [];
+      CHART_HALF = computeChartHalf();
+      buildBlips(tokens);
+      lastIds = tokens.map(t => t.id).join(',');
+      centerOnShip();
+      renderGrid();
+      positionBlips();
+      updateReadout();
     };
-    if (img.complete && img.naturalWidth > 0) onReady();
-    else img.addEventListener('load', onReady);
+    requestAnimationFrame(onReady);
 
-    this._navResizeObserver = new ResizeObserver(() => fit());
+    this._navResizeObserver = new ResizeObserver(() => { sizeCanvas(); scheduleRender(); });
     this._navResizeObserver.observe(mapEl);
 
     this._navPollInterval = setInterval(() => {
       if (this.rendered && this.activeView === 'nav') refresh();
     }, 400);
 
-    // GM: change a token's NAV type from the readout panel (writes a token flag).
+    // GM: change a token's NAV type or STATUS from the readout panel.
     if (game.user.isGM && readoutBody && !readoutBody._navTypeBound) {
       readoutBody._navTypeBound = true;
       readoutBody.addEventListener('change', async (e) => {
-        const sel = e.target.closest('[data-action="set-nav-type"]');
-        if (!sel) return;
+        const typeSel = e.target.closest('[data-action="set-nav-type"]');
+        const statusSel = e.target.closest('[data-action="set-nav-status"]');
         const doc = scene.tokens?.get(this._navSelectedId);
         if (!doc) return;
         try {
-          await doc.setFlag('wy-terminal', 'navType', sel.value);
-          lastIds = null; // force rebuild so the blip re-colours
+          if (typeSel) {
+            await doc.setFlag('wy-terminal', 'navType', typeSel.value);
+          } else if (statusSel) {
+            // Write STATUS to the linked System actor (source of truth) if any,
+            // else onto the token itself.
+            const target = doc.actor || doc;
+            await target.setFlag('wy-terminal', 'status', statusSel.value);
+          } else {
+            return;
+          }
+          lastIds = null; // force rebuild so the blip / readout refresh
           refresh();
           this._broadcastSocket('refreshView', { view: 'nav' });
         } catch (err) {
-          console.warn('WY-Terminal | Failed to set NAV type:', err);
+          console.warn('WY-Terminal | Failed to set NAV type/status:', err);
+        }
+      });
+    }
+
+    // ALL users: live ETA preview + SET COURSE (players route the request to GM).
+    if (readoutBody && !readoutBody._navCourseBound) {
+      readoutBody._navCourseBound = true;
+      readoutBody.addEventListener('input', (e) => {
+        if (e.target.closest('#wy-nav-course-speed')) updateCoursePreview();
+      });
+      readoutBody.addEventListener('click', (e) => {
+        // GM: designate the selected token as the player ship for NAV tracking.
+        const psBtn = e.target.closest('[data-action="set-player-ship"]');
+        if (psBtn) {
+          if (game.user.isGM && this._navSelectedId) {
+            TerminalSFX.play('beep');
+            this._setNavPlayerShip(this._navSelectedId);
+          }
+          return;
+        }
+        const btn = e.target.closest('[data-action="set-course"]');
+        if (!btn) return;
+        const tokens = this._lastNavTokens || [];
+        const shipId = this._getNavPlayerShipId(tokens);
+        const ship = tokens.find(x => x.id === shipId);
+        const target = tokens.find(x => x.id === this._navSelectedId);
+        console.log('WY-Terminal | SET COURSE clicked', { shipId, ship, targetId: this._navSelectedId, target, tokenCount: tokens.length });
+        if (!ship) {
+          ui.notifications?.warn('WY-TERMINAL: No ship token found on the NAV scene. Plot the ship first (CONFIGURE NAV SCENE / PLOT KNOWN SYSTEMS).');
+          return;
+        }
+        if (!target) {
+          ui.notifications?.warn('WY-TERMINAL: No destination selected. Select a contact on the chart first.');
+          return;
+        }
+        const speedInput = readoutBody.querySelector('#wy-nav-course-speed');
+        const spd = parseFloat(speedInput?.value) || this._navShipSpeedLyPerDay();
+        const payload = {
+          destName: target.name,
+          destSpin: target.spinward, destCore: target.coreward,
+          startSpin: ship.spinward, startCore: ship.coreward,
+          speedAuPerDay: spd,
+        };
+        TerminalSFX.play('beep');
+        if (game.user.isGM) {
+          this._setNavCourse(payload);
+        } else {
+          this._broadcastSocket('setCourse', payload);
+          btn.textContent = '◈ COURSE REQUEST SENT';
+          btn.disabled = true;
+        }
+      });
+    }
+
+    // NAV throttle controls — adjust the active course speed, or (with no
+    // course) the commanded cruise speed used as the SET COURSE default.
+    const throttleBar = contentEl.querySelector('#wy-nav-throttle');
+    if (throttleBar) {
+      throttleBar.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        const max = this._navMaxSpeed();               // engine-limited (0 if engines offline)
+        const step = 0.1;
+        const course = this._getNavCourse();
+        const nav = this._loadSetting('navData') || {};
+        const cur = course.active
+          ? course.speed
+          : ((nav.commandedSpeed != null) ? Number(nav.commandedSpeed) : this._navShipSpeedLyPerDay());
+        let newSpeed = cur;
+        switch (btn.dataset.action) {
+          case 'nav-speed-up': newSpeed = Math.min(max, cur + step); break;
+          case 'nav-speed-down': newSpeed = Math.max(0, cur - step); break;
+          case 'nav-full-stop': newSpeed = 0; break;
+          case 'nav-full-speed': newSpeed = max; break;
+          default: return;
+        }
+        newSpeed = Math.round(newSpeed * 1000) / 1000;
+        TerminalSFX.play('beep');
+        if (course.active) {
+          if (game.user.isGM) this._navSetCourseSpeed(newSpeed);
+          else this._broadcastSocket('setCourseSpeed', { speed: newSpeed });
+        } else if (game.user.isGM) {
+          this._navSetCommandedSpeed(newSpeed);
+        } else {
+          this._broadcastSocket('setCommandedSpeed', { speed: newSpeed });
         }
       });
     }
   }
 
   /**
-   * Identify the NAV token that represents the active player ship — the ship
-   * configured on the GM screen (`activeShip` setting, e.g. MONTERO / CRONUS).
-   * Prefers a SHIP-typed token whose name/actor matches the ship, then any
-   * matching token, then the first SHIP token.
+   * Identify the NAV token that represents the active player ship. An explicit
+   * GM designation (`navData.playerShipTokenId`) wins when that token is present
+   * on the chart; otherwise falls back to auto-detection: a SHIP-typed token
+   * whose name/actor matches the active ship, then any match, then first SHIP.
    */
   _getNavPlayerShipId(tokens) {
     if (!tokens?.length) return null;
+    // Explicit GM designation takes precedence.
+    try {
+      const pinned = (this._loadSetting('navData') || {}).playerShipTokenId;
+      if (pinned && tokens.some(t => t.id === pinned)) return pinned;
+    } catch { /* setting unavailable */ }
     let shipKey = 'montero';
     try { shipKey = (game.settings.get('wy-terminal', 'activeShip') || 'montero').toLowerCase(); } catch { /* pre-init */ }
     const profile = SHIP_PROFILES[shipKey];
@@ -4189,60 +4676,249 @@ export class WYTerminalApp extends Application {
   }
 
   /**
-   * Centre and zoom the NAV chart on the active player ship so the view opens
-   * locked onto it. No-op if the ship token isn't on the NAV scene yet.
+   * GM: designate (or clear) which NAV token is the player ship, so course
+   * plotting/tracking always uses the correct object. Toggles off if the same
+   * token is chosen again. Persisted on navData.playerShipTokenId.
    */
-  _navCenterOnPlayerShip(mapEl, tokenLayer) {
-    if (!this._navZoom || !mapEl || !tokenLayer) return;
-    const tokens = this._lastNavTokens || [];
-    const id = this._getNavPlayerShipId(tokens);
-    if (!id) return;
-    const t = tokens.find(x => x.id === id);
-    if (!t) return;
-    const lw = tokenLayer.offsetWidth;
-    const lh = tokenLayer.offsetHeight;
-    if (!lw || !lh) return;
-    // Token position in the (untransformed) viewport coordinate space.
-    const vx = tokenLayer.offsetLeft + (parseFloat(t.x) / 100) * lw;
-    const vy = tokenLayer.offsetTop + (parseFloat(t.y) / 100) * lh;
-    const cw = mapEl.clientWidth;
-    const ch = mapEl.clientHeight;
-    const S = 2.75; // initial zoom-in factor
-    // screen = pan + S * viewportCoord  →  centre the ship in the map box
-    this._navZoom.scale = S;
-    this._navZoom.panX = cw / 2 - S * vx;
-    this._navZoom.panY = ch / 2 - S * vy;
-    this._navZoom._applyTransform();
+  async _setNavPlayerShip(tokenId) {
+    if (!game.user.isGM || !tokenId) return;
+    const nav = this._loadSetting('navData') || {};
+    nav.playerShipTokenId = (nav.playerShipTokenId === tokenId) ? null : tokenId;
+    await game.settings.set('wy-terminal', 'navData', nav);
+    ui.notifications?.info(nav.playerShipTokenId
+      ? 'WY-TERMINAL: NAV player ship designated.'
+      : 'WY-TERMINAL: NAV player ship cleared — reverting to auto-detect.');
+    this._broadcastSocket('refreshView', { view: 'nav' });
+    this.refreshCurrentView?.();
   }
 
   /**
-   * Live NAV ETA countdown ticker — reads from the default NAV ETA timer by ID.
+   * Re-centre + zoom the NAV chart on the active player ship. Delegates to the
+   * live view controller set up in _setupNavSceneMap.
    */
-  _setupNavEtaTicker(contentEl) {
-    const etaEl = contentEl.querySelector('#wy-nav-eta-display');
-    if (!etaEl) return;
-    const etaTimer = this._getActiveTimers().find(t => t.id === DEFAULT_NAV_ETA_ID);
-    if (!etaTimer || etaTimer.remainingMs <= 0) return;
-    let lastText = '';
-    let lastTag = '';
-    if (this._navEtaInterval) clearInterval(this._navEtaInterval);
-    this._navEtaInterval = setInterval(() => {
-      const timer = this._getActiveTimers().find(t => t.id === DEFAULT_NAV_ETA_ID);
-      if (timer && timer.remainingMs > 0) {
-        const paused = game.settings.get('wy-terminal', 'gameClockPaused') ?? false;
-        const text = this._formatDuration(timer.remainingMs);
-        const tag = paused ? 'PAUSED' : 'LIVE';
-        if (text !== lastText || tag !== lastTag) {
-          lastText = text;
-          lastTag = tag;
-          const tagColor = paused ? 'var(--wy-amber)' : 'var(--wy-green-dim)';
-          etaEl.innerHTML = `${text} <span style="font-size: 10px; color: ${tagColor};">[${tag}]</span>`;
+  _navCenterOnPlayerShip() {
+    this._navResetView?.();
+  }
+
+  /**
+   * GM: plot and activate a NAV course. Records the ship's current position, the
+   * destination, speed, current fuel, and the game-clock start time; the ship
+   * then auto-travels via _startNavCourseTicker. World-setting write → GM only.
+   */
+  async _setNavCourse(p) {
+    if (!game.user.isGM || !p) return;
+    const nav = this._loadSetting('navData') || {};
+    let fuelStart = parseInt(nav.fuel);
+    if (isNaN(fuelStart)) fuelStart = 100;
+    const total = Math.hypot((p.destSpin - p.startSpin), (p.destCore - p.startCore));
+    const commanded = Math.max(0.001, Number(p.speedAuPerDay) || this._navShipSpeedLyPerDay());
+    nav.course = {
+      active: true,
+      destName: p.destName || 'DESTINATION',
+      destSpin: p.destSpin, destCore: p.destCore,
+      startSpin: p.startSpin, startCore: p.startCore,
+      startGameMs: this._getGameClockDate().date.getTime(),
+      commandedSpeed: commanded,                       // crew's requested speed
+      speedAuPerDay: Math.min(commanded, this._navMaxSpeed()),  // effective (engine-limited)
+      fuelStart,
+      fuelPerAu: WYTerminalApp.NAV_FUEL_PER_AU,
+      totalDistAu: total,
+    };
+    await game.settings.set('wy-terminal', 'navData', nav);
+    console.log('WY-Terminal | NAV course set', nav.course);
+    ui.notifications?.info(`WY-TERMINAL: Course plotted to ${nav.course.destName} — ${total.toFixed(1)} AU at ${nav.course.speedAuPerDay} AU/day.`);
+    try {
+      this._addLog('NAVIGATION', `COURSE PLOTTED — ${nav.course.destName}`, 'info',
+        `Course set to ${nav.course.destName}. Distance ${total.toFixed(1)} AU at ${nav.course.speedAuPerDay} AU/day.`);
+    } catch (_) { /* logging optional */ }
+    this._broadcastSocket('refreshView', { view: 'nav' });
+    this._broadcastSocket('newLogAlert', {});
+    this._startNavCourseTicker();
+    this.refreshCurrentView?.();
+  }
+
+  /**
+   * GM: change the active course speed in real time without teleporting the
+   * ship. Rebases the course origin to the current position/time/fuel so the
+   * new speed applies from here onward. FULL STOP = 0 (ship holds position).
+   */
+  async _navSetCourseSpeed(newSpeed) {
+    if (!game.user.isGM) return;
+    const course = this._getNavCourse();
+    if (!course.active) return;
+    const nav = this._loadSetting('navData') || {};
+    const c = nav.course;
+    if (!c) return;
+    c.startSpin = course.curSpin;
+    c.startCore = course.curCore;
+    c.startGameMs = this._getGameClockDate().date.getTime();
+    c.totalDistAu = course.remain;
+    c.fuelStart = course.fuelNow;
+    c.commandedSpeed = Math.max(0, Number(newSpeed) || 0);         // crew's requested speed
+    c.speedAuPerDay = Math.min(c.commandedSpeed, this._navMaxSpeed());  // effective (engine-limited)
+    await game.settings.set('wy-terminal', 'navData', nav);
+    console.log('WY-Terminal | NAV speed set', c.speedAuPerDay, 'commanded', c.commandedSpeed);
+    this._broadcastSocket('refreshView', { view: 'nav' });
+    this._startNavCourseTicker();
+    this.refreshCurrentView?.();
+  }
+
+  /**
+   * GM: set the commanded cruise speed (AU/day) when no course is active. Stored
+   * on navData and used as the SPEED readout + the SET COURSE default speed.
+   */
+  async _navSetCommandedSpeed(newSpeed) {
+    if (!game.user.isGM) return;
+    const nav = this._loadSetting('navData') || {};
+    nav.commandedSpeed = Math.max(0, Number(newSpeed) || 0);
+    await game.settings.set('wy-terminal', 'navData', nav);
+    console.log('WY-Terminal | NAV commanded speed set', nav.commandedSpeed);
+    this._broadcastSocket('refreshView', { view: 'nav' });
+    this.refreshCurrentView?.();
+  }
+
+  /**
+   * GM: drive the SHIP token along the active course as game time passes. Runs
+   * every few real seconds, moving the token to the course-derived position and
+   * finalising (stop + single log) on arrival or fuel depletion.
+   */
+  _startNavCourseTicker() {
+    if (!game.user.isGM) return;
+    if (this._navCourseTicker) { clearInterval(this._navCourseTicker); this._navCourseTicker = null; }
+    let warnedNoShip = false;
+    console.log('WY-Terminal | NAV course ticker started');
+
+    const tick = async () => {
+      const course = this._getNavCourse();
+      if (!course.active) { clearInterval(this._navCourseTicker); this._navCourseTicker = null; return; }
+
+      // Realtime ENGINE enforcement: clamp the effective travel speed to the
+      // engine-limited max (0 when ENGINES are offline). Engine changes thus
+      // instantly halt / throttle / resume travel. Rebase from the current
+      // position so nothing teleports; auto-resumes to the commanded speed when
+      // engines recover.
+      const nav = this._loadSetting('navData') || {};
+      const c = nav.course;
+      if (c?.active) {
+        const effMax = this._navMaxSpeed();
+        const commanded = (c.commandedSpeed != null) ? c.commandedSpeed : (c.speedAuPerDay ?? 0);
+        const desired = Math.max(0, Math.min(commanded, effMax));
+        if (Math.abs(desired - (c.speedAuPerDay ?? 0)) > 1e-4) {
+          c.startSpin = course.curSpin;
+          c.startCore = course.curCore;
+          c.startGameMs = this._getGameClockDate().date.getTime();
+          c.totalDistAu = course.remain;
+          c.fuelStart = course.fuelNow;
+          c.speedAuPerDay = desired;
+          await game.settings.set('wy-terminal', 'navData', nav);
+          this._broadcastSocket('refreshView', { view: 'nav' });
+          return;  // re-evaluate next tick with the rebased (halted/resumed) course
+        }
+      }
+
+      const scene = this._getNavScene();
+      if (!scene) return;
+      const tokens = this._getNavSceneData().navTokens || [];
+      const shipId = this._getNavPlayerShipId(tokens);
+      const shipTok = shipId ? scene.tokens?.get(shipId) : null;
+      if (!shipTok) {
+        if (!warnedNoShip) {
+          warnedNoShip = true;
+          console.warn('WY-Terminal | NAV course: no ship token found on scene', scene?.name, 'shipId=', shipId, 'tokens=', tokens.map(t => `${t.name}:${t.navType}`));
         }
       } else {
-        etaEl.textContent = 'ARRIVED';
-        clearInterval(this._navEtaInterval);
+        warnedNoShip = false;
+        // Position via imgW/spanLy so this exactly inverts _getNavSceneData's
+        // coordinate derivation — that guarantees the ship lands on the same
+        // pixel where PLOT KNOWN SYSTEMS placed a destination system.
+        const dims = scene.dimensions || {};
+        const imgW = dims.sceneWidth || scene.width;
+        const imgH = dims.sceneHeight || scene.height;
+        const pxPerUnitX = imgW / NAV_CHART.spanLy;
+        const pxPerUnitY = imgH / NAV_CHART.spanLy;
+        const tokGrid = scene.grid?.size || NAV_CHART.gridPx;
+        const solX = (dims.sceneX || 0) + imgW / 2;
+        const solY = (dims.sceneY || 0) + imgH / 2;
+        const x = Math.round(solX + course.curSpin * pxPerUnitX - ((shipTok.width || 1) * tokGrid) / 2);
+        const y = Math.round(solY - course.curCore * pxPerUnitY - ((shipTok.height || 1) * tokGrid) / 2);
+        if (Math.abs((shipTok.x || 0) - x) > 0.5 || Math.abs((shipTok.y || 0) - y) > 0.5) {
+          try { await shipTok.update({ x, y }); } catch (e) { console.warn('WY-Terminal | NAV token move failed', e); }
+        }
       }
-    }, 1000);
+      if (course.arrived || course.outOfFuel) {
+        const nav = this._loadSetting('navData') || {};
+        if (nav.course?.active) {
+          nav.course.active = false;
+          await game.settings.set('wy-terminal', 'navData', nav);
+          if (course.arrived) {
+            this._addLog('NAVIGATION', `ARRIVED — ${course.destName}`, 'info', `Ship has arrived at ${course.destName}.`);
+          } else {
+            this._addLog('NAVIGATION', `FUEL DEPLETED — ${course.destName}`, 'critical', `Fuel exhausted before reaching ${course.destName}. Adrift.`);
+          }
+          this._broadcastSocket('refreshView', { view: 'nav' });
+          this._broadcastSocket('newLogAlert', {});
+        }
+        clearInterval(this._navCourseTicker);
+        this._navCourseTicker = null;
+      }
+    };
+    this._navCourseTicker = setInterval(() => { tick().catch(() => {}); }, 1500);
+    tick().catch(() => {});
+  }
+
+  /**
+   * Live NAV status ticker — refreshes POSITION / DESTINATION / DST COORDS /
+   * HEADING / SPEED / FUEL / ETA every second from the active course (or the
+   * legacy ETA timer when no course is set).
+   */
+  _setupNavEtaTicker(contentEl) {
+    if (this._navEtaInterval) clearInterval(this._navEtaInterval);
+    const q = (id) => contentEl.querySelector(id);
+    const etaEl = q('#wy-nav-eta-display');
+    const posEl = q('#wy-nav-position');
+    const destEl = q('#wy-nav-destination');
+    const dstEl = q('#wy-nav-dstcoords');
+    const headEl = q('#wy-nav-heading');
+    const speedEl = q('#wy-nav-speed');
+    const fuelEl = q('#wy-nav-fuel');
+
+    const tick = () => {
+      const course = this._getNavCourse();
+      const paused = game.settings.get('wy-terminal', 'gameClockPaused') ?? false;
+      if (course.active) {
+        if (posEl) posEl.textContent = formatNavCoord(course.curSpin, course.curCore);
+        if (destEl) destEl.textContent = course.destName || 'NOT SET';
+        if (dstEl) dstEl.textContent = formatNavCoord(course.destSpin, course.destCore);
+        if (headEl) headEl.textContent = `${String(course.headingDeg).padStart(3, '0')}°`;
+        if (speedEl) speedEl.textContent = this._fmtNavSpeed(course.speed);
+        if (fuelEl) {
+          const f = Math.round(course.fuelNow);
+          fuelEl.textContent = `${f}%`;
+          fuelEl.className = f <= 25 ? 'wy-text-red' : (f <= 50 ? 'wy-text-amber' : 'wy-text-green');
+        }
+        if (etaEl) {
+          const txt = course.arrived ? 'ARRIVED'
+            : (course.outOfFuel ? 'OUT OF FUEL'
+              : (course.speed <= 0 ? 'HOLDING' : this._formatEtaDays(course.etaDays)));
+          const tag = (course.arrived || course.outOfFuel) ? '' : (paused ? ' [PAUSED]' : ' [LIVE]');
+          etaEl.textContent = txt + tag;
+        }
+        return;
+      }
+      // No active course — reflect the engine-limited commanded speed live so
+      // ENGINE status changes show immediately, and keep the legacy ETA timer.
+      const nav = this._loadSetting('navData') || {};
+      const commanded = (nav.commandedSpeed != null) ? Number(nav.commandedSpeed) : this._navShipSpeedLyPerDay();
+      if (speedEl) speedEl.textContent = this._fmtNavSpeed(Math.min(commanded, this._navMaxSpeed()));
+      if (etaEl) {
+        const timer = this._getActiveTimers().find(t => t.id === DEFAULT_NAV_ETA_ID);
+        if (timer && timer.remainingMs > 0) {
+          etaEl.textContent = this._formatDuration(timer.remainingMs) + (paused ? ' [PAUSED]' : ' [LIVE]');
+        }
+      }
+    };
+    tick();
+    this._navEtaInterval = setInterval(tick, 1000);
   }
 
   /* ── Nav View Setup (LEGACY star-map markers — retained, no longer wired) ── */
@@ -6919,6 +7595,26 @@ export class WYTerminalApp extends Application {
     // ── External radar: configure the RADAR scene background ──
     contentEl.querySelector('[data-action="setup-radar-scene"]')?.addEventListener('click', () => {
       game.wyTerminal?.setupRadarScene?.();
+    });
+
+    // ── NAV star chart: configure the NAV scene + plot known systems ──
+    contentEl.querySelector('[data-action="setup-nav-scene"]')?.addEventListener('click', () => {
+      game.wyTerminal?.setupNavScene?.();
+    });
+    contentEl.querySelector('[data-action="plot-nav-systems"]')?.addEventListener('click', () => {
+      game.wyTerminal?.plotNavSystems?.();
+    });
+    contentEl.querySelector('[data-action="import-items-stardb"]')?.addEventListener('click', () => {
+      game.wyTerminal?.importItemsToStarDB?.();
+    });
+    contentEl.querySelector('[data-action="build-system-actors"]')?.addEventListener('click', () => {
+      game.wyTerminal?.buildSystemActors?.();
+    });
+    contentEl.querySelector('[data-action="generate-planet-images"]')?.addEventListener('click', () => {
+      game.wyTerminal?.generatePlanetImages?.();
+    });
+    contentEl.querySelector('[data-action="build-ship-actors"]')?.addEventListener('click', () => {
+      game.wyTerminal?.buildShipActors?.();
     });
 
     // ── Door control: lock / unlock every door on the active ship's decks ──

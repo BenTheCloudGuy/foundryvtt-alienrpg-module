@@ -1,5 +1,138 @@
 # Changelog
 
+## v1.2.19 — 2026-07-18
+
+### NAVIGATION — engine-governed throttle, restored + live
+
+- The **ENGINE throttle** (`[ FULL STOP ] [ − 0.1 ] [ + 0.1 ] [ FULL SPEED ]`) is back — it now shows whenever the NAV chart is present, not only when a ship is detected/underway.
+- **ENGINE status now governs propulsion.** Max speed = the ship's FTL rating × the ENGINES power factor: `OFFLINE` → **0 (no movement)**, `CRITICAL` ≈ 30%, `WARNING` ≈ 60%, `ONLINE/NOMINAL` → full. `FULL SPEED` and the `+0.1` step clamp to this live max.
+- **Engine changes hit NAV movement in real time.** While a course is underway, the ship's travel is re-evaluated every ~1.5 s against ENGINE status: knocking engines offline **halts** the ship on the spot, restoring them **auto-resumes** at the commanded speed, and degraded engines **throttle it down** — all without teleporting (it rebases from the current position). The SPEED/ETA readouts reflect this immediately.
+
+## v1.2.18 — 2026-07-18
+
+### NAVIGATION — even system distribution
+
+- Replaced the fit-to-map placement (which faithfully reproduced the source data's two tight clusters either side of Sol) with an **even, rank-based distribution**: each system is ranked along Coreward and Spinward independently and dropped into an evenly-spaced slot. Systems now fill the whole chart with no clustering while keeping left→right / bottom→top ordering. Validated against the full set: **88% width / 88% height coverage, 106 px minimum spacing, nothing off-scene**.
+
+## v1.2.17 — 2026-07-18
+
+### NAVIGATION — systems auto-plot and spread across the map
+
+- SYSTEM tokens now **auto-plot onto the NAV scene on load** (GM), so you no longer need to open GM settings and run PLOT KNOWN SYSTEMS by hand (the button still works).
+- Placement switched to a **"fit to map"** model: every system's coordinates are mapped onto the scene by their bounding box (independent X/Y scale, capped at 2× to limit distortion, centred). This spreads systems across the chart and keeps their relative layout recognisable, and it's immune to the light-year/parsec calibration question. Validated against the full system set: all systems land on-scene, covering ~84% width / ~71% height with no clustering into a corner.
+
+## v1.2.16 — 2026-07-18
+
+### NAVIGATION — calibrated to the Middle Heavens art
+
+- Calibrated **PLOT KNOWN SYSTEMS** to the actual "Stars of the Middle Heavens" map. Using the canonical core-rules scene (native 4804×3106, Sol at centre, printed grid ≈ 100 px per parsec), placement now scales as a fraction of the NAV scene (so it holds even though the map is stretched to fit), and treats each system's `location` value as **light-years**, converting to parsecs (÷3.26) for the grid. Calibration lives in three tunable constants so a single known system can lock it exactly.
+
+## v1.2.15 — 2026-07-18
+
+### NAVIGATION — fit the whole chart
+
+- **PLOT KNOWN SYSTEMS** now auto-expands the NAV scene's padding so the farthest system (plus a margin) fits on the canvas. The Middle Heavens map image stays centred at its native scale for the core systems; distant systems (e.g. the Far Spinward Colonies) plot in the space beyond the map edge at their correct grid offset instead of falling off.
+- The terminal **NAV zoom-out now reaches 200 beyond the farthest plotted system** (recomputed as systems load), so you can always pull back to see every contact with margin, and zoom-to-cursor/pan limits follow suit.
+
+## v1.2.14 — 2026-07-18
+
+### NAVIGATION — PLOT KNOWN SYSTEMS matches the Middle Heavens map
+
+- Calibrated **PLOT KNOWN SYSTEMS** to the "Stars of the Middle Heavens" starmap the NAV scene uses. The map's axes are **COREWARD = right (+X)** and **SPINWARD = up (+Y)** with Sol at the scene centre — the module had these **swapped** (spinward→X, coreward→Y), which transposed every system except SOL (0,0). Systems now land in the correct place.
+- Placement now scales by the scene **grid size (1 square = 1 parsec)**, matching the map's own grid and the parsec units in each system's `location`, instead of the synthetic ±50 chart scale.
+- The ship auto-travel ticker was aligned to the same mapping so a plotted destination and the ship that flies to it share the exact pixel.
+
+## v1.2.13 — 2026-07-18
+
+### NAVIGATION — PLOT KNOWN SYSTEMS accounts for every system
+
+- **PLOT KNOWN SYSTEMS** now plots **every** SYSTEM actor. When an actor is missing its `spinward/coreward` flags it resolves the position from the STAR SYSTEMS DB (by `starDbId`, then by name) — the same Middle Heavens `location` the original starmap used — so systems land where they belong instead of being silently skipped.
+- Every plotted token is now forced to **SYSTEM** (never STATION), and re-running **repairs** any existing tokens that were left marked STATION.
+- Systems with no/CLASSIFIED coordinates can't be placed on the chart; they're now reported by name in the notification instead of vanishing quietly.
+
+## v1.2.12 — 2026-07-18
+
+### NAVIGATION — GM can designate the player ship
+
+- The GM can now explicitly mark which NAV contact is the player ship: select a token and click **☆ SET AS PLAYER SHIP** in the readout (click again to clear). The designation is persisted (`navData.playerShipTokenId`) and takes precedence over name/type auto-detection, so course plotting and tracking always use the correct object. Clearing reverts to auto-detect.
+
+## v1.2.11 — 2026-07-18
+
+### NAVIGATION — engine throttle always available
+
+- The **ENGINE** throttle (`[ FULL STOP ]  [ − 0.1 ]  [ + 0.1 ]  [ FULL SPEED ]`) now shows on the NAV page whenever the player ship is on the chart — not just while a course is active. Steps are a fixed **±0.1 AU/day**; `FULL SPEED` = the ship's max (FTL RATING ÷ 10).
+- With no active course the throttle sets a **commanded cruise speed** (persisted), which drives the NAV **SPEED** readout and pre-fills the **SET COURSE** speed to match the ship's max. With a course active the throttle adjusts the live travel speed as before. Player throttle input routes to the GM.
+
+## v1.2.10 — 2026-07-18
+
+### NAVIGATION — FTL speed from the ship's FTL RATING
+
+- The NAV travel speed (ETA, SET COURSE default, throttle `FULL SPEED` / steps) is now derived from the active ship actor's **FTL RATING** attribute — **rating ÷ 10 = AU/day** (e.g. the Montero's rating of 12 → **1.2 AU/day**). Falls back to the ship profile value, then 0.1, if no ship actor is found. Run **BUILD MONTERO & CRONUS SHIP ACTORS** so the ship actors exist.
+
+## v1.2.9 — 2026-07-18
+
+### SHIPS — Montero & Cronus spacecraft actors
+
+- Added **GM CONTROLS ▸ BUILD MONTERO & CRONUS SHIP ACTORS** (and `game.wyTerminal.buildShipActors()`) — creates/updates the **USCSS Montero** and **USCSS Cronus** `spacecraft` actors in a **01. SHIPS** folder, populated with canonical data:
+  - **Montero** — Lockmart CM-88B Bison M-Class Starfreighter (unarmed): hull/armor/FTL/length/lease stats, `MONTERO.png` art, and embedded **module** items (cargo hold, cryonics bay, life support, escape pods).
+  - **Cronus** — C-Class Military Science Vessel: heavier stats, `CRONUS.png` art, embedded **weapon** items (rail gun, missile battery, point-defense array) and **module** items (science pod, cryo vault, biohazard cargo bay, med-lab).
+  - **Crew** are linked into each ship's occupant list, matched to your existing world crew actors by name (Miller/Davis/Cham/Wilson/Rye; Johns/Cooper/Flynn/Clayton/Reid/Ava-6) with their roles as positions. Unmatched crew are reported in the notification.
+- Idempotent by `flags.wy-terminal.shipId` — re-running updates the existing actors (refreshing stats, art, items, and crew) rather than duplicating.
+
+## v1.2.8 — 2026-07-18
+
+### NAVIGATION — throttle controls + detailed ETA
+
+- Added **THROTTLE** controls to the NAV status panel (shown while a course is active): **[ − ]** / **[ + ]** step the speed in quarter increments of the ship's rated FTL speed, **[ FULL STOP ]** holds position (speed 0), and **[ FULL SPEED ]** sets the rated maximum. Speed changes rebase the course from the ship's current position/fuel so it never teleports. Players' throttle input is routed to the GM over the socket.
+- **ETA now reads out as MONTHS / DAYS / HOURS / MINUTES** (e.g. `2MO 05D 12H 30M`) everywhere it appears — the status panel, the live ticker, and the SET COURSE preview. A stopped ship shows `HOLDING`; SPEED shows `FULL STOP` at zero.
+
+## v1.2.7 — 2026-07-18
+
+### NAVIGATION — active course tracking
+
+- **SET COURSE**: selecting any non-ship contact (system, station, ship) in the NAV readout now shows a **SPEED (AU/DAY)** input, a live **EST. ETA** preview (distance ÷ speed, updates as you change speed), and a **◈ SET COURSE** button. Changing speed updates the ETA before committing.
+- Once a course is set, the whole NAV status readout becomes **live and real-time**, derived from the game clock: **POSITION**, **DESTINATION**, **DST COORDINATES**, **HEADING**, **SPEED**, **ETA** and **FUEL** reserves all update every second. Fuel counts down as it is consumed (0.5%/AU), and ETA shows `ARRIVED` or `OUT OF FUEL` at the ends.
+- The **ship token physically auto-travels** along the plotted course on the NAV scene as game time passes (GM-driven), interpolating position from elapsed game-time × speed. On arrival it snaps to the destination, stops, and logs **ARRIVED** exactly once (no more arrival log spam); running dry logs a single fuel-depletion warning.
+- **Players can plot a course too** — a player's SET COURSE request is routed to the GM over the module socket, and the GM writes the course + drives the ship. An in-progress course resumes automatically after a reload.
+
+## v1.2.6 — 2026-07-18
+
+### SYSTEMS — actors from a single source of truth
+
+- The **STAR SYSTEMS database is the single source of truth** for systems. Workflow: **IMPORT PLANET-SYSTEM ITEMS → STAR DB** (seeds the DB with the rich AlienRPG world data), maintain/edit systems + **STATUS** in the STELLAR CARTOGRAPHY view, then **BUILD SYSTEM ACTORS (FROM STAR DB)** to (re)generate `planet` System actors in the **05. SYSTEMS** folder.
+  - **IMPORT PLANET-SYSTEM ITEMS → STAR DB** — converts installed `planet-system` items into STAR SYSTEMS entries (name, sector, coordinates from `location`, affiliation, and a dossier); idempotent by a `wyt-item-<id>` id. `game.wyTerminal.importItemsToStarDB()`.
+  - **BUILD SYSTEM ACTORS (FROM STAR DB)** — creates/updates `planet` actors from every STAR SYSTEMS entry, carrying STATUS + sector/territory/affiliation/classification + coordinates into `flags.wy-terminal` and the dossier into notes; idempotent by `starDbId`. `game.wyTerminal.buildSystemActors()`.
+- The Middle Heavens coordinate parser now accepts comma- or slash-separated pairs (e.g. `-6.8 Rimward, 0.2 Spinward`).
+- **GENERATE PLANET IMAGES**: renders a procedural monochrome-green planet (seeded by system name) for each SYSTEM actor and assigns it as the actor + prototype-token art. `game.wyTerminal.generatePlanetImages()`.
+- **System STATUS tracking**: systems carry a status (ACTIVE / SURVEYED / UNEXPLORED / RESTRICTED / QUARANTINED / ABANDONED / DECOM / CLASSIFIED). NAV shows the selected contact's STATUS colour-coded, and the GM can set it from a dropdown in the NAV readout (persisted on the linked System actor). Added **RESTRICTED** to the STAR SYSTEMS editor.
+
+### NAVIGATION — systems on the chart
+
+- The NAV token scene now spans **±50 AU** (3200²/32px grid) so real system coordinates fit. Re-run **CONFIGURE NAV SCENE** to apply.
+- **PLOT KNOWN SYSTEMS** now prefers the built **SYSTEM actors** — placing tokens linked to each `planet` actor at its coordinates so the NAV readout shows the actor's dossier + SECTOR — and falls back to the bundled cartography JSON only if no System actors exist.
+
+## v1.2.5 — 2026-07-18
+
+### NAVIGATION — deep-space level-of-detail chart
+
+- The NAV chart is now a **level-of-detail renderer** that stays crisp at every zoom. The core worlds **scene** remains ±25 AU (where tokens are placed), but the chart **zooms/scrolls out to ±400 AU** of open space, opening zoomed into the core on the active ship. Max zoom-out is fitted to the larger canvas dimension so the field edge never overscans.
+- The grid **redraws as you zoom** — fine 5-AU cells near the core, coarsening to 25/50/100/250 AU as you pull back — with **zero-padded corner coordinates** like `(-005 +012)` at each major intersection. SOL stays fixed at 0,0.
+- Blips are plotted by AU coordinate (not scene pixels) and shrink/grow with zoom; pan (drag/one-finger), wheel/pinch zoom-to-cursor, and the +/−/reset buttons all drive the AU view. Replaces the previous CSS-transform zoom on NAV.
+
+## v1.2.4 — 2026-07-18
+
+### NAVIGATION — interactive green star chart
+
+- Replaced the static NAV image with a **rendered green-phosphor star chart**: black background with a seeded starfield, a coordinate grid, coordinate numbers, Spinward/Coreward axes, and **SOL permanently at 0,0** (chart centre). Uses the Alien RPG "Middle Heavens" model — 1 grid = 1 AU, span ±25 AU.
+- **Coordinates** are shown for any selected contact (e.g. `6.8 RIMWARD / 0.2 SPINWARD`), computed from its position relative to Sol.
+- **Live distance + time-to-arrival**: selecting a contact shows its distance (AU) and ETA from the active player ship, recalculated live as the ship moves. ETA uses a per-ship FTL rate (`ftlSpeedLyPerDay` on the ship profile) and auto-formats days → months → years.
+- **SYSTEM** contacts read their dossier (sector, territory, affiliation, description) from the stellar-cartography database.
+- New GM CONTROLS: **CONFIGURE NAV SCENE** (applies a 2400² / 48px AU grid + bakes the chart into the scene background) and **PLOT KNOWN SYSTEMS** (auto-places unlinked SYSTEM tokens from `starsystems.json` at their real coordinates, idempotent). Also `game.wyTerminal.setupNavScene()` / `plotNavSystems()`.
+
+### Player Terminal
+
+- Suppressed Foundry's core "no Token in this Scene which gives you visibility of the area" vision warning on player terminal clients (the canvas is hidden there, so the notice was just noise).
+
 ## v1.2.3 — 2026-07-18
 
 ### SCHEMATICS
