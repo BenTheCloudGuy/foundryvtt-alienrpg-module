@@ -15,23 +15,15 @@
 
 ## Active Work
 
-- Map Sensors RANGE to something more meaningful and can be reflected in the RADAR. 
-- Any SHIP beyond the effective RANGE of Sensors should be invisible or intermittent visibility if on the very edge of SENSOR RANGE..
-- Configure visiblity of Internal Sensor Hazards so they can be pre-placed and triggered based on specific events in the game. 
+- 
 
 ## Future Work (Don't do these until moved under Acctive work)
 
 - Create custom Player Interface that shows the Character Sheet.
-- NAVIGATION CHANGES
-  - Replace GM Integrated Navigation with SCENE rendered information. 
-  - Add NAV Map to SCENE and allow tracking using TOKEN
-    - STATION TOKENS
-    - SYSTEM TOKENS (small but selectable) to not interfere with map. 
-    - SHIP TOKENS
-  - Tapping the token brings up an informational window to the RIGHT of NAV MAP with information on STATION, SHIP, SYSTEM pulled directly from the information the token represents in FOUNDRYVTT. 
-- Integrate DOORS [Locked/Unlocked] with FoundryVTT MAP Doors to simplify the onbarding.. 
-  - Give GM easy way to LOCK/UNOCK all doors with a single button on a specific ship/structure.
-  - Wire this into Emergency Settings/Events. 
+- Add Additional Players
+  - Each PC for dedicated CharacterSheet App
+  - Dedicated VTT MAP.
+- Need to find a way to update NAVIGATION STAR MAP with all systems.
 - New COMPENDIUM
   - WEAPONS
   - GEAR
@@ -39,9 +31,21 @@
   - WORLDS
   - Etc Etc
 
-
 ## COMPLETED
 
+- NAV opens locked onto the active player ship (activeShip on the GM screen, e.g. MONTERO/CRONUS) — auto-centres and zooms in on the matching SHIP token.
+- NAV contact names are hidden until a contact is selected, except SHIP (players' location) tokens which always show their name.
+- SCHEMATICS shows the selected ship map only — removed player/crew token overlay and roster (crew tracking stays on SENSORS ▸ INTERNAL).
+- NAV tokens are sized from their actual token size on the NAVIGATION scene (no longer oversized).
+- NAVIGATION: replaced GM marker nav with a scene-driven star chart (scene named NAV) — STATION/SYSTEM/SHIP tokens rendered as selectable blips, live-tracked; tapping a blip shows an info panel (right of the map) pulled from the linked Foundry actor. GM types tokens via a NAV TYPE selector (token flag).
+- Map Sensors RANGE to something more meaningful and can be reflected in the RADAR. 
+- Any SHIP beyond the effective RANGE of Sensors should be invisible or intermittent visibility if on the very edge of SENSOR RANGE..
+- Configure visiblity of Internal Sensor Hazards so they can be pre-placed and triggered based on specific events in the game.
+- Changing Scenes should not force Player Interface to change to SCHEMATICS Page. 
+- SENSORS MAP Token Tracker isn't aligning with the SCENE, tokens are off by a little bit.
+- Integrate DOORS [Locked/Unlocked] with FoundryVTT MAP Doors to simplify the onbarding.. 
+  - Give GM easy way to LOCK/UNOCK all doors with a single button on a specific ship/structure.
+  - Wire this into Emergency Settings/Events. 
 - RADARs Target Data should read Information on object. 
   - NAME
   - MODEL/CLASS

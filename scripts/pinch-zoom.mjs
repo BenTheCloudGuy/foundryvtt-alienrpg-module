@@ -179,6 +179,7 @@ export class PinchZoomHandler {
   }
 
   _onTouchMove(e) {
+    if (!this.enabled) return;
     const currentTouches = Array.from(e.touches);
 
     if (currentTouches.length === 2) {

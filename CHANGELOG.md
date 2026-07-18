@@ -1,5 +1,51 @@
 # Changelog
 
+## v1.2.3 — 2026-07-18
+
+### SCHEMATICS
+
+- The **SHIP SCHEMATICS** view now shows the selected ship map **only** — crew/player token overlays and the "detected signatures" roster were removed. Live crew tracking remains on SENSORS ▸ INTERNAL.
+
+### NAVIGATION
+
+- NAV chart contacts are now **sized to their actual token size** on the NAVIGATION scene (token footprint as a % of the scene) instead of a fixed oversized glyph. Blips track the map scale and the zoom level.
+- Fixed NAV blips **not lining up** with the Foundry scene: the contact icon is now centred on the token position with its label positioned out-of-flow below it (previously the icon + label were centred as a group, pushing the icon above the true point).
+- NAV contact **names are now hidden until a contact is selected** — keeping the chart uncluttered — with the exception of **SHIP** tokens (the players' location), whose names always show.
+- NAV now **opens locked onto the active player ship** — the chart auto-centres and zooms in on the ship configured on the GM screen (`activeShip`, e.g. MONTERO / CRONUS), matched to a SHIP token on the NAVIGATION scene by name.
+
+## v1.2.2 — 2026-07-18
+
+### Fixes
+
+- Changing the active scene no longer forces player terminals to jump to the **SHIP SCHEMATICS** view. The GM's scene change now updates the tracked scene quietly in the background; the SCHEMATICS view only re-renders (and plays the screen-change tone) for players who are already viewing it.
+- Fixed the SENSORS / SCHEMATICS token tracker being **off by a little bit**: token positions now use the token's *centre* (top-left + half its footprint) instead of its top-left corner, so CSS-centred blips/tokens line up exactly with the token on the Foundry scene. Drag-to-move commits the reverse conversion accordingly.
+- Fixed a **zoom/pan lock regression**: a disabled pinch-zoom handler still processed two-finger gestures, so pinching on the nested NAV/SCHEMATICS map also transformed (and unlocked) the whole terminal display. The touch-move handler now respects the `enabled` flag, so only the intended map area moves and every other page stays locked.
+
+### SENSORS — Range & Radar
+
+- **Sensor RANGE is now a meaningful distance scale.** The EXTERNAL radar rings are labelled in **AU** (outer ring = maximum sensor range = the SENSORS system's full range), and the degraded effective-range ring is labelled with the current range in AU.
+- **Range-based contact visibility:** spacecraft beyond the effective sensor range are now **invisible** (previously they were pinned to the outer ring). Contacts within the outer ~15% *edge band* of the effective range show **intermittently** — each radar sweep has only a chance to refresh them, and they render dimmer, like weak returns fading in and out at the limit of detection. True range readouts are computed from the token's actual distance (no longer clamped).
+
+### SENSORS — Internal Hazards (pre-place & trigger)
+
+- Internal-sensor hazards (FIRE / RADIATION / DAMAGE / NO O2) and doors can now be **pre-placed hidden** via a **PRE-PLACE (HIDDEN)** toggle in the GM tools. Hidden markers are invisible to players and shown to the GM as a pulsing dashed "armed" ghost.
+- The GM marker list gained a **TRIGGER / HIDE** button to reveal or re-hide each marker. Triggering a hazard reveals it to all player terminals and pushes an alert (e.g. `⚠ RADIATION DETECTED — 6 RADS`).
+- Added a scripting hook for event-driven reveals: `game.wyTerminal.triggerHazard(deckId, idOrLabel, reveal)` (label/type or id match; omit `reveal` to toggle) — call it from a macro tied to any in-game event.
+
+### DOORS — FoundryVTT integration
+
+- New **DOOR CONTROL** panel in GM CONTROLS: **LOCK ALL DOORS** / **UNLOCK ALL DOORS** seals or unseals every wall door (and secret door) across all deck scenes for the active ship in one click, and mirrors the LOCKED/UNLOCKED state onto the internal-sensor DOOR markers.
+- **SHIP LOCKDOWN** (Emergency) now automatically seals all doors when activated and unseals them when lifted.
+- Exposed `game.wyTerminal.lockAllDoors()` / `unlockAllDoors()` for macros/automation.
+
+### NAVIGATION — scene-driven chart
+
+- The NAV view's manual GM marker system is replaced with a **scene-driven star chart**. Create a Foundry scene named **NAV** (or NAVIGATION), set its background to your star map, and drop tokens onto it — they render as selectable **STATION / SYSTEM / SHIP** blips on the terminal NAV chart, tracked live (GM token moves update player terminals in real time).
+- Tokens are typed by linked actor: **spacecraft → SHIP**; the GM selects a contact and picks **SHIP / STATION / SYSTEM** from the NAV TYPE selector (stored as a `flags.wy-terminal.navType` token flag).
+- Tapping a blip opens an **info panel** to the right of the chart, populated directly from the token's linked Foundry actor (designation, model/class, manufacturer, crew, length, hull, armor, and notes).
+- When no NAV scene exists, the GM sees a setup hint and players see an "awaiting telemetry" message. The HEADING / SPEED / FUEL / ETA status table and live ETA countdown are retained.
+- Pinch/scroll-zoom and drag-pan are now **contained to the NAV chart** — only the star-chart image and its tokens transform; the rest of the terminal page stays static. Zoom buttons also drive the NAV chart.
+
 ## v1.2.1 — 2026-07-17
 
 ### External Radar Target Data

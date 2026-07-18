@@ -1327,6 +1327,30 @@
 }
 .wy-sensors-gm-tools .wy-setting-input { min-width: 90px; width: auto; }
 .wy-sensors-gm-tools #wy-sensors-marker-label { min-width: 140px; }
+.wy-sensors-hidden-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--wy-amber);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.wy-sensors-hidden-toggle input { accent-color: var(--wy-amber); }
+
+/* Pre-placed but not-yet-triggered hazards — GM-only "armed" ghost */
+.wy-marker-armed {
+  opacity: 0.45;
+  filter: grayscale(0.4);
+  outline: 1px dashed var(--wy-amber);
+  outline-offset: 2px;
+  animation: wy-armed-pulse 1.6s ease-in-out infinite;
+}
+@keyframes wy-armed-pulse {
+  0%, 100% { opacity: 0.30; }
+  50%      { opacity: 0.55; }
+}
 
 /* --- Internal scan line (JS-driven) + blip labels / ping --- */
 .wy-sensors-scanline {
@@ -1524,7 +1548,149 @@
   line-height: 1.5;
 }
 
-/* === CREW — List/Detail/Keypad Layout === */
+/* === NAV — scene-driven star chart + token info panel === */
+.wy-nav-map-layout {
+  flex: 1 1 auto;
+  min-height: 340px;
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+.wy-nav-map {
+  flex: 1 1 62%;
+  position: relative;
+  min-width: 0;
+  border: 1px solid var(--wy-border);
+  background: #000;
+  overflow: hidden;
+  touch-action: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wy-nav-viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  transform-origin: 0 0;  /* Required for PinchZoomHandler zoom-toward-cursor math */
+}
+.wy-nav-map-label {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  z-index: 4;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--wy-green-dim);
+  text-shadow: 0 0 4px var(--wy-green-glow);
+  pointer-events: none;
+}
+.wy-nav-map-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.wy-nav-map-empty {
+  padding: 24px;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--wy-green-dim);
+  line-height: 1.7;
+}
+.wy-nav-token-layer {
+  position: absolute;
+  pointer-events: none;
+}
+.wy-nav-token {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  cursor: pointer;
+  line-height: 0;
+  z-index: 3;
+}
+.wy-nav-token-icon {
+  display: block;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--wy-green);
+  text-shadow: 0 0 6px var(--wy-green-glow);
+}
+.wy-nav-token-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 1px;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--wy-green);
+  white-space: nowrap;
+  text-shadow: 0 0 4px var(--wy-green-glow);
+  pointer-events: none;
+  display: none; /* hidden by default — only shown when selected or a SHIP */
+}
+/* Show the name only for the selected contact, plus always for SHIP (player) tokens */
+.wy-nav-token.wy-selected .wy-nav-token-label,
+.wy-nav-token-ship .wy-nav-token-label {
+  display: block;
+}
+.wy-nav-token-ship .wy-nav-token-icon,
+.wy-nav-token-ship .wy-nav-token-label { color: var(--wy-cyan); text-shadow: 0 0 6px rgba(0, 229, 255, 0.4); }
+.wy-nav-token-system .wy-nav-token-icon,
+.wy-nav-token-system .wy-nav-token-label { color: var(--wy-amber); text-shadow: 0 0 6px rgba(255, 191, 0, 0.4); }
+.wy-nav-token.wy-selected .wy-nav-token-icon {
+  outline: 1px solid var(--wy-cyan);
+  border-radius: 50%;
+  padding: 2px;
+}
+.wy-nav-token:hover .wy-nav-token-icon { filter: brightness(1.4); }
+.wy-nav-readout {
+  flex: 1 1 38%;
+  min-width: 170px;
+  border: 1px solid var(--wy-border);
+  background: rgba(0, 0, 0, 0.5);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.wy-nav-readout-title {
+  color: var(--wy-green);
+  font-size: 11px;
+  letter-spacing: 2px;
+  border-bottom: 1px solid var(--wy-border);
+  padding-bottom: 4px;
+  margin-bottom: 6px;
+}
+.wy-nav-readout-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 3px 0;
+  border-bottom: 1px dotted rgba(127, 255, 0, 0.15);
+}
+.wy-nav-readout-notes {
+  margin-top: 8px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--wy-green-dim);
+  line-height: 1.5;
+}
+.wy-nav-readout-gm {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+.wy-nav-readout-gm select { flex: 1; }
 .wy-view-crew {
   display: flex;
   flex-direction: column;

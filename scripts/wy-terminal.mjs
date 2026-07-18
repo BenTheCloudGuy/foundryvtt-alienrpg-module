@@ -81,6 +81,9 @@ Hooks.once('ready', () => {
     setupRadarScene: () => setupRadarScene(),
     importAlienContent: (opts) => importAlienContent(opts),
     importSpacecraft: () => importAlienContent({ spacecraftOnly: true }),
+    triggerHazard: (deckId, idOrLabel, reveal) => terminalApp?.triggerSensorMarker(deckId, idOrLabel, reveal),
+    lockAllDoors: () => terminalApp?._setShipDoors(true),
+    unlockAllDoors: () => terminalApp?._setShipDoors(false),
     MuthurEngine,
     isTerminalDisplay,
   };
@@ -423,10 +426,14 @@ Hooks.once('ready', () => {
       terminalApp.showAlert(data.payload.message);
     }
     if (data.type === 'sceneChange' && terminalApp?.rendered) {
-      // GM pushed a scene change — switch terminal to that scene
-      TerminalSFX.play('screenChange');
+      // GM pushed a scene change — update the active scene quietly.
+      // Do NOT force the player away from their current view; only refresh
+      // the SCHEMATICS view if the player is already looking at it.
       terminalApp.activeSceneId = data.payload.sceneId;
-      terminalApp._switchView('scenes');
+      if (terminalApp.activeView === 'scenes') {
+        TerminalSFX.play('screenChange');
+        terminalApp._renderView('scenes');
+      }
     }
     if (data.type === 'refreshTokens' && terminalApp?.rendered) {
       // GM sent pre-computed token positions — apply them directly.

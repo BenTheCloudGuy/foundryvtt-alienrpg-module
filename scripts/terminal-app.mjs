@@ -178,10 +178,11 @@ export class WYTerminalApp extends Application {
       });
     });
 
-    // Zoom buttons — use per-scene zoom when in schematics, fallback to global
-    el.querySelector('[data-action="zoom-in"]')?.addEventListener('click', () => (this._sceneZoom || this.zoomHandler)?.zoomIn());
-    el.querySelector('[data-action="zoom-out"]')?.addEventListener('click', () => (this._sceneZoom || this.zoomHandler)?.zoomOut());
-    el.querySelector('[data-action="zoom-reset"]')?.addEventListener('click', () => (this._sceneZoom || this.zoomHandler)?.reset());
+    // Zoom buttons — use per-scene zoom when in schematics, nav zoom on the NAV
+    // chart, else fall back to the global display zoom
+    el.querySelector('[data-action="zoom-in"]')?.addEventListener('click', () => (this._sceneZoom || this._navZoom || this.zoomHandler)?.zoomIn());
+    el.querySelector('[data-action="zoom-out"]')?.addEventListener('click', () => (this._sceneZoom || this._navZoom || this.zoomHandler)?.zoomOut());
+    el.querySelector('[data-action="zoom-reset"]')?.addEventListener('click', () => (this._sceneZoom || this._navZoom || this.zoomHandler)?.reset());
 
     // Initialize pinch-zoom on the display frame (disabled until scenes view)
     const displayFrame = el.querySelector('#wy-display-frame');
@@ -212,6 +213,10 @@ export class WYTerminalApp extends Application {
       this.zoomHandler.destroy();
       this.zoomHandler = null;
     }
+    if (this._navZoom) {
+      this._navZoom.destroy();
+      this._navZoom = null;
+    }
     if (this.muthurBridge) {
       this.muthurBridge.destroy();
       this.muthurBridge = null;
@@ -238,6 +243,19 @@ export class WYTerminalApp extends Application {
     if (this._navEtaInterval) {
       clearInterval(this._navEtaInterval);
       this._navEtaInterval = null;
+    }
+    // Clean up scene-driven nav map poller / observer when leaving nav view
+    if (this._navPollInterval) {
+      clearInterval(this._navPollInterval);
+      this._navPollInterval = null;
+    }
+    if (this._navResizeObserver) {
+      this._navResizeObserver.disconnect();
+      this._navResizeObserver = null;
+    }
+    if (this._navZoom) {
+      this._navZoom.destroy();
+      this._navZoom = null;
     }
     // Clean up sensors radar animation / observers when leaving sensors view
     if (this._radarRAF) {
@@ -283,11 +301,10 @@ export class WYTerminalApp extends Application {
     // Only show zoom controls on scenes (ship schematics) view with an active scene
     const zoomControls = el.querySelector('#wy-zoom-controls');
     const isSchematicsView = viewName === 'scenes' && (game.user.isGM || this.activeSceneId);
+    if (zoomControls) zoomControls.style.display = (isSchematicsView || viewName === 'nav') ? '' : 'none';
     if (isSchematicsView) {
-      if (zoomControls) zoomControls.style.display = '';
       // Per-scene zoom is created in _setupScenesView; global zoom stays disabled
     } else {
-      if (zoomControls) zoomControls.style.display = 'none';
       if (this.zoomHandler) {
         this.zoomHandler.enabled = false;
         this.zoomHandler.reset();
@@ -870,16 +887,15 @@ export class WYTerminalApp extends Application {
 
     let activeSceneImg = null;
     let activeSceneName = null;
-    let tokens = [];
+    // SCHEMATICS shows the selected ship map ONLY — no crew/player tokens are
+    // overlaid here (live crew tracking lives on SENSORS ▸ INTERNAL instead).
+    const tokens = [];
 
     if (this.activeSceneId) {
       const scene = game.scenes.get(this.activeSceneId);
       if (scene) {
         activeSceneImg = scene.background?.src || scene.img;
         activeSceneName = scene.name;
-
-        // Extract token data for the selected scene
-        tokens = this._getSceneTokens(scene);
       }
     }
 
@@ -972,10 +988,19 @@ export class WYTerminalApp extends Application {
       padY = imgH * padding;
     }
 
+    const gridSize = scene.grid?.size || scene.data?.grid || 100;
+
     return scene.tokens.contents.map(t => {
-      // Convert from canvas pixel coordinates to image-relative percentages
-      const xPct = (((t.x || 0) - padX) / imgW) * 100;
-      const yPct = (((t.y || 0) - padY) / imgH) * 100;
+      // Convert from canvas pixel coordinates to image-relative percentages.
+      // Use the token CENTER (top-left + half its footprint) so blips/tokens,
+      // which are CSS-centered via translate(-50%,-50%), line up with the token's
+      // visual centre rather than its top-left corner.
+      const tokenWpx = (t.width || 1) * gridSize;
+      const tokenHpx = (t.height || 1) * gridSize;
+      const cx = (t.x || 0) + tokenWpx / 2;
+      const cy = (t.y || 0) + tokenHpx / 2;
+      const xPct = (((cx) - padX) / imgW) * 100;
+      const yPct = (((cy) - padY) / imgH) * 100;
 
       // Determine disposition class
       let disposition = 'neutral';
@@ -989,9 +1014,7 @@ export class WYTerminalApp extends Application {
       const img = t.texture?.src || t.img || null;
 
       // Token size (grid-relative)
-      const gridSize = scene.grid?.size || scene.data?.grid || 100;
-      const tokenWidth = (t.width || 1) * gridSize;
-      const displaySize = Math.max(24, Math.min(64, tokenWidth * 0.5));
+      const displaySize = Math.max(24, Math.min(64, tokenWpx * 0.5));
 
       return {
         id: t.id,
@@ -1002,6 +1025,10 @@ export class WYTerminalApp extends Application {
         x: xPct.toFixed(2),
         y: yPct.toFixed(2),
         size: displaySize,
+        // Token footprint as a percentage of the scene image, so overlays can
+        // size a blip to match the token's actual on-scene size.
+        wPct: (tokenWpx / imgW) * 100,
+        hPct: (tokenHpx / imgH) * 100,
         img,
         icon: disposition === 'hostile' ? '▲' : disposition === 'friendly' ? '◆' : '●',
         disposition,
@@ -1334,6 +1361,9 @@ export class WYTerminalApp extends Application {
       dstCoordinates = `${(destMarker.x * 100).toFixed(1)}%, ${(destMarker.y * 100).toFixed(1)}%`;
     }
 
+    // Scene-driven NAV chart (tokens read from a Foundry scene named NAV)
+    const navSceneInfo = this._getNavSceneData();
+
     return {
       currentPosition,
       destination,
@@ -1352,7 +1382,94 @@ export class WYTerminalApp extends Application {
       navPoints: nav.navPoints || [],
       navMarkers,
       isGM: game.user.isGM,
+      ...navSceneInfo,
     };
+  }
+
+  /**
+   * Find the Foundry scene used as the NAV chart. Prefers an exact "NAV" or
+   * "NAVIGATION" scene, then any scene whose name contains NAV.
+   */
+  _getNavScene() {
+    const scenes = game.scenes?.contents || [];
+    return scenes.find(s => (s.name || '').toUpperCase() === 'NAV')
+      || scenes.find(s => (s.name || '').toUpperCase() === 'NAVIGATION')
+      || scenes.find(s => /\bNAV\b/.test((s.name || '').toUpperCase()))
+      || null;
+  }
+
+  /**
+   * Classify a NAV token: an explicit `flags.wy-terminal.navType` wins, otherwise
+   * spacecraft actors are SHIPs and everything else defaults to STATION.
+   */
+  _getNavTokenType(tokenDoc, actorType) {
+    const flag = tokenDoc?.flags?.['wy-terminal']?.navType
+      || (tokenDoc?.getFlag ? tokenDoc.getFlag('wy-terminal', 'navType') : null);
+    if (flag) return String(flag).toUpperCase();
+    if (actorType === 'spacecraft') return 'SHIP';
+    return 'STATION';
+  }
+
+  /**
+   * Build the NAV chart data: background image + classified tokens (percent
+   * positions from _getSceneTokens, which uses token centres). Caches the token
+   * list for the map poll loop.
+   */
+  _getNavSceneData() {
+    const scene = this._getNavScene();
+    if (!scene) {
+      this._lastNavTokens = [];
+      return { navScene: null, navSceneImg: null, navSceneName: null, navSceneMissing: true, navTokens: [] };
+    }
+    const base = this._getSceneTokens(scene);
+    const navTokens = base.map(b => {
+      const doc = scene.tokens?.get(b.id);
+      return { ...b, navType: this._getNavTokenType(doc, b.actorType) };
+    });
+    this._lastNavTokens = navTokens;
+    return {
+      navScene: scene.id,
+      navSceneImg: scene.background?.src || scene.img || null,
+      navSceneName: (scene.name || '').toUpperCase(),
+      navSceneMissing: false,
+      navTokens,
+    };
+  }
+
+  /**
+   * Build the right-hand NAV readout HTML for a selected token, pulling data
+   * straight from its linked Foundry actor (spacecraft attributes + notes).
+   */
+  _buildNavReadoutHtml(t) {
+    const actor = t.actorId ? game.actors?.get(t.actorId) : null;
+    const sys = actor?.system || {};
+    const row = (k, v) => ((v === '' || v == null) ? '' : `<div class="wy-nav-readout-row"><span class="wy-text-dim">${k}</span><span>${v}</span></div>`);
+    const gv = (x) => (x && typeof x === 'object' ? (x.value ?? '') : (x ?? ''));
+    let rows = row('DESIGNATION', t.name) + row('CLASSIFICATION', t.navType);
+    if (t.actorType === 'spacecraft') {
+      const a = sys.attributes || {};
+      const len = gv(a.length);
+      rows += row('MODEL / CLASS', String(a.model || '').trim())
+        + row('MANUFACTURER', String(a.manufacturer || '').trim())
+        + row('CREW', gv(a.crew))
+        + row('LENGTH', len ? `${len} M` : '')
+        + row('HULL', gv(a.hull))
+        + row('ARMOR', gv(a.armor));
+    }
+    const notes = this._extractText(sys.notes)
+      || this._extractText(sys.general?.notes)
+      || this._extractText(sys.description)
+      || this._extractText(sys.biography);
+    const notesHtml = notes
+      ? `<div class="wy-nav-readout-notes"><span class="wy-text-dim">NOTES</span><br>${notes}</div>`
+      : (actor ? '' : '<div class="wy-nav-readout-notes wy-text-dim">NO LINKED ACTOR DATA ON FILE.</div>');
+    let gmCtl = '';
+    if (game.user.isGM) {
+      const opt = (v) => `<option value="${v}" ${t.navType === v ? 'selected' : ''}>${v}</option>`;
+      gmCtl = `<div class="wy-nav-readout-gm"><span class="wy-text-dim">NAV TYPE</span>`
+        + `<select class="wy-setting-input" data-action="set-nav-type">${opt('SHIP')}${opt('STATION')}${opt('SYSTEM')}</select></div>`;
+    }
+    return rows + notesHtml + gmCtl;
   }
 
   /* ── Sensors data (INTERNAL bio-scan + EXTERNAL radar) ── */
@@ -1389,10 +1506,8 @@ export class WYTerminalApp extends Application {
     } else {
       const rs = this._getRadarSceneContacts();
       radarSceneMissing = !rs.scene;
-      radarContacts = rs.contacts;
-      if (sensorState.diminished) {
-        radarContacts = radarContacts.filter(c => c.radiusPct <= sensorState.rangeRatio + 0.001);
-      }
+      // Apply effective sensor range (drops out-of-range, flags edge contacts)
+      radarContacts = this._filterRadarByRange(rs.contacts);
     }
     // Cache for the animation loop in _setupExternalRadar
     this._lastRadarContacts = radarContacts;
@@ -1474,7 +1589,10 @@ export class WYTerminalApp extends Application {
       const tcy = (t.y || 0) + th / 2;
       const dx = (tcx - centerX) / half;
       const dy = (tcy - centerY) / half;
-      const radiusPct = Math.min(1, Math.hypot(dx, dy));
+      // True range as a fraction of the outer ring (may exceed 1 = beyond max
+      // sensor range). radiusPct is the clamped value used only for drawing.
+      const rawRadius = Math.hypot(dx, dy);
+      const radiusPct = Math.min(1, rawRadius);
       const angle = Math.atan2(dy, dx); // canvas angle (0 rad = east)
       const bearing = Math.round((((Math.atan2(dx, -dy) * 180 / Math.PI) % 360) + 360) % 360);
       const sizeUnits = Math.max(t.width || 1, t.height || 1);
@@ -1490,9 +1608,10 @@ export class WYTerminalApp extends Application {
         label: (t.name || t.actor?.name || 'CONTACT').toUpperCase(),
         type: 'SPACECRAFT',
         angle,
+        rawRadius,
         radiusPct,
         bearing,
-        range: Math.round(radiusPct * fullAU),
+        range: Math.round(rawRadius * fullAU),
         size,
         sizePct: tw / sceneW,
         status: '',
@@ -1512,6 +1631,25 @@ export class WYTerminalApp extends Application {
       });
     });
     return { scene, contacts };
+  }
+
+  /**
+   * Apply the effective sensor RANGE to a list of radar contacts:
+   *   • contacts beyond the effective range are dropped (invisible);
+   *   • contacts within the outer EDGE band of the effective range are flagged
+   *     `onEdge` so the scope renders them intermittently (fading in/out).
+   * Effective range is a fraction of the outer ring (= max range / fullAU).
+   * At full sensor power the effective range is the outer ring (1.0), so only
+   * contacts physically beyond max range are hidden and near-max contacts flicker.
+   */
+  _filterRadarByRange(contacts) {
+    const st = this._sensorState || {};
+    const effFrac = Math.max(0, Math.min(1, st.rangeRatio ?? 1));
+    const EDGE_BAND = 0.15; // outer 15% of effective range = intermittent
+    const edgeStart = effFrac * (1 - EDGE_BAND);
+    return (contacts || [])
+      .filter(c => (c.rawRadius ?? c.radiusPct ?? 0) <= effFrac + 0.001)
+      .map(c => ({ ...c, onEdge: (c.rawRadius ?? c.radiusPct ?? 0) >= edgeStart }));
   }
 
   /**
@@ -1755,10 +1893,15 @@ export class WYTerminalApp extends Application {
     const markers = this._getSensorMarkers(this._sensorsDeckId);
     markerLayer.innerHTML = '';
     markers.forEach(m => {
+      // Hidden (pre-placed, not-yet-triggered) hazards are invisible to players.
+      // The GM still sees them, rendered as a dashed "armed" ghost.
+      if (m.hidden && !isGM) return;
       const el = document.createElement('div');
       el.dataset.markerId = m.id;
+      if (m.hidden) el.classList.add('wy-marker-armed');
       if (m.type === 'DOOR') {
         el.className = 'wy-sensors-door ' + (m.status === 'LOCKED' ? 'wy-door-locked' : 'wy-door-unlocked');
+        if (m.hidden) el.classList.add('wy-marker-armed');
         el.style.left = `${m.x}%`;
         el.style.top = `${m.y}%`;
         el.title = `DOOR — ${m.status}${m.label ? ' — ' + m.label : ''}`;
@@ -1767,6 +1910,7 @@ export class WYTerminalApp extends Application {
       } else {
         const w = m.w || 12, h = m.h || 12;
         el.className = `wy-sensors-box wy-sensors-box-${(m.type || '').toLowerCase()}`;
+        if (m.hidden) el.classList.add('wy-marker-armed');
         el.style.left = `${m.x}%`;
         el.style.top = `${m.y}%`;
         el.style.width = `${w}%`;
@@ -1800,10 +1944,15 @@ export class WYTerminalApp extends Application {
             const doorBtn = m.type === 'DOOR'
               ? `<button class="wy-muthur-send" data-action="toggle-door" data-marker-id="${m.id}" style="width:64px;padding:2px;font-size:9px;">TOGGLE</button>`
               : '';
+            // Visibility (trigger/hide) control for pre-placed hazards & doors
+            const visBtn = m.hidden
+              ? `<button class="wy-muthur-send wy-trigger-btn" data-action="toggle-visible" data-marker-id="${m.id}" style="width:64px;padding:2px;font-size:9px;border-color:#f80;color:#fb0;" title="Reveal to players">TRIGGER</button>`
+              : `<button class="wy-muthur-send" data-action="toggle-visible" data-marker-id="${m.id}" style="width:64px;padding:2px;font-size:9px;" title="Hide from players">HIDE</button>`;
             const extra = m.type === 'DOOR' ? ` [${m.status}]`
               : (m.type === 'RADIATION' && m.rads != null && m.rads !== '' ? ` [${m.rads} RADS]` : '');
-            const desc = `${m.type}${extra}${m.label ? ' — ' + m.label : ''}`;
-            return `<div class="wy-sensors-marker-row"><span>${desc}</span><span style="display:flex;gap:4px;">${doorBtn}<button class="wy-muthur-send" data-action="del-sensor-marker" data-marker-id="${m.id}" style="width:40px;padding:2px;font-size:9px;border-color:#a33;color:#f44;">DEL</button></span></div>`;
+            const armed = m.hidden ? ' <span class="wy-text-amber">◇ ARMED</span>' : '';
+            const desc = `${m.type}${extra}${m.label ? ' — ' + m.label : ''}${armed}`;
+            return `<div class="wy-sensors-marker-row"><span>${desc}</span><span style="display:flex;gap:4px;">${visBtn}${doorBtn}<button class="wy-muthur-send" data-action="del-sensor-marker" data-marker-id="${m.id}" style="width:40px;padding:2px;font-size:9px;border-color:#a33;color:#f44;">DEL</button></span></div>`;
           }).join('');
         }
       }
@@ -1890,6 +2039,7 @@ export class WYTerminalApp extends Application {
     const statusSel = contentEl.querySelector('#wy-sensors-marker-status');
     const labelInput = contentEl.querySelector('#wy-sensors-marker-label');
     const radsInput = contentEl.querySelector('#wy-sensors-marker-rads');
+    const hiddenChk = contentEl.querySelector('#wy-sensors-marker-hidden');
     const list = contentEl.querySelector('#wy-sensors-marker-list');
     let placing = false;
 
@@ -1929,6 +2079,7 @@ export class WYTerminalApp extends Application {
         type,
         status: type === 'DOOR' ? (statusSel?.value || 'LOCKED') : '',
         label: (labelInput?.value || '').trim().toUpperCase(),
+        hidden: !!hiddenChk?.checked,
         x: Number(x.toFixed(2)),
         y: Number(y.toFixed(2)),
       };
@@ -1949,6 +2100,7 @@ export class WYTerminalApp extends Application {
     list?.addEventListener('click', async (e) => {
       const del = e.target.closest('[data-action="del-sensor-marker"]');
       const tog = e.target.closest('[data-action="toggle-door"]');
+      const vis = e.target.closest('[data-action="toggle-visible"]');
       if (del) {
         const id = del.dataset.markerId;
         const markers = this._getSensorMarkers(this._sensorsDeckId).filter(m => m.id !== id);
@@ -1963,8 +2115,46 @@ export class WYTerminalApp extends Application {
           await this._setSensorMarkers(this._sensorsDeckId, markers);
           this._renderSensorMarkers(contentEl, markerLayer);
         }
+      } else if (vis) {
+        const id = vis.dataset.markerId;
+        await this.triggerSensorMarker(this._sensorsDeckId, id);
+        this._renderSensorMarkers(contentEl, markerLayer);
       }
     });
+  }
+
+  /**
+   * Reveal (trigger) or hide an internal-sensor hazard marker. Pass an explicit
+   * `reveal` boolean, or omit it to toggle. Persists + syncs to players so a
+   * pre-placed hazard can be sprung when the corresponding event happens.
+   * Callable from macros via game.wyTerminal.triggerHazard(...).
+   * @param {string} deckId  scene id of the deck the marker lives on
+   * @param {string} idOrLabel  marker id, or a case-insensitive label/type match
+   * @param {boolean} [reveal]  true=show, false=hide, undefined=toggle
+   */
+  async triggerSensorMarker(deckId, idOrLabel, reveal) {
+    if (!deckId) deckId = this._sensorsDeckId;
+    const markers = this._getSensorMarkers(deckId);
+    const key = String(idOrLabel || '').toUpperCase();
+    const m = markers.find(x => x.id === idOrLabel)
+      || markers.find(x => (x.label || '').toUpperCase() === key)
+      || markers.find(x => (x.type || '').toUpperCase() === key);
+    if (!m) {
+      console.warn(`WY-Terminal | triggerSensorMarker: no marker matching "${idOrLabel}" on deck ${deckId}`);
+      return false;
+    }
+    const newHidden = (reveal === undefined) ? !m.hidden : !reveal;
+    m.hidden = newHidden;
+    await this._setSensorMarkers(deckId, markers);
+    TerminalSFX.play(newHidden ? 'beep' : 'alert');
+    if (!newHidden && m.type !== 'DOOR') {
+      // Announce a newly sprung hazard to player terminals
+      const rads = (m.type === 'RADIATION' && m.rads) ? ` — ${m.rads} RADS` : '';
+      const msg = `⚠ ${m.type} DETECTED${m.label ? ' — ' + m.label : ''}${rads}`;
+      this._broadcastSocket('alert', { message: msg });
+      this.showAlert?.(msg);
+    }
+    return true;
   }
 
   /**
@@ -2046,7 +2236,7 @@ export class WYTerminalApp extends Application {
       if (st.offline) { contacts = []; }
       else {
         const rs = this._getRadarSceneContacts();
-        contacts = st.diminished ? rs.contacts.filter(c => c.radiusPct <= st.rangeRatio + 0.001) : rs.contacts;
+        contacts = this._filterRadarByRange(rs.contacts);
       }
       this._lastRadarContacts = contacts;
     };
@@ -2096,6 +2286,22 @@ export class WYTerminalApp extends Application {
       ctx.moveTo(cx, cy - R); ctx.lineTo(cx, cy + R);
       ctx.stroke();
 
+      // Range-ring labels in AU (outer ring = max sensor range) so the scope
+      // reads as a meaningful distance scale.
+      const fullAU = st.fullAU || 100;
+      ctx.save();
+      ctx.fillStyle = 'rgba(127,255,0,0.5)';
+      ctx.font = '8px monospace';
+      ctx.textAlign = 'left';
+      for (let i = 1; i <= 4; i++) {
+        const ringR = (R * i) / 4;
+        const au = Math.round((fullAU * i) / 4);
+        ctx.fillText(`${au}`, cx + 3, cy - ringR + 9);
+      }
+      ctx.fillStyle = 'rgba(127,255,0,0.7)';
+      ctx.fillText('AU', cx + 3, cy - R + 20);
+      ctx.restore();
+
       // Reduced effective-range ring when sensors are diminished
       if (st.diminished && st.rangeRatio < 1) {
         ctx.save();
@@ -2105,6 +2311,11 @@ export class WYTerminalApp extends Application {
         ctx.beginPath();
         ctx.arc(cx, cy, R * st.rangeRatio, 0, Math.PI * 2);
         ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = 'rgba(255,191,0,0.8)';
+        ctx.font = '8px monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText(`EFF ${Math.round((st.rangeAU ?? st.rangeRatio * fullAU))} AU`, cx + 3, cy - R * st.rangeRatio - 3);
         ctx.restore();
       }
 
@@ -2129,9 +2340,16 @@ export class WYTerminalApp extends Application {
 
       // Paint updates: snapshot a target's position only when the sweep passes
       // its bearing (first frame paints everything so the scope isn't empty).
+      // Contacts on the very edge of sensor range appear intermittently — each
+      // sweep pass has only a ~55% chance of refreshing (registering) them.
       contacts.forEach(c => {
         if (prevSweep < 0 || crossedAngle(prevSweep, sweep, normA(c.angle))) {
-          disp.set(c.id, { ...c });
+          if (c.onEdge && prevSweep >= 0) {
+            if (Math.random() < 0.55) disp.set(c.id, { ...c });
+            else disp.delete(c.id);
+          } else {
+            disp.set(c.id, { ...c });
+          }
         }
       });
       const liveIds = new Set(contacts.map(c => c.id));
@@ -2150,7 +2368,9 @@ export class WYTerminalApp extends Application {
           py += Math.cos(now / 370 + i) * j;
         }
         const da = (((sweep - c.angle) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
-        const intensity = Math.max(0.25, 1 - da / (Math.PI * 2));
+        let intensity = Math.max(0.25, 1 - da / (Math.PI * 2));
+        // Edge-of-range contacts are weak/noisy returns — dim them further.
+        if (c.onEdge) intensity *= 0.55;
         const r = blipRadius(c, R);
         const isSel = c.id === this._radarSelectedId;
         ctx.fillStyle = `rgba(127,255,0,${intensity})`;
@@ -3275,13 +3495,19 @@ export class WYTerminalApp extends Application {
       padY = imgH * padding;
     }
 
-    // Reverse the percentage conversion:  pct = ((px - pad) / imgDim) * 100
-    //   =>  px = (pct / 100) * imgDim + pad
-    const newX = (pctX / 100) * imgW + padX;
-    const newY = (pctY / 100) * imgH + padY;
-
+    // Reverse the percentage conversion. Percentages now reference the token
+    // CENTRE (see _getSceneTokens), so subtract half the token footprint to get
+    // the top-left corner Foundry stores in x/y.
+    //   pctCenter = (((topLeft + half) - pad) / imgDim) * 100
+    //   => topLeft = (pct / 100) * imgDim + pad - half
     const tokenDoc = scene.tokens?.get(tokenId);
     if (!tokenDoc) return;
+
+    const gridSize = scene.grid?.size || scene.data?.grid || 100;
+    const halfW = ((tokenDoc.width || 1) * gridSize) / 2;
+    const halfH = ((tokenDoc.height || 1) * gridSize) / 2;
+    const newX = (pctX / 100) * imgW + padX - halfW;
+    const newY = (pctY / 100) * imgH + padY - halfH;
 
     try {
       // GM can update directly; player updates go through normal Foundry permissions
@@ -3797,8 +4023,230 @@ export class WYTerminalApp extends Application {
     if (formEl) formEl.classList.add('wy-hidden');
   }
 
-  /* ── Nav View Setup — star map canvas overlay + NAV markers ── */
+  /* ── Nav View Setup — scene-driven star chart + selectable token info panel ── */
   _setupNavView(contentEl) {
+    this._setupNavSceneMap(contentEl);
+    this._setupNavEtaTicker(contentEl);
+  }
+
+  /**
+   * Scene-driven NAV chart: renders the NAV scene background with selectable
+   * STATION / SYSTEM / SHIP token blips; tapping a blip populates the right-hand
+   * info panel from the token's linked Foundry actor. Positions poll live so a
+   * GM moving a token tracks in real time on player terminals.
+   */
+  _setupNavSceneMap(contentEl) {
+    const mapEl = contentEl.querySelector('#wy-nav-map');
+    const img = contentEl.querySelector('#wy-nav-map-img');
+    const viewport = contentEl.querySelector('#wy-nav-viewport');
+    const tokenLayer = contentEl.querySelector('#wy-nav-token-layer');
+    const readoutBody = contentEl.querySelector('#wy-nav-readout-body');
+
+    // Reset any previous poller / observer / zoom before (re)binding.
+    if (this._navPollInterval) { clearInterval(this._navPollInterval); this._navPollInterval = null; }
+    if (this._navResizeObserver) { this._navResizeObserver.disconnect(); this._navResizeObserver = null; }
+    if (this._navZoom) { try { this._navZoom.destroy(); } catch (_) { /* noop */ } this._navZoom = null; }
+
+    const scene = this._getNavScene();
+    if (!mapEl || !img || !tokenLayer || !scene) return;
+
+    // Contained pinch / wheel / drag-pan — only the NAV chart viewport (image +
+    // token layer) transforms; the rest of the terminal stays static.
+    if (viewport) {
+      this._navZoom = new PinchZoomHandler(mapEl, viewport);
+    }
+
+    const NAV_ICONS = { SHIP: '▲', STATION: '■', SYSTEM: '◉' };
+
+    // Size each blip icon to the token's real footprint on the NAV scene
+    // (wPct = token width as a % of the scene). Uses the fitted layer width so
+    // blips track the map scale; the viewport transform handles zoom on top.
+    const sizeBlips = () => {
+      const layerW = tokenLayer.clientWidth || 0;
+      if (!layerW) return;
+      blipMap.forEach(el => {
+        const wpct = parseFloat(el.dataset.wpct) || 0;
+        const px = Math.max(7, Math.min(40, (wpct / 100) * layerW));
+        const icon = el.querySelector('.wy-nav-token-icon');
+        if (icon) icon.style.fontSize = `${px}px`;
+      });
+    };
+    const fit = () => { this._fitTokenLayer(img, tokenLayer); sizeBlips(); };
+
+    const defaultReadout = () =>
+      '<div class="wy-text-dim">NO CONTACT SELECTED.<br>TOUCH A STATION, SYSTEM, OR SHIP ON THE CHART.</div>';
+
+    const updateReadout = () => {
+      if (!readoutBody) return;
+      const t = (this._lastNavTokens || []).find(x => x.id === this._navSelectedId);
+      readoutBody.innerHTML = t ? this._buildNavReadoutHtml(t) : defaultReadout();
+    };
+
+    let blipMap = new Map();
+    let lastIds = null;
+    const buildBlips = (tokens) => {
+      tokenLayer.innerHTML = '';
+      blipMap = new Map();
+      tokens.forEach(t => {
+        const el = document.createElement('div');
+        el.className = `wy-nav-token wy-nav-token-${t.navType.toLowerCase()}`;
+        el.dataset.tokenId = t.id;
+        el.dataset.wpct = String(t.wPct ?? 0);
+        el.style.left = `${t.x}%`;
+        el.style.top = `${t.y}%`;
+        if (t.id === this._navSelectedId) el.classList.add('wy-selected');
+        el.innerHTML =
+          `<span class="wy-nav-token-icon">${NAV_ICONS[t.navType] || '◆'}</span>` +
+          `<span class="wy-nav-token-label">${t.name}</span>`;
+        // Keep a press on a token from starting a chart pan; a click still selects.
+        el.addEventListener('mousedown', (e) => e.stopPropagation());
+        el.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this._navSelectedId = t.id;
+          TerminalSFX.play('beep');
+          tokenLayer.querySelectorAll('.wy-nav-token').forEach(x => x.classList.remove('wy-selected'));
+          el.classList.add('wy-selected');
+          updateReadout();
+        });
+        tokenLayer.appendChild(el);
+        blipMap.set(t.id, el);
+      });
+      sizeBlips();
+    };
+
+    const refresh = () => {
+      const tokens = this._getNavSceneData().navTokens || [];
+      const ids = tokens.map(t => t.id).join(',');
+      if (ids !== lastIds) {
+        lastIds = ids;
+        buildBlips(tokens);
+        updateReadout();
+      } else {
+        tokens.forEach(t => {
+          const el = blipMap.get(t.id);
+          if (el) { el.style.left = `${t.x}%`; el.style.top = `${t.y}%`; }
+        });
+      }
+      fit();
+    };
+
+    const onReady = () => {
+      fit();
+      refresh();
+      // Lock the chart onto the active player ship: centre + zoom in on it.
+      requestAnimationFrame(() => this._navCenterOnPlayerShip(mapEl, tokenLayer));
+    };
+    if (img.complete && img.naturalWidth > 0) onReady();
+    else img.addEventListener('load', onReady);
+
+    this._navResizeObserver = new ResizeObserver(() => fit());
+    this._navResizeObserver.observe(mapEl);
+
+    this._navPollInterval = setInterval(() => {
+      if (this.rendered && this.activeView === 'nav') refresh();
+    }, 400);
+
+    // GM: change a token's NAV type from the readout panel (writes a token flag).
+    if (game.user.isGM && readoutBody && !readoutBody._navTypeBound) {
+      readoutBody._navTypeBound = true;
+      readoutBody.addEventListener('change', async (e) => {
+        const sel = e.target.closest('[data-action="set-nav-type"]');
+        if (!sel) return;
+        const doc = scene.tokens?.get(this._navSelectedId);
+        if (!doc) return;
+        try {
+          await doc.setFlag('wy-terminal', 'navType', sel.value);
+          lastIds = null; // force rebuild so the blip re-colours
+          refresh();
+          this._broadcastSocket('refreshView', { view: 'nav' });
+        } catch (err) {
+          console.warn('WY-Terminal | Failed to set NAV type:', err);
+        }
+      });
+    }
+  }
+
+  /**
+   * Identify the NAV token that represents the active player ship — the ship
+   * configured on the GM screen (`activeShip` setting, e.g. MONTERO / CRONUS).
+   * Prefers a SHIP-typed token whose name/actor matches the ship, then any
+   * matching token, then the first SHIP token.
+   */
+  _getNavPlayerShipId(tokens) {
+    if (!tokens?.length) return null;
+    let shipKey = 'montero';
+    try { shipKey = (game.settings.get('wy-terminal', 'activeShip') || 'montero').toLowerCase(); } catch { /* pre-init */ }
+    const profile = SHIP_PROFILES[shipKey];
+    const needles = [shipKey];
+    if (profile?.name) needles.push(profile.name.split(' ').pop().toLowerCase());
+    const matches = (t) => {
+      const hay = `${t.name || ''} ${t.actor || ''}`.toLowerCase();
+      return needles.some(n => n && hay.includes(n));
+    };
+    const ships = tokens.filter(t => t.navType === 'SHIP');
+    return (ships.find(matches) || tokens.find(matches) || ships[0])?.id || null;
+  }
+
+  /**
+   * Centre and zoom the NAV chart on the active player ship so the view opens
+   * locked onto it. No-op if the ship token isn't on the NAV scene yet.
+   */
+  _navCenterOnPlayerShip(mapEl, tokenLayer) {
+    if (!this._navZoom || !mapEl || !tokenLayer) return;
+    const tokens = this._lastNavTokens || [];
+    const id = this._getNavPlayerShipId(tokens);
+    if (!id) return;
+    const t = tokens.find(x => x.id === id);
+    if (!t) return;
+    const lw = tokenLayer.offsetWidth;
+    const lh = tokenLayer.offsetHeight;
+    if (!lw || !lh) return;
+    // Token position in the (untransformed) viewport coordinate space.
+    const vx = tokenLayer.offsetLeft + (parseFloat(t.x) / 100) * lw;
+    const vy = tokenLayer.offsetTop + (parseFloat(t.y) / 100) * lh;
+    const cw = mapEl.clientWidth;
+    const ch = mapEl.clientHeight;
+    const S = 2.75; // initial zoom-in factor
+    // screen = pan + S * viewportCoord  →  centre the ship in the map box
+    this._navZoom.scale = S;
+    this._navZoom.panX = cw / 2 - S * vx;
+    this._navZoom.panY = ch / 2 - S * vy;
+    this._navZoom._applyTransform();
+  }
+
+  /**
+   * Live NAV ETA countdown ticker — reads from the default NAV ETA timer by ID.
+   */
+  _setupNavEtaTicker(contentEl) {
+    const etaEl = contentEl.querySelector('#wy-nav-eta-display');
+    if (!etaEl) return;
+    const etaTimer = this._getActiveTimers().find(t => t.id === DEFAULT_NAV_ETA_ID);
+    if (!etaTimer || etaTimer.remainingMs <= 0) return;
+    let lastText = '';
+    let lastTag = '';
+    if (this._navEtaInterval) clearInterval(this._navEtaInterval);
+    this._navEtaInterval = setInterval(() => {
+      const timer = this._getActiveTimers().find(t => t.id === DEFAULT_NAV_ETA_ID);
+      if (timer && timer.remainingMs > 0) {
+        const paused = game.settings.get('wy-terminal', 'gameClockPaused') ?? false;
+        const text = this._formatDuration(timer.remainingMs);
+        const tag = paused ? 'PAUSED' : 'LIVE';
+        if (text !== lastText || tag !== lastTag) {
+          lastText = text;
+          lastTag = tag;
+          const tagColor = paused ? 'var(--wy-amber)' : 'var(--wy-green-dim)';
+          etaEl.innerHTML = `${text} <span style="font-size: 10px; color: ${tagColor};">[${tag}]</span>`;
+        }
+      } else {
+        etaEl.textContent = 'ARRIVED';
+        clearInterval(this._navEtaInterval);
+      }
+    }, 1000);
+  }
+
+  /* ── Nav View Setup (LEGACY star-map markers — retained, no longer wired) ── */
+  _setupNavViewLegacy(contentEl) {
     const container = contentEl.querySelector('#wy-nav-starmap');
     const img = contentEl.querySelector('#wy-nav-starmap-img');
     const canvas = contentEl.querySelector('#wy-nav-starmap-overlay');
@@ -5878,10 +6326,56 @@ export class WYTerminalApp extends Application {
    * @param {string} triggeredBy — Crew member name
    * @param {string} [target] — For purge: deck/ship target
    */
+  /**
+   * Lock or unlock every door on the active ship's deck scenes by driving the
+   * underlying FoundryVTT wall-door state. Operates on all scenes matched to the
+   * active ship profile (see _getShipDecks). Also mirrors the LOCKED/UNLOCKED
+   * state onto any internal-sensor DOOR markers so the terminal stays in sync.
+   * GM-only (players cannot update wall documents).
+   * @param {boolean} locked  true = seal (locked), false = unseal (closed)
+   * @returns {Promise<number>} number of doors changed
+   */
+  async _setShipDoors(locked) {
+    if (!game.user.isGM) return 0;
+    const DOOR_STATES = CONST?.WALL_DOOR_STATES ?? { CLOSED: 0, OPEN: 1, LOCKED: 2 };
+    const targetDs = locked ? DOOR_STATES.LOCKED : DOOR_STATES.CLOSED;
+    const { decks } = this._getShipDecks();
+    let total = 0;
+    for (const d of decks) {
+      const scene = game.scenes?.get(d.sceneId);
+      if (!scene) continue;
+      const walls = scene.walls?.contents || [];
+      const updates = walls
+        .filter(w => (w.door ?? 0) > 0)          // only actual doors / secret doors
+        .filter(w => (w.ds ?? 0) !== targetDs)   // skip ones already in target state
+        .map(w => ({ _id: w.id, ds: targetDs }));
+      if (updates.length) {
+        try {
+          await scene.updateEmbeddedDocuments('Wall', updates);
+          total += updates.length;
+        } catch (err) {
+          console.warn(`WY-Terminal | Failed to update doors on scene ${scene.name}:`, err);
+        }
+      }
+      // Mirror onto internal-sensor DOOR markers for this deck
+      const markers = this._getSensorMarkers(d.sceneId);
+      let changed = false;
+      markers.forEach(m => {
+        if (m.type === 'DOOR') { m.status = locked ? 'LOCKED' : 'UNLOCKED'; changed = true; }
+      });
+      if (changed) await this._setSensorMarkers(d.sceneId, markers);
+    }
+    console.log(`WY-Terminal | ${locked ? 'Locked' : 'Unlocked'} ${total} door(s) across ${decks.length} deck(s).`);
+    return total;
+  }
+
   _activateEmergency(protocolKey, triggeredBy, target = '') {
     const proto = WYTerminalApp.EMERGENCY_PROTOCOLS[protocolKey];
     if (!proto) return;
-
+    // SHIP LOCKDOWN also physically seals every door on the ship's decks.
+    if (protocolKey === 'lockdown' && game.user.isGM) {
+      this._setShipDoors(true).catch(err => console.warn('WY-Terminal | Lockdown door seal failed:', err));
+    }
     const updates = {
       [proto.activeKey]: true,
       [proto.triggeredByKey]: triggeredBy.toUpperCase(),
@@ -5938,6 +6432,11 @@ export class WYTerminalApp extends Application {
     };
     if (proto.targetKey) updates[proto.targetKey] = null;
     this.shipStatus?.update(updates);
+
+    // Lifting a lockdown unseals the doors it sealed.
+    if (protocolKey === 'lockdown' && game.user.isGM) {
+      this._setShipDoors(false).catch(err => console.warn('WY-Terminal | Lockdown door unseal failed:', err));
+    }
 
     // Log entry
     const logSubject = target
@@ -6420,6 +6919,16 @@ export class WYTerminalApp extends Application {
     // ── External radar: configure the RADAR scene background ──
     contentEl.querySelector('[data-action="setup-radar-scene"]')?.addEventListener('click', () => {
       game.wyTerminal?.setupRadarScene?.();
+    });
+
+    // ── Door control: lock / unlock every door on the active ship's decks ──
+    contentEl.querySelector('[data-action="lock-all-doors"]')?.addEventListener('click', async () => {
+      const n = await this._setShipDoors(true);
+      ui.notifications?.info(`WY-Terminal: SEALED ${n} DOOR(S).`);
+    });
+    contentEl.querySelector('[data-action="unlock-all-doors"]')?.addEventListener('click', async () => {
+      const n = await this._setShipDoors(false);
+      ui.notifications?.info(`WY-Terminal: UNSEALED ${n} DOOR(S).`);
     });
 
     // ── AlienRPG content import ──
