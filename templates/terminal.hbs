@@ -65,6 +65,11 @@
         <span class="btn-label">NAV</span>
       </button>
 
+      <button class="wy-nav-btn {{#if (eq activeView 'sensors')}}active{{/if}}" data-view="sensors">
+        <span class="btn-icon">◎</span>
+        <span class="btn-label">SENSORS</span>
+      </button>
+
       {{!-- Ship-specific extra nav buttons --}}
       {{#if extraNavButtons.length}}
       <div class="wy-nav-separator"></div>

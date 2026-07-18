@@ -1008,6 +1008,8 @@
 .wy-view-nav {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
   height: 100%;
 }
 
@@ -1045,7 +1047,8 @@
 .wy-nav-starmap-img {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
   pointer-events: none;
   filter: brightness(0.7) saturate(0.4) hue-rotate(80deg);
   transform-origin: 0 0;
@@ -1098,6 +1101,427 @@
 }
 .wy-nav-marker-form .wy-setting-input {
   width: 200px;
+}
+
+/* === SENSORS — Internal bio-scan + External radar === */
+.wy-view-sensors {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
+.wy-sensors-tabs {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-bottom: 10px;
+}
+
+.wy-sensors-tab {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--wy-border);
+  color: var(--wy-green-dim);
+  font-family: var(--wy-font);
+  font-size: 12px;
+  letter-spacing: 3px;
+  padding: 8px 10px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.wy-sensors-tab:hover {
+  border-color: var(--wy-green);
+  color: var(--wy-green);
+}
+.wy-sensors-tab.active {
+  background: var(--wy-green-glow);
+  border-color: var(--wy-green);
+  color: var(--wy-green);
+  text-shadow: 0 0 8px var(--wy-green-glow);
+}
+.wy-sensors-tab .btn-icon { margin-right: 6px; }
+
+/* --- Sensor system status bar + offline / degraded states --- */
+.wy-sensors-sysbar {
+  flex-shrink: 0;
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 4px 6px;
+  margin-bottom: 8px;
+  border: 1px solid var(--wy-border);
+  border-left-width: 3px;
+  color: var(--wy-green);
+}
+.wy-sensors-sysbar.wy-sys-online   { border-left-color: var(--wy-green); }
+.wy-sensors-sysbar.wy-sys-warning  { border-left-color: var(--wy-amber); color: var(--wy-amber); }
+.wy-sensors-sysbar.wy-sys-critical { border-left-color: var(--wy-red); color: var(--wy-red); }
+.wy-sensors-sysbar.wy-sys-offline  { border-left-color: var(--wy-red); color: var(--wy-red); animation: wy-blink 1.2s step-end infinite; }
+.wy-sensors-sysbar-status { font-weight: bold; }
+.wy-sensors-sysbar-degraded { color: var(--wy-amber); font-weight: bold; }
+
+.wy-sensors-offline {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  border: 1px solid var(--wy-red-dim);
+  background: repeating-linear-gradient(45deg, rgba(255, 51, 51, 0.03) 0 10px, transparent 10px 20px);
+  letter-spacing: 3px;
+}
+.wy-sensors-offline-title {
+  color: var(--wy-red);
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 4px;
+  text-shadow: 0 0 10px rgba(255, 51, 51, 0.4);
+  animation: wy-blink 1.2s step-end infinite;
+}
+
+/* Degraded internal scan overlay (noise) */
+.wy-sensors-ship.wy-sensors-degraded::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(255, 191, 0, 0.05) 0 2px, transparent 2px 4px);
+  animation: wy-crt-flicker 3s ease-in-out infinite;
+  z-index: 4;
+}
+
+.wy-sensors-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.wy-sensors-deck-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-bottom: 8px;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+.wy-sensors-deck-select .wy-setting-input {
+  flex: 0 0 auto;
+  min-width: 180px;
+}
+
+.wy-sensors-scan-label {
+  font-size: 10px;
+  color: var(--wy-green-dim);
+  letter-spacing: 3px;
+  padding: 4px 2px;
+  flex-shrink: 0;
+}
+
+.wy-sensors-readout {
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 6px 2px 0;
+  flex-shrink: 0;
+}
+
+.wy-sensors-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--wy-green-dim);
+  letter-spacing: 2px;
+  font-size: 12px;
+  padding: 20px;
+}
+
+/* --- Internal bio-scan --- */
+.wy-sensors-ship {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  border: 1px solid var(--wy-border);
+  background: rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.wy-sensors-ship-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: brightness(0.5) saturate(0.3) hue-rotate(80deg) contrast(1.2);
+  opacity: 0.7;
+}
+
+.wy-sensors-blip-layer {
+  position: absolute;
+  pointer-events: none;
+}
+
+.wy-sensors-blip {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: var(--wy-green);
+  box-shadow: 0 0 8px 2px var(--wy-green-glow-strong, rgba(127, 255, 0, 0.6));
+}
+
+.wy-sensors-scan-sweep {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 40px;
+  background: linear-gradient(to bottom, transparent, rgba(127, 255, 0, 0.15), transparent);
+  pointer-events: none;
+  animation: wy-sensors-scan 3.5s linear infinite;
+}
+
+@keyframes wy-sensors-scan {
+  0%   { top: -40px; }
+  100% { top: 100%; }
+}
+
+/* --- External radar --- */
+.wy-radar {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--wy-border);
+  background: radial-gradient(circle at center, rgba(0, 30, 0, 0.6), rgba(0, 0, 0, 0.85));
+  overflow: hidden;
+}
+
+.wy-radar-canvas {
+  display: block;
+  filter: drop-shadow(0 0 6px var(--wy-green-glow));
+}
+
+/* --- Sensors topbar (deck select + GM tools) --- */
+.wy-sensors-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  margin-bottom: 8px;
+}
+.wy-sensors-gm-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.wy-sensors-gm-tools .wy-setting-input { min-width: 90px; width: auto; }
+.wy-sensors-gm-tools #wy-sensors-marker-label { min-width: 140px; }
+
+/* --- Internal scan line (JS-driven) + blip labels / ping --- */
+.wy-sensors-scanline {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--wy-green), transparent);
+  box-shadow: 0 0 10px 3px var(--wy-green-glow);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.wy-sensors-blip-label {
+  position: absolute;
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--wy-green);
+  white-space: nowrap;
+  text-shadow: 0 0 4px var(--wy-green-glow);
+  pointer-events: none;
+}
+.wy-sensors-blip-unknown {
+  background: var(--wy-amber);
+  box-shadow: 0 0 8px 2px rgba(255, 191, 0, 0.6);
+}
+.wy-sensors-blip-unknown .wy-sensors-blip-label {
+  color: var(--wy-amber);
+  text-shadow: 0 0 4px rgba(255, 191, 0, 0.5);
+}
+
+/* --- Internal overlay markers (doors / hazards) --- */
+.wy-sensors-ship.wy-marker-placing { cursor: crosshair; }
+.wy-sensors-marker-layer { position: absolute; pointer-events: none; z-index: 2; }
+.wy-sensors-marker-layer.wy-gm > * { pointer-events: auto; }
+
+/* Doors — red padlock (locked) / green padlock (unlocked) */
+.wy-sensors-door {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: grab;
+}
+.wy-sensors-door i {
+  font-size: 18px;
+  line-height: 1;
+  text-shadow: 0 0 6px currentColor;
+}
+.wy-sensors-door.wy-door-locked   i { color: var(--wy-red); }
+.wy-sensors-door.wy-door-unlocked i { color: var(--wy-green); }
+.wy-sensors-door-label {
+  font-size: 8px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  color: var(--wy-green-dim);
+}
+
+/* Hazard boxes — centred on their point, sized by w/h (% of deck) */
+.wy-sensors-box {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid;
+  cursor: grab;
+  overflow: hidden;
+}
+.wy-sensors-box-label {
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-align: center;
+  padding: 2px;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+}
+/* FIRE / RADIATION — yellow hazard box */
+.wy-sensors-box-fire,
+.wy-sensors-box-radiation {
+  border-color: var(--wy-amber);
+  background: repeating-linear-gradient(45deg, rgba(255, 191, 0, 0.18) 0 10px, rgba(255, 191, 0, 0.06) 10px 20px);
+  color: var(--wy-amber);
+}
+.wy-sensors-box-fire { animation: wy-blink 0.8s step-end infinite; }
+/* DAMAGE — large red box */
+.wy-sensors-box-damage {
+  border-color: var(--wy-red);
+  border-style: dashed;
+  background: rgba(255, 51, 51, 0.14);
+  color: var(--wy-red);
+}
+/* NO O2 — cyan box with crossed O2 symbol */
+.wy-sensors-box-no_o2 {
+  border-color: #33ccff;
+  background: rgba(51, 204, 255, 0.12);
+  color: #33ccff;
+}
+.wy-sensors-o2 {
+  position: relative;
+  font-size: 15px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #33ccff;
+}
+.wy-sensors-o2::after {
+  content: '';
+  position: absolute;
+  left: -4px; right: -4px; top: 50%;
+  height: 2px;
+  background: var(--wy-red);
+  transform: rotate(-25deg);
+  box-shadow: 0 0 4px var(--wy-red);
+}
+/* Resize handle (GM) */
+.wy-sensors-resize {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 12px;
+  height: 12px;
+  background: var(--wy-green);
+  border: 1px solid #000;
+  cursor: nwse-resize;
+  opacity: 0.8;
+}
+
+/* --- GM marker management list --- */
+.wy-sensors-marker-list {
+  flex-shrink: 0;
+  margin-top: 6px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+.wy-sensors-marker-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 3px 4px;
+  border-bottom: 1px solid var(--wy-border);
+}
+
+/* --- External radar two-column layout + readout --- */
+.wy-radar-layout {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  gap: 10px;
+  overflow: hidden;
+}
+.wy-radar-layout .wy-radar { flex: 1 1 60%; min-width: 0; min-height: 0; }
+.wy-radar-readout {
+  flex: 1 1 40%;
+  min-width: 160px;
+  min-height: 0;
+  border: 1px solid var(--wy-border);
+  background: rgba(0, 0, 0, 0.5);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.wy-radar-readout-title {
+  color: var(--wy-green);
+  font-size: 11px;
+  letter-spacing: 2px;
+  border-bottom: 1px solid var(--wy-border);
+  padding-bottom: 4px;
+  margin-bottom: 6px;
+}
+.wy-radar-readout-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 3px 0;
+  border-bottom: 1px dotted rgba(127, 255, 0, 0.15);
+}
+.wy-radar-readout-notes {
+  margin-top: 8px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--wy-green-dim);
+  line-height: 1.5;
 }
 
 /* === CREW — List/Detail/Keypad Layout === */
@@ -1688,6 +2112,19 @@
   min-height: 0;
   overflow: hidden;
   padding: 0;
+}
+
+/* --- Fill-height view mode (nav / sensors) — flex chain but keeps scroll + padding --- */
+.wy-display-frame.wy-fillheight-view {
+  display: flex;
+  flex-direction: column;
+}
+
+.wy-display-frame.wy-fillheight-view .wy-display-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 /* --- MU/TH/UR Chat View --- */

@@ -136,6 +136,33 @@ export function registerSettings() {
     default: [],
   });
 
+  // Internal: GM-defined external sensor / radar contacts
+  // Each: { label, type, bearing(0-359), range(0-100), size(1-10), status, notes }
+  game.settings.register('wy-terminal', 'radarContacts', {
+    scope: 'world',
+    config: false,
+    type: Array,
+    default: [],
+  });
+
+  // Internal: GM crew label overrides for INTERNAL sensors — { actorId: label }
+  game.settings.register('wy-terminal', 'sensorCrewLabels', {
+    scope: 'world',
+    config: false,
+    type: Object,
+    default: {},
+  });
+
+  // Internal: GM-placed INTERNAL sensor overlay markers, keyed by scene id.
+  // { [sceneId]: [ { id, type, status, x, y, label } ] }
+  // type: DOOR | DAMAGE | FIRE | RADIATION | NO_O2 ; DOOR status: LOCKED | UNLOCKED
+  game.settings.register('wy-terminal', 'sensorMarkers', {
+    scope: 'world',
+    config: false,
+    type: Object,
+    default: {},
+  });
+
   // Internal: log entries
   game.settings.register('wy-terminal', 'logEntries', {
     scope: 'world',

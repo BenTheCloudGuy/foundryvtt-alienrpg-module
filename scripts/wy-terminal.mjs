@@ -40,6 +40,7 @@ Hooks.once('init', () => {
     'modules/wy-terminal/templates/views/starsystems.hbs',
     'modules/wy-terminal/templates/views/emergency.hbs',
     'modules/wy-terminal/templates/views/nav.hbs',
+    'modules/wy-terminal/templates/views/sensors.hbs',
     'modules/wy-terminal/templates/views/comms.hbs',
     'modules/wy-terminal/templates/views/cargo.hbs',
     'modules/wy-terminal/templates/views/settings.hbs',
@@ -77,6 +78,9 @@ Hooks.once('ready', () => {
     app: () => terminalApp,
     sendGmCommand: (cmd) => MuthurBridge.sendGmCommand(cmd),
     getPlugins: () => MuthurEngine.getAvailablePlugins(),
+    setupRadarScene: () => setupRadarScene(),
+    importAlienContent: (opts) => importAlienContent(opts),
+    importSpacecraft: () => importAlienContent({ spacecraftOnly: true }),
     MuthurEngine,
     isTerminalDisplay,
   };
@@ -280,6 +284,129 @@ function toggleTerminal() {
   }
 }
 
+/**
+ * Configure the "RADAR" scene: apply the generated radar-scope background and a
+ * square, gridless canvas so SPACECRAFT tokens line up with the radar rings.
+ * Center of the scene = ship (radar origin); the outer ring = maximum range.
+ */
+async function setupRadarScene() {
+  if (!game.user.isGM) {
+    ui.notifications.warn('WY-Terminal: Only the GM can configure the RADAR scene.');
+    return;
+  }
+  const scenes = game.scenes?.contents || [];
+  const scene = scenes.find(s => (s.name || '').toUpperCase() === 'RADAR')
+    || scenes.find(s => (s.name || '').toUpperCase().includes('RADAR'));
+  if (!scene) {
+    ui.notifications.error('WY-Terminal: No scene named "RADAR" found. Create an empty scene called RADAR first.');
+    return;
+  }
+  try {
+    // Use flattened keys so partial nested fields (background.src, grid.type)
+    // update cleanly without dropping other required subfields.
+    await scene.update({
+      'background.src': 'modules/wy-terminal/images/radar-scope.png',
+      'background.offsetX': 0,
+      'background.offsetY': 0,
+      width: 1024,
+      height: 1024,
+      padding: 0,
+      backgroundColor: '#020802',
+      'grid.type': 0,
+      'grid.size': 128,
+    });
+    // If the RADAR scene is currently being viewed, force a redraw so the new
+    // background paints immediately.
+    if (canvas?.scene?.id === scene.id) {
+      try { await canvas.draw(); } catch (_) { /* non-fatal */ }
+    }
+    ui.notifications.info('WY-Terminal: RADAR scene configured. Drop SPACECRAFT tokens on it to track them on SENSORS ▸ EXTERNAL.');
+    console.log(`WY-Terminal | RADAR scene "${scene.name}" background + dimensions configured.`);
+  } catch (e) {
+    console.error('WY-Terminal | Failed to configure RADAR scene:', e);
+    ui.notifications.error(`WY-Terminal: Could not configure RADAR scene — ${e?.message || e}. Check console.`);
+  }
+}
+
+/** Small confirm dialog helper that works across v13 (DialogV2) with fallbacks. */
+async function _wyConfirm(title, content) {
+  try {
+    const D = foundry.applications?.api?.DialogV2;
+    if (D?.confirm) {
+      return await D.confirm({ window: { title }, content: `<p>${content}</p>`, modal: true, rejectClose: false });
+    }
+  } catch (_) { /* fall through */ }
+  try { return await Dialog.confirm({ title, content: `<p>${content}</p>` }); } catch (_) { /* fall through */ }
+  return window.confirm(content);
+}
+
+/** Ensure a world Folder of the given type/name exists; returns the Folder. */
+async function _wyEnsureFolder(type, name) {
+  let folder = game.folders.find(f => f.type === type && f.name === name);
+  if (!folder) folder = await Folder.create({ name, type });
+  return folder;
+}
+
+/**
+ * Bulk-import AlienRPG compendium content into the current world (GM only).
+ * @param {object} [opts]
+ * @param {boolean} [opts.spacecraftOnly=false] Import only spacecraft actors.
+ */
+async function importAlienContent({ spacecraftOnly = false } = {}) {
+  if (!game.user.isGM) {
+    ui.notifications.warn('WY-Terminal: Only the GM can import content.');
+    return;
+  }
+  const packs = game.packs.filter(p => {
+    const pkg = (p.metadata?.packageName || '').toLowerCase();
+    const id = (p.collection || '').toLowerCase();
+    const isAlien = pkg.startsWith('alienrpg') || id.startsWith('alienrpg');
+    if (!isAlien) return false;
+    return spacecraftOnly ? p.documentName === 'Actor' : true;
+  });
+  if (!packs.length) {
+    ui.notifications.error('WY-Terminal: No AlienRPG compendium packs found. Install/enable the AlienRPG modules first.');
+    return;
+  }
+
+  const label = spacecraftOnly ? 'all SPACECRAFT actors' : `EVERYTHING from ${packs.length} AlienRPG compendium pack(s)`;
+  const proceed = await _wyConfirm(
+    'Import AlienRPG Content',
+    `Import ${label} into this world? This can create many documents and may create duplicates if run more than once.`
+  );
+  if (!proceed) return;
+
+  let total = 0;
+  for (const pack of packs) {
+    try {
+      if (spacecraftOnly) {
+        const index = await pack.getIndex({ fields: ['type'] });
+        const ids = index.filter(e => e.type === 'spacecraft').map(e => e._id);
+        if (!ids.length) continue;
+        const folder = await _wyEnsureFolder('Actor', 'AlienRPG Spacecraft');
+        const objs = [];
+        for (const docId of ids) {
+          const doc = await pack.getDocument(docId);
+          if (!doc) continue;
+          const obj = doc.toObject();
+          delete obj._id;
+          obj.folder = folder?.id ?? null;
+          objs.push(obj);
+        }
+        const created = await Actor.createDocuments(objs);
+        total += created.length;
+      } else {
+        const created = await pack.importAll({ folderName: pack.metadata.label });
+        total += Array.isArray(created) ? created.length : 0;
+      }
+      console.log(`WY-Terminal | Imported from pack ${pack.collection}`);
+    } catch (e) {
+      console.error(`WY-Terminal | Import failed for pack ${pack.collection}:`, e);
+    }
+  }
+  ui.notifications.info(`WY-Terminal: Imported ${total} document(s) from AlienRPG content.`);
+}
+
 /* ──────────────────────────────────────────────────────────────────
    Socket Handling — Sync status across clients
    ────────────────────────────────────────────────────────────────── */
@@ -306,8 +433,7 @@ Hooks.once('ready', () => {
       // This avoids reading from local scene docs which may have stale data
       // if this socket message arrives before Foundry's own document sync.
       const { sceneId, tokens } = data.payload || {};
-      if (terminalApp.activeView === 'scenes' &&
-          sceneId && sceneId === terminalApp.activeSceneId) {
+      if (terminalApp.activeView === 'scenes' && sceneId && sceneId === terminalApp.activeSceneId) {
         if (tokens && tokens.length > 0) {
           // Use GM-authoritative positions (debounced internally)
           terminalApp.scheduleTokenUpdate(tokens);
@@ -315,6 +441,9 @@ Hooks.once('ready', () => {
           // Fallback: no tokens in payload — read from local scene data after delay
           terminalApp.scheduleTokenUpdate(null);
         }
+      } else if (terminalApp.activeView === 'sensors' && sceneId && sceneId === terminalApp._sensorsDeckId) {
+        // INTERNAL sensors re-reads local scene tokens on re-render
+        terminalApp._renderView('sensors');
       }
     }
     // Player requests to move a token they can't directly update —
@@ -539,9 +668,12 @@ function _broadcastTokenRefresh(scene) {
 
   // Also refresh locally (GM's own terminal, or player hook backup).
   // Use debounced schedule to coalesce rapid successive updates.
-  if (terminalApp?.rendered && terminalApp.activeView === 'scenes'
-      && terminalApp.activeSceneId === scene.id) {
-    terminalApp.scheduleTokenUpdate(null);
+  if (terminalApp?.rendered) {
+    if (terminalApp.activeView === 'scenes' && terminalApp.activeSceneId === scene.id) {
+      terminalApp.scheduleTokenUpdate(null);
+    } else if (terminalApp.activeView === 'sensors' && terminalApp._sensorsDeckId === scene.id) {
+      terminalApp._renderView('sensors');
+    }
   }
 }
 

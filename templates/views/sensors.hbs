@@ -1,0 +1,117 @@
+{{!-- SENSORS view — INTERNAL bio-scan (ship interior) + EXTERNAL proximity radar --}}
+<div class="wy-view-sensors" data-mode="{{sensorMode}}">
+
+  <div class="wy-sensors-tabs">
+    <button class="wy-sensors-tab {{#if (eq sensorMode 'internal')}}active{{/if}}" data-sensor-mode="internal">
+      <span class="btn-icon">▦</span> INTERNAL
+    </button>
+    <button class="wy-sensors-tab {{#if (eq sensorMode 'external')}}active{{/if}}" data-sensor-mode="external">
+      <span class="btn-icon">◎</span> EXTERNAL
+    </button>
+  </div>
+
+  <div class="wy-sensors-sysbar wy-sys-{{sensorStatusClass}}">
+    SENSOR ARRAY: <span class="wy-sensors-sysbar-status">{{sensorStatus}}</span>{{#if sensorRangeLabel}} — {{sensorRangeLabel}}{{/if}}{{#if sensorDiminished}} — <span class="wy-sensors-sysbar-degraded">SIGNAL DEGRADED</span>{{/if}}
+  </div>
+
+  {{#if (eq sensorMode 'internal')}}
+  {{!-- ─────────── INTERNAL SENSORS ─────────── --}}
+  <div class="wy-sensors-panel wy-sensors-internal">
+
+    <div class="wy-sensors-topbar">
+      {{#if multiDeck}}
+      <div class="wy-sensors-deck-select">
+        <span class="wy-text-dim">DECK:</span>
+        <select class="wy-setting-input" id="wy-sensors-deck">
+          {{#each decks}}
+          <option value="{{this.sceneId}}" {{#if (eq this.sceneId ../activeDeckId)}}selected{{/if}}>{{this.deckName}}</option>
+          {{/each}}
+        </select>
+      </div>
+      {{/if}}
+
+      {{#if isGM}}
+      <div class="wy-sensors-gm-tools">
+        <button class="wy-nav-marker-toggle" id="wy-sensors-place-toggle" title="Click the deck to place">PLACE</button>
+        <select class="wy-setting-input" id="wy-sensors-marker-type">
+          <option value="DOOR">DOOR</option>
+          <option value="DAMAGE">DAMAGED</option>
+          <option value="FIRE">FIRE</option>
+          <option value="RADIATION">RADIATION</option>
+          <option value="NO_O2">NO O2</option>
+        </select>
+        <select class="wy-setting-input" id="wy-sensors-marker-status">
+          <option value="LOCKED">LOCKED</option>
+          <option value="UNLOCKED">UNLOCKED</option>
+        </select>
+        <input class="wy-setting-input" id="wy-sensors-marker-rads" type="number" min="0" placeholder="RADS" style="display: none; width: 72px;" />
+        <input class="wy-setting-input" id="wy-sensors-marker-label" type="text" placeholder="LABEL (OPTIONAL)" />
+      </div>
+      {{/if}}
+    </div>
+
+    {{#if sensorOffline}}
+    <div class="wy-sensors-offline">
+      <div class="wy-sensors-offline-title">◎ SENSOR ARRAY OFFLINE</div>
+      <div class="wy-text-dim">DIAGNOSTICS REPORT SENSORS OFFLINE — NO LIFE-SIGN TELEMETRY.</div>
+    </div>
+    {{else}}
+    {{#if activeSceneImg}}
+    <div class="wy-sensors-scan-label">INTERNAL BIO-SCAN — {{activeSceneName}}</div>
+    <div class="wy-sensors-ship" id="wy-sensors-ship">
+      <img src="{{activeSceneImg}}" class="wy-sensors-ship-img" id="wy-sensors-ship-img" alt="SHIP INTERIOR" />
+      <div class="wy-sensors-scanline" id="wy-sensors-scanline"></div>
+      <div class="wy-sensors-marker-layer" id="wy-sensors-marker-layer"></div>
+      <div class="wy-sensors-blip-layer" id="wy-sensors-blip-layer"></div>
+    </div>
+    <div class="wy-sensors-readout">
+      <span class="wy-text-dim">LIFE SIGNS DETECTED:</span>
+      <span class="wy-text-green" id="wy-sensors-count">{{contactCount}}</span>
+    </div>
+    {{#if isGM}}
+    <div class="wy-sensors-marker-list" id="wy-sensors-marker-list"></div>
+    {{/if}}
+    {{else}}
+    <div class="wy-sensors-empty">
+      {{#if isGM}}
+      NO SHIP DECKS FOUND — CREATE FOUNDRY SCENES NAMED FOR THE ACTIVE SHIP TO ENABLE INTERNAL SENSORS.
+      {{else}}
+      AWAITING DECK TELEMETRY FROM SHIP COMPUTER…
+      {{/if}}
+    </div>
+    {{/if}}
+    {{/if}}
+  </div>
+  {{else}}
+  {{!-- ─────────── EXTERNAL SENSORS ─────────── --}}
+  <div class="wy-sensors-panel wy-sensors-external">
+    <div class="wy-sensors-scan-label">EXTERNAL PROXIMITY SCAN</div>
+    {{#if sensorOffline}}
+    <div class="wy-sensors-offline">
+      <div class="wy-sensors-offline-title">◎ SENSOR ARRAY OFFLINE</div>
+      <div class="wy-text-dim">NO SIGNAL — EXTERNAL SENSORS OFFLINE.</div>
+    </div>
+    {{else}}
+    <div class="wy-radar-layout">
+      <div class="wy-radar" id="wy-radar">
+        <canvas id="wy-radar-canvas" class="wy-radar-canvas"></canvas>
+      </div>
+      <div class="wy-radar-readout" id="wy-radar-readout">
+        <div class="wy-radar-readout-title">▶ TARGET DATA</div>
+        <div class="wy-radar-readout-body" id="wy-radar-readout-body">
+          {{#if radarSceneMissing}}
+          <div class="wy-text-dim">NO "RADAR" SCENE FOUND.<br>GM: OPEN GM CONTROLS ▸ EXTERNAL RADAR AND CONFIGURE IT.</div>
+          {{else}}
+          <div class="wy-text-dim">NO TARGET SELECTED.<br>TOUCH A CONTACT ON THE SCOPE.</div>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+    <div class="wy-sensors-readout">
+      <span class="wy-text-dim">CONTACTS:</span>
+      <span class="wy-text-green" id="wy-radar-count">{{radarCount}}</span>
+    </div>
+    {{/if}}
+  </div>
+  {{/if}}
+</div>

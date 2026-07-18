@@ -5,7 +5,9 @@
   "type": "module",
   "description": "Build tools for the Weyland-Yutani Ship Terminal FoundryVTT module",
   "scripts": {
-    "build-packs": "node compendium-src/build-packs.mjs"
+    "build-packs": "node compendium-src/build-packs.mjs",
+    "sync": "node dev/sync-to-foundry.mjs",
+    "watch": "node dev/sync-to-foundry.mjs --watch"
   },
   "dependencies": {
     "classic-level": "^3.0.0"

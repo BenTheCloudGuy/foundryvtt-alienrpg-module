@@ -1,5 +1,44 @@
 # Changelog
 
+## v1.2.1 — 2026-07-17
+
+### External Radar Target Data
+
+- The EXTERNAL radar readout now reads full spacecraft data from the tracked token's actor: DESIGNATION, MODEL/CLASS, MANUFACTURER, ARMAMENTS, MODULES/UPGRADES, AI, CREW, LENGTH, HULL, ARMOR, DAMAGE, plus BEARING/RANGE/SIZE. Empty fields are hidden.
+- Fixed the NOTES section showing `[object Object]`: notes are now read via a robust extractor that handles both string and object (`{value}`/`{content}`) fields and falls back to the actor's general notes.
+
+### Content Import
+
+- Added a GM helper to bulk-import AlienRPG compendium content into the world: `game.wyTerminal.importAlienContent()` (all AlienRPG packs) and `game.wyTerminal.importSpacecraft()` (spacecraft actors only), plus **IMPORT SPACECRAFT ONLY** / **IMPORT ALL ALIENRPG CONTENT** buttons in GM CONTROLS. Includes a confirmation prompt and organizes imports into folders.
+
+## v1.2.0 — 2026-07-17
+
+### SENSORS View (new)
+
+- Added a **SENSORS** button/view (left NAV column) with **INTERNAL** and **EXTERNAL** tabs; removed the orphaned MAPS view/template.
+- **INTERNAL bio-scan** renders the ship deck image with live life-sign blips read from the deck's Foundry scene tokens (GM-hidden tokens excluded).
+  - Independent deck selection (does not depend on SCHEMATICS): decks are the scenes matching the active ship profile — single deck auto-displays, multiple decks show a DECK selector defaulting to a MAIN deck.
+  - Small **name labels** above crew blips; GM can override any crew label from GM CONTROLS ▸ INTERNAL SENSOR CREW LABELS. **Hostile/secret** disposition tokens always read **UNKNOWN**.
+  - Old-school SONAR behavior: a horizontal scan line sweeps top→bottom and each blip only jumps to its latest position **as the scan line passes over it**. Steady dots (no pulsing/resize/color animation).
+  - GM overlay markers placed on the deck: **DOOR** (red padlock = LOCKED, green padlock = UNLOCKED, with a TOGGLE), and hazard boxes **FIRE** (yellow), **RADIATION** (yellow + `N RADS`), **DAMAGE** (large red area box), **NO O2** (cyan box with crossed O₂). Boxes are drag-to-move and drag-to-resize; markers persist per deck and sync to players.
+- **EXTERNAL radar** is an animated scope (range rings, crosshair, rotating sweep with fading trail) that tracks **SPACECRAFT** tokens dropped on a Foundry scene named **RADAR**.
+  - `game.wyTerminal.setupRadarScene()` (and GM CONTROLS ▸ EXTERNAL RADAR button) applies a generated radar-scope background (`images/radar-scope.png`) and squares/gridless-sizes the RADAR scene so tokens line up with the rings.
+  - Scene centre = ship, outer ring = max range, bearing 0° = top (clockwise). Blip size scales with token size; **target data** is read from the spacecraft actor's notes field and shown in a right-hand readout panel when a blip is tapped.
+  - Positions update in real time but each blip only repaints **when the sweep passes its bearing** (radar persistence). Retired the old GM-settings contact list.
+
+### Sensor System Status Integration
+
+- SENSORS view reacts to the **SENSORS** ship system: **OFFLINE** blanks both tabs with a "SENSOR ARRAY OFFLINE" panel; **diminished** (WARNING/CRITICAL or reduced `RANGE: XX AU`) shrinks the effective range (out-of-range external contacts dropped, dashed range ring shown) and adds accuracy jitter/noise on both tabs. A status bar shows the current sensor state.
+
+### NAV
+
+- Fixed the NAV star map not extending to the base of the page (fill-height layout + `object-fit: cover`).
+
+### Fixes
+
+- Fixed the RADAR scene background not applying (now uses flattened `background.src` update keys and redraws the active scene).
+- Hardened the external radar layout to stop the GM view scrolling out of bounds.
+
 ## v1.1.0 — 2026-02-20
 
 ### Per-User Clearance System

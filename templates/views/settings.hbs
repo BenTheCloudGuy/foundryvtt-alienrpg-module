@@ -263,5 +263,46 @@
     </div>
   </div>
 
+  <div class="wy-section-title" style="margin-top: 16px;">EXTERNAL RADAR</div>
+  <div class="wy-border-box" id="wy-radar-scene-section">
+    <div style="color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px; margin-bottom: 8px; line-height: 1.6;">
+      EXTERNAL RADAR TRACKS <span style="color: var(--wy-green);">[SPACECRAFT]</span> TOKENS DROPPED ON A SCENE NAMED <span style="color: var(--wy-amber);">"RADAR"</span>.<br>
+      CENTRE OF THE SCENE = THIS SHIP · OUTER RING = MAXIMUM SENSOR RANGE · BEARING 0° = TOP (FORE), CLOCKWISE.<br>
+      BLIP SIZE SCALES WITH TOKEN SIZE · TARGET DATA IS READ FROM THE SPACECRAFT'S NOTES FIELD.<br><br>
+      1. CREATE AN EMPTY SCENE CALLED <span style="color: var(--wy-amber);">RADAR</span>.<br>
+      2. CLICK BELOW TO APPLY THE RADAR SCOPE BACKGROUND &amp; SIZING.<br>
+      3. DROP SPACECRAFT TOKENS ON IT — THEY APPEAR ON SENSORS ▸ EXTERNAL IN REAL TIME.
+    </div>
+    <button class="wy-muthur-send" data-action="setup-radar-scene" style="width: 100%;">CONFIGURE RADAR SCENE BACKGROUND</button>
+  </div>
+
+  <div class="wy-section-title" style="margin-top: 16px;">ALIENRPG CONTENT IMPORT</div>
+  <div class="wy-border-box" id="wy-content-import-section">
+    <div style="color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px; margin-bottom: 8px; line-height: 1.6;">
+      IMPORT ALIENRPG COMPENDIUM CONTENT INTO THIS WORLD SO YOU CAN EDIT SHIP DATA AND DROP TOKENS.
+      REQUIRES THE OFFICIAL ALIENRPG MODULES TO BE INSTALLED &amp; ENABLED. RUNNING TWICE MAY CREATE DUPLICATES.
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button class="wy-muthur-send" data-action="import-spacecraft" style="flex: 1;">IMPORT SPACECRAFT ONLY</button>
+      <button class="wy-muthur-send" data-action="import-all-content" style="flex: 1;">IMPORT ALL ALIENRPG CONTENT</button>
+    </div>
+  </div>
+
+  <div class="wy-section-title" style="margin-top: 16px;">INTERNAL SENSOR CREW LABELS</div>
+  <div class="wy-border-box" id="wy-crew-labels-section">
+    <div style="color: var(--wy-green-dim); font-size: 10px; letter-spacing: 1px; margin-bottom: 8px;">
+      OVERRIDE THE NAME SHOWN ABOVE EACH CREW BLIP ON INTERNAL SENSORS. BLANK = USE THE ACTOR/TOKEN NAME. HOSTILE / SECRET TOKENS ALWAYS SHOW "UNKNOWN".
+    </div>
+    {{#each crewLabelList}}
+    <div class="wy-setting-row">
+      <span class="wy-setting-label">{{this.name}}</span>
+      <input class="wy-setting-input" data-crew-label="{{this.id}}" type="text" value="{{this.label}}" placeholder="(DEFAULT)" />
+    </div>
+    {{/each}}
+    <div style="margin-top: 8px;">
+      <button class="wy-muthur-send" data-action="save-crew-labels" style="width: 100%;">SAVE CREW LABELS</button>
+    </div>
+  </div>
+
   {{/if}}
 </div>

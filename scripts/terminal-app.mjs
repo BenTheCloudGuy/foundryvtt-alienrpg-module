@@ -38,9 +38,6 @@ export class WYTerminalApp extends Application {
   /** @type {string|null} Currently selected scene ID */
   activeSceneId = null;
 
-  /** @type {string|null} Currently selected map ID */
-  activeMapId = null;
-
   constructor(options = {}) {
     super(options);
     this.shipStatus = options.shipStatus;
@@ -242,6 +239,19 @@ export class WYTerminalApp extends Application {
       clearInterval(this._navEtaInterval);
       this._navEtaInterval = null;
     }
+    // Clean up sensors radar animation / observers when leaving sensors view
+    if (this._radarRAF) {
+      cancelAnimationFrame(this._radarRAF);
+      this._radarRAF = null;
+    }
+    if (this._internalRAF) {
+      cancelAnimationFrame(this._internalRAF);
+      this._internalRAF = null;
+    }
+    if (this._sensorsResizeObserver) {
+      this._sensorsResizeObserver.disconnect();
+      this._sensorsResizeObserver = null;
+    }
     // Clean up audio playback when leaving logs view
     if (this._activeAudioCleanup) {
       this._activeAudioCleanup();
@@ -319,6 +329,8 @@ export class WYTerminalApp extends Application {
       const displayFrame = contentEl.closest('#wy-display-frame') ?? contentEl.parentElement;
       if (displayFrame) {
         displayFrame.classList.toggle('wy-fullheight-view', viewName === 'muthur');
+        // Fill-height (keeps scroll + padding) for map-style views
+        displayFrame.classList.toggle('wy-fillheight-view', viewName === 'nav' || viewName === 'sensors');
       }
 
       // Post-render hooks per view
@@ -479,6 +491,9 @@ export class WYTerminalApp extends Application {
       case 'nav':
         return { ...base, ...this._getNavData() };
 
+      case 'sensors':
+        return { ...base, ...this._getSensorsData() };
+
       case 'comms':
         return { ...base, ...this._getCommsData() };
 
@@ -554,6 +569,12 @@ export class WYTerminalApp extends Application {
           shipAccessList,
           actorFolderList,
           navData: this._getNavSettingsData(),
+          crewLabelList: (() => {
+            const overrides = game.settings.get('wy-terminal', 'sensorCrewLabels') || {};
+            return (game.actors?.filter(a => a.type === 'character' || a.type === 'synthetic') || [])
+              .map(a => ({ id: a.id, name: a.name, label: overrides[a.id] || '' }))
+              .sort((a, b) => a.name.localeCompare(b.name));
+          })(),
           activeClearance: this._getActiveClearance(),
           isGM: game.user.isGM,
         };
@@ -976,6 +997,8 @@ export class WYTerminalApp extends Application {
         id: t.id,
         name: (t.name || 'UNKNOWN').toUpperCase(),
         actor: (t.actor?.name || t.actorId || '').toUpperCase(),
+        actorId: t.actorId || t.actor?.id || null,
+        actorType: t.actor?.type || null,
         x: xPct.toFixed(2),
         y: yPct.toFixed(2),
         size: displaySize,
@@ -1332,6 +1355,829 @@ export class WYTerminalApp extends Application {
     };
   }
 
+  /* ── Sensors data (INTERNAL bio-scan + EXTERNAL radar) ── */
+  _getSensorsData() {
+    const mode = this._sensorMode || 'internal';
+    const isGM = game.user.isGM;
+
+    // INTERNAL — independent deck selection (does NOT depend on SCHEMATICS).
+    // Decks are the Foundry scenes belonging to the active ship profile.
+    const { decks, defaultDeckId } = this._getShipDecks();
+    if (!this._sensorsDeckId || !decks.some(d => d.sceneId === this._sensorsDeckId)) {
+      this._sensorsDeckId = defaultDeckId;
+    }
+    let activeSceneImg = null;
+    let activeSceneName = null;
+    let contactCount = 0;
+    const deckScene = this._sensorsDeckId ? game.scenes?.get(this._sensorsDeckId) : null;
+    if (deckScene) {
+      activeSceneImg = deckScene.background?.src || deckScene.img;
+      activeSceneName = (deckScene.name || '').toUpperCase();
+      // _getSceneTokens already drops GM-hidden (invisible) tokens
+      contactCount = this._getSceneTokens(deckScene).length;
+    }
+
+    // Sensor system state (offline / diminished + full range)
+    const sensorState = this._getSensorSystemState();
+    this._sensorState = sensorState;
+
+    // EXTERNAL — track SPACECRAFT tokens dropped on the "RADAR" scene (live).
+    let radarContacts = [];
+    let radarSceneMissing = false;
+    if (sensorState.offline) {
+      radarContacts = [];
+    } else {
+      const rs = this._getRadarSceneContacts();
+      radarSceneMissing = !rs.scene;
+      radarContacts = rs.contacts;
+      if (sensorState.diminished) {
+        radarContacts = radarContacts.filter(c => c.radiusPct <= sensorState.rangeRatio + 0.001);
+      }
+    }
+    // Cache for the animation loop in _setupExternalRadar
+    this._lastRadarContacts = radarContacts;
+
+    return {
+      sensorMode: mode,
+      isGM,
+      activeSceneImg,
+      activeSceneName,
+      contactCount,
+      decks,
+      activeDeckId: this._sensorsDeckId,
+      multiDeck: decks.length > 1,
+      radarCount: radarContacts.length,
+      radarContacts,
+      radarSceneMissing,
+      sensorOffline: sensorState.offline,
+      sensorDiminished: sensorState.diminished,
+      sensorStatus: (sensorState.status || '').toUpperCase(),
+      sensorStatusClass: sensorState.statusClass,
+      sensorRangeLabel: (sensorState.rangeLabel || '').toUpperCase(),
+    };
+  }
+
+  /** Strip HTML tags to plain text. Accepts a string. */
+  _stripHtml(html) {
+    if (!html) return '';
+    const tmp = document.createElement('div');
+    tmp.innerHTML = String(html);
+    return (tmp.textContent || tmp.innerText || '').replace(/\s+/g, ' ').trim();
+  }
+
+  /**
+   * Extract readable text from a field that may be a string OR an object
+   * ({value}/{content}/{html}/{text}), stripping any HTML. Fixes the
+   * "[object Object]" that appeared when notes were stored as an object.
+   */
+  _extractText(val) {
+    if (val == null) return '';
+    if (typeof val === 'string') return this._stripHtml(val);
+    if (typeof val === 'object') {
+      const inner = val.value ?? val.content ?? val.html ?? val.text ?? '';
+      return this._stripHtml(String(inner));
+    }
+    return this._stripHtml(String(val));
+  }
+
+  /**
+   * Build external-radar contacts from SPACECRAFT tokens on the "RADAR" scene.
+   * Scene center = ship (origin); the min half-extent = maximum range (outer
+   * ring). Bearing 0° = top, clockwise. Blip size scales with token size, and
+   * target data is read from the spacecraft actor's notes field.
+   */
+  _getRadarSceneContacts() {
+    const scenes = game.scenes?.contents || [];
+    const scene = scenes.find(s => (s.name || '').toUpperCase() === 'RADAR')
+      || scenes.find(s => (s.name || '').toUpperCase().includes('RADAR'));
+    if (!scene) return { scene: null, contacts: [] };
+
+    let dims = null;
+    try { dims = scene.dimensions; } catch { /* unavailable */ }
+    const sceneW = dims?.sceneWidth || scene.width || 1;
+    const sceneH = dims?.sceneHeight || scene.height || 1;
+    const originX = dims?.sceneX || 0;
+    const originY = dims?.sceneY || 0;
+    const centerX = originX + sceneW / 2;
+    const centerY = originY + sceneH / 2;
+    const half = (Math.min(sceneW, sceneH) / 2) || 1; // outer ring = min half-extent
+    const grid = scene.grid?.size || 100;
+    const fullAU = this._sensorState?.fullAU || 100;
+
+    const contacts = [];
+    (scene.tokens?.contents || []).forEach(t => {
+      if (t.hidden) return;
+      if ((t.actor?.type || '') !== 'spacecraft') return;
+      const tw = (t.width || 1) * grid;
+      const th = (t.height || 1) * grid;
+      const tcx = (t.x || 0) + tw / 2;
+      const tcy = (t.y || 0) + th / 2;
+      const dx = (tcx - centerX) / half;
+      const dy = (tcy - centerY) / half;
+      const radiusPct = Math.min(1, Math.hypot(dx, dy));
+      const angle = Math.atan2(dy, dx); // canvas angle (0 rad = east)
+      const bearing = Math.round((((Math.atan2(dx, -dy) * 180 / Math.PI) % 360) + 360) % 360);
+      const sizeUnits = Math.max(t.width || 1, t.height || 1);
+      const size = Math.max(1, Math.min(10, Math.round(sizeUnits * 1.5)));
+      const sys = t.actor?.system || {};
+      const a = sys.attributes || {};
+      const gv = (x) => (x && typeof x === 'object' ? (x.value ?? '') : (x ?? ''));
+      const notes = this._extractText(sys.notes)
+        || this._extractText(sys.general?.notes)
+        || this._extractText(sys.general?.misc);
+      contacts.push({
+        id: t.id,
+        label: (t.name || t.actor?.name || 'CONTACT').toUpperCase(),
+        type: 'SPACECRAFT',
+        angle,
+        radiusPct,
+        bearing,
+        range: Math.round(radiusPct * fullAU),
+        size,
+        sizePct: tw / sceneW,
+        status: '',
+        notes,
+        data: {
+          model: String(a.model || '').trim(),
+          manufacturer: String(a.manufacturer || '').trim(),
+          armaments: String(a.armaments || '').trim(),
+          modules: String(a.modules || '').trim(),
+          ai: String(a.ai || '').trim(),
+          crew: gv(a.crew),
+          length: gv(a.length),
+          hull: gv(a.hull),
+          armor: gv(a.armor),
+          damage: gv(a.damage),
+        },
+      });
+    });
+    return { scene, contacts };
+  }
+
+  /**
+   * Read the SENSORS ship-system status and derive offline / diminished state
+   * plus a degrade factor (0 = perfect, 1 = worst) used for accuracy jitter and
+   * effective-range reduction on both sensor tabs.
+   */
+  _getSensorSystemState() {
+    const systems = this._getSystemsData();
+    const sensor = systems.find(s => (s.name || '').toUpperCase().includes('SENSOR'));
+    const statusClass = sensor ? this._statusToClass(sensor.status) : 'online';
+    const offline = statusClass === 'offline';
+    const parseAU = (str) => {
+      const m = /(\d+(?:\.\d+)?)\s*AU/i.exec(str || '');
+      return m ? parseFloat(m[1]) : null;
+    };
+    const currentAU = parseAU(sensor?.detail);
+    let defaultAU = null;
+    try {
+      const prof = this._getShipProfile();
+      const ps = (prof?.defaultSystems || []).find(s => (s.name || '').toUpperCase().includes('SENSOR'));
+      defaultAU = parseAU(ps?.detail);
+    } catch { /* profile unavailable */ }
+    const fullAU = defaultAU || currentAU || 100;
+    let rangeRatio = 1;
+    if (currentAU != null && fullAU > 0) rangeRatio = Math.max(0, Math.min(1, currentAU / fullAU));
+    const diminished = !offline && (statusClass !== 'online' || rangeRatio < 0.999);
+    const sevBase = statusClass === 'critical' ? 0.6 : statusClass === 'warning' ? 0.35 : 0;
+    const degrade = offline ? 1 : Math.max(0, Math.min(1, sevBase + (1 - rangeRatio)));
+    return {
+      status: sensor?.status || 'ONLINE',
+      statusClass,
+      offline,
+      diminished,
+      rangeAU: currentAU,
+      fullAU,
+      rangeRatio,
+      degrade,
+      rangeLabel: sensor?.detail || '',
+    };
+  }
+
+  /**
+   * Build the deck list for the active ship profile — the Foundry scenes whose
+   * name matches the active ship. Returns { decks, defaultDeckId }. Falls back
+   * to all scenes if no profile match. Default deck prefers a "MAIN" deck.
+   */
+  _getShipDecks() {
+    const allScenes = game.scenes?.contents ?? [];
+    let activeShip = 'montero';
+    try { activeShip = game.settings.get('wy-terminal', 'activeShip') || 'montero'; } catch { /* pre-init */ }
+    const profile = SHIP_PROFILES[activeShip];
+
+    let matched = [];
+    if (profile) {
+      const shipKey = activeShip.toLowerCase();
+      matched = allScenes.filter(s => (s.name || '').toLowerCase().includes(shipKey));
+    }
+    // Fallback: no profile-matched scenes — offer all scenes so it is never empty
+    if (matched.length === 0) matched = allScenes.slice();
+
+    const prefix = profile ? profile.name.split(' ').pop().toUpperCase() : '';
+    const decks = matched.map(s => {
+      const rawName = (s.name || '').toUpperCase();
+      let deckName = prefix ? rawName.replace(prefix, '').trim() : rawName;
+      if (!deckName) deckName = rawName;
+      return { sceneId: s.id, deckName };
+    }).sort((a, b) => a.deckName.localeCompare(b.deckName));
+
+    // Default to a "MAIN" deck if present, else an "A" deck, else the first.
+    let defaultDeckId = decks[0]?.sceneId ?? null;
+    const main = decks.find(d => /\bMAIN\b/.test(d.deckName))
+      || decks.find(d => /(^|\s)(DECK\s*)?A(\s|$)/.test(d.deckName));
+    if (main) defaultDeckId = main.sceneId;
+
+    return { decks, defaultDeckId };
+  }
+
+  /* ── Sensors view setup ── */
+  _setupSensorsView(contentEl) {
+    // Tab switching between INTERNAL / EXTERNAL
+    contentEl.querySelectorAll('[data-sensor-mode]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.sensorMode;
+        if (mode === (this._sensorMode || 'internal')) return;
+        this._sensorMode = mode;
+        TerminalSFX.play('beep');
+        this._renderView('sensors');
+      });
+    });
+
+    if ((this._sensorMode || 'internal') === 'internal') {
+      this._setupInternalSensors(contentEl);
+    } else {
+      this._setupExternalRadar(contentEl);
+    }
+  }
+
+  /**
+   * INTERNAL sensors — overlay generic life-sign blips over the ship deck image.
+   * Reads live token positions from the active scene; GM-hidden tokens are
+   * already excluded by _getSceneTokens.
+   */
+  _setupInternalSensors(contentEl) {
+    // Deck selector (independent of SCHEMATICS)
+    const deckSel = contentEl.querySelector('#wy-sensors-deck');
+    deckSel?.addEventListener('change', (e) => {
+      this._sensorsDeckId = e.target.value;
+      TerminalSFX.play('beep');
+      this._renderView('sensors');
+    });
+
+    const shipEl = contentEl.querySelector('#wy-sensors-ship');
+    const img = contentEl.querySelector('#wy-sensors-ship-img');
+    const blipLayer = contentEl.querySelector('#wy-sensors-blip-layer');
+    const markerLayer = contentEl.querySelector('#wy-sensors-marker-layer');
+    const scanline = contentEl.querySelector('#wy-sensors-scanline');
+    if (!shipEl || !img || !blipLayer) return;
+
+    const scene = this._sensorsDeckId ? game.scenes?.get(this._sensorsDeckId) : null;
+    let labelOverrides = {};
+    try { labelOverrides = game.settings.get('wy-terminal', 'sensorCrewLabels') || {}; } catch { /* pre-init */ }
+
+    // Sensor degradation (accuracy jitter) from SENSORS system status
+    const st = this._sensorState || {};
+    if (st.diminished) shipEl.classList.add('wy-sensors-degraded');
+    const jit = () => (st.diminished ? (Math.random() - 0.5) * (st.degrade || 0) * 8 : 0);
+    const clampPct = (v) => Math.max(0, Math.min(100, v));
+
+    const fitLayers = () => {
+      this._fitTokenLayer(img, blipLayer);
+      if (markerLayer) this._fitTokenLayer(img, markerLayer);
+    };
+
+    // Blip elements keyed by token id → { el, y }
+    let blipMap = new Map();
+    const buildBlips = (tokens) => {
+      blipLayer.innerHTML = '';
+      blipMap = new Map();
+      tokens.forEach(t => {
+        // Crew vs monster by disposition (hostile/secret = UNKNOWN monster)
+        const isMonster = t.disposition === 'hostile' || t.disposition === 'secret';
+        const label = isMonster ? 'UNKNOWN' : (labelOverrides[t.actorId] || t.name);
+        const el = document.createElement('div');
+        el.className = 'wy-sensors-blip' + (isMonster ? ' wy-sensors-blip-unknown' : '');
+        const tx = parseFloat(t.x);
+        const ty = parseFloat(t.y);
+        el.style.left = `${tx}%`;
+        el.style.top = `${ty}%`;
+        const lab = document.createElement('span');
+        lab.className = 'wy-sensors-blip-label';
+        lab.textContent = label;
+        el.appendChild(lab);
+        blipLayer.appendChild(el);
+        blipMap.set(t.id, { el, tx, ty, dx: tx, dy: ty });
+      });
+      const countEl = contentEl.querySelector('#wy-sensors-count');
+      if (countEl) countEl.textContent = String(tokens.length);
+    };
+
+    let lastIds = null;
+    const refreshTokens = () => {
+      const tokens = scene ? this._getSceneTokens(scene) : [];
+      const ids = tokens.map(t => t.id).join(',');
+      if (ids !== lastIds) {
+        lastIds = ids;
+        buildBlips(tokens);
+      } else {
+        tokens.forEach(t => {
+          const entry = blipMap.get(t.id);
+          if (entry) {
+            // Only refresh the TARGET position; the blip jumps to it when the
+            // scan line next passes over it.
+            entry.tx = parseFloat(t.x);
+            entry.ty = parseFloat(t.y);
+          }
+        });
+      }
+    };
+
+    const renderMarkers = () => this._renderSensorMarkers(contentEl, markerLayer);
+
+    const onReady = () => { fitLayers(); refreshTokens(); renderMarkers(); };
+    if (img.complete && img.naturalWidth > 0) onReady();
+    else img.addEventListener('load', onReady);
+
+    if (this._sensorsResizeObserver) this._sensorsResizeObserver.disconnect();
+    this._sensorsResizeObserver = new ResizeObserver(() => { fitLayers(); renderMarkers(); });
+    this._sensorsResizeObserver.observe(shipEl);
+
+    // Old-school radar loop: the scan line sweeps top→bottom; a blip only jumps
+    // to its latest position when the scan line passes over it (movie SONAR feel).
+    const SCAN_PERIOD = 3500;
+    const start = performance.now();
+    let lastPoll = 0;
+    let prevLine = 0;
+    const passed = (prev, cur, y) => (cur >= prev ? (y > prev && y <= cur) : (y > prev || y <= cur));
+    const tick = (now) => {
+      const lineYpct = (((now - start) % SCAN_PERIOD) / SCAN_PERIOD) * 100;
+      if (scanline) scanline.style.top = `${lineYpct}%`;
+      if (now - lastPoll > 250) { lastPoll = now; refreshTokens(); }
+      blipMap.forEach(entry => {
+        if (passed(prevLine, lineYpct, entry.ty)) {
+          entry.dx = clampPct(entry.tx + jit());
+          entry.dy = clampPct(entry.ty + jit());
+          entry.el.style.left = `${entry.dx}%`;
+          entry.el.style.top = `${entry.dy}%`;
+        }
+      });
+      prevLine = lineYpct;
+      this._internalRAF = requestAnimationFrame(tick);
+    };
+    if (this._internalRAF) cancelAnimationFrame(this._internalRAF);
+    this._internalRAF = requestAnimationFrame(tick);
+
+    // GM overlay-marker placement (doors / damage / hazards / no-O2)
+    if (game.user.isGM) this._setupSensorMarkerPlacement(contentEl, shipEl, markerLayer);
+  }
+
+  /* ── Internal sensor overlay markers (doors / damage / hazards) ── */
+  _getSensorMarkers(deckId) {
+    if (!deckId) return [];
+    let all = {};
+    try { all = game.settings.get('wy-terminal', 'sensorMarkers') || {}; } catch { /* pre-init */ }
+    return Array.isArray(all[deckId]) ? all[deckId].map(m => ({ ...m })) : [];
+  }
+
+  async _setSensorMarkers(deckId, markers) {
+    if (!deckId) return;
+    let all = {};
+    try { all = foundry.utils.deepClone(game.settings.get('wy-terminal', 'sensorMarkers') || {}); } catch { all = {}; }
+    all[deckId] = markers;
+    await game.settings.set('wy-terminal', 'sensorMarkers', all);
+    this._broadcastSocket('refreshView', { view: 'sensors' });
+  }
+
+  _renderSensorMarkers(contentEl, markerLayer) {
+    if (!markerLayer) return;
+    const isGM = game.user.isGM;
+    markerLayer.classList.toggle('wy-gm', isGM);
+    const markers = this._getSensorMarkers(this._sensorsDeckId);
+    markerLayer.innerHTML = '';
+    markers.forEach(m => {
+      const el = document.createElement('div');
+      el.dataset.markerId = m.id;
+      if (m.type === 'DOOR') {
+        el.className = 'wy-sensors-door ' + (m.status === 'LOCKED' ? 'wy-door-locked' : 'wy-door-unlocked');
+        el.style.left = `${m.x}%`;
+        el.style.top = `${m.y}%`;
+        el.title = `DOOR — ${m.status}${m.label ? ' — ' + m.label : ''}`;
+        el.innerHTML = `<i class="fas ${m.status === 'LOCKED' ? 'fa-lock' : 'fa-lock-open'}"></i>`
+          + (m.label ? `<span class="wy-sensors-door-label">${m.label}</span>` : '');
+      } else {
+        const w = m.w || 12, h = m.h || 12;
+        el.className = `wy-sensors-box wy-sensors-box-${(m.type || '').toLowerCase()}`;
+        el.style.left = `${m.x}%`;
+        el.style.top = `${m.y}%`;
+        el.style.width = `${w}%`;
+        el.style.height = `${h}%`;
+        el.title = `${m.type}${m.label ? ' — ' + m.label : ''}`;
+        let inner;
+        if (m.type === 'NO_O2') {
+          inner = '<span class="wy-sensors-o2">O₂</span>';
+        } else if (m.type === 'RADIATION') {
+          const rads = (m.rads != null && m.rads !== '') ? ` · ${m.rads} RADS` : '';
+          inner = `<span class="wy-sensors-box-label">RADIATION${rads}${m.label ? ' · ' + m.label : ''}</span>`;
+        } else if (m.type === 'FIRE') {
+          inner = `<span class="wy-sensors-box-label">FIRE${m.label ? ' · ' + m.label : ''}</span>`;
+        } else {
+          inner = `<span class="wy-sensors-box-label">DAMAGE${m.label ? ' · ' + m.label : ''}</span>`;
+        }
+        el.innerHTML = inner + (isGM ? '<span class="wy-sensors-resize" title="Drag to resize"></span>' : '');
+      }
+      markerLayer.appendChild(el);
+    });
+
+    // GM drag/resize + management list
+    if (isGM) {
+      this._attachMarkerDrag(markerLayer);
+      const list = contentEl.querySelector('#wy-sensors-marker-list');
+      if (list) {
+        if (markers.length === 0) {
+          list.innerHTML = '<div class="wy-text-dim" style="font-size:10px; padding:4px;">NO MARKERS ON THIS DECK.</div>';
+        } else {
+          list.innerHTML = markers.map(m => {
+            const doorBtn = m.type === 'DOOR'
+              ? `<button class="wy-muthur-send" data-action="toggle-door" data-marker-id="${m.id}" style="width:64px;padding:2px;font-size:9px;">TOGGLE</button>`
+              : '';
+            const extra = m.type === 'DOOR' ? ` [${m.status}]`
+              : (m.type === 'RADIATION' && m.rads != null && m.rads !== '' ? ` [${m.rads} RADS]` : '');
+            const desc = `${m.type}${extra}${m.label ? ' — ' + m.label : ''}`;
+            return `<div class="wy-sensors-marker-row"><span>${desc}</span><span style="display:flex;gap:4px;">${doorBtn}<button class="wy-muthur-send" data-action="del-sensor-marker" data-marker-id="${m.id}" style="width:40px;padding:2px;font-size:9px;border-color:#a33;color:#f44;">DEL</button></span></div>`;
+          }).join('');
+        }
+      }
+    }
+  }
+
+  /** GM: drag markers to move, and drag the corner handle on boxes to resize. */
+  _attachMarkerDrag(markerLayer) {
+    const layerRect = () => markerLayer.getBoundingClientRect();
+    markerLayer.querySelectorAll('[data-marker-id]').forEach(el => {
+      const id = el.dataset.markerId;
+      const handle = el.querySelector('.wy-sensors-resize');
+
+      // Move (drag anywhere on the marker except the resize handle)
+      el.addEventListener('mousedown', (e) => {
+        if (handle && e.target === handle) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const rect = layerRect();
+        const move = (ev) => {
+          const x = Math.max(0, Math.min(100, ((ev.clientX - rect.left) / rect.width) * 100));
+          const y = Math.max(0, Math.min(100, ((ev.clientY - rect.top) / rect.height) * 100));
+          el.style.left = `${x}%`;
+          el.style.top = `${y}%`;
+        };
+        const up = async (ev) => {
+          window.removeEventListener('mousemove', move);
+          window.removeEventListener('mouseup', up);
+          const x = Math.max(0, Math.min(100, ((ev.clientX - rect.left) / rect.width) * 100));
+          const y = Math.max(0, Math.min(100, ((ev.clientY - rect.top) / rect.height) * 100));
+          await this._updateSensorMarker(id, { x: Number(x.toFixed(2)), y: Number(y.toFixed(2)) });
+        };
+        window.addEventListener('mousemove', move);
+        window.addEventListener('mouseup', up);
+      });
+
+      // Resize (box hazards) — corner handle changes width/height about the centre
+      if (handle) {
+        handle.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const rect = layerRect();
+          const cx = parseFloat(el.style.left) || 0;
+          const cy = parseFloat(el.style.top) || 0;
+          const move = (ev) => {
+            const px = ((ev.clientX - rect.left) / rect.width) * 100;
+            const py = ((ev.clientY - rect.top) / rect.height) * 100;
+            const w = Math.max(4, Math.min(95, Math.abs(px - cx) * 2));
+            const h = Math.max(4, Math.min(95, Math.abs(py - cy) * 2));
+            el.style.width = `${w}%`;
+            el.style.height = `${h}%`;
+          };
+          const up = async () => {
+            window.removeEventListener('mousemove', move);
+            window.removeEventListener('mouseup', up);
+            await this._updateSensorMarker(id, {
+              w: Number(parseFloat(el.style.width).toFixed(2)),
+              h: Number(parseFloat(el.style.height).toFixed(2)),
+            });
+          };
+          window.addEventListener('mousemove', move);
+          window.addEventListener('mouseup', up);
+        });
+      }
+    });
+  }
+
+  /** GM: patch a single sensor marker and persist + re-render locally. */
+  async _updateSensorMarker(id, patch) {
+    const markers = this._getSensorMarkers(this._sensorsDeckId);
+    const m = markers.find(x => x.id === id);
+    if (!m) return;
+    Object.assign(m, patch);
+    await this._setSensorMarkers(this._sensorsDeckId, markers);
+    const contentEl = this.element[0]?.querySelector('#wy-display-content')
+      ?? this.element?.find?.('#wy-display-content')?.[0];
+    const layer = contentEl?.querySelector('#wy-sensors-marker-layer');
+    if (contentEl && layer) this._renderSensorMarkers(contentEl, layer);
+  }
+
+  _setupSensorMarkerPlacement(contentEl, shipEl, markerLayer) {
+    const toggle = contentEl.querySelector('#wy-sensors-place-toggle');
+    const typeSel = contentEl.querySelector('#wy-sensors-marker-type');
+    const statusSel = contentEl.querySelector('#wy-sensors-marker-status');
+    const labelInput = contentEl.querySelector('#wy-sensors-marker-label');
+    const radsInput = contentEl.querySelector('#wy-sensors-marker-rads');
+    const list = contentEl.querySelector('#wy-sensors-marker-list');
+    let placing = false;
+
+    // Default box sizes (% of deck) per hazard type
+    const DEF_SIZE = {
+      DAMAGE: { w: 22, h: 16 },
+      FIRE: { w: 12, h: 10 },
+      RADIATION: { w: 16, h: 12 },
+      NO_O2: { w: 12, h: 12 },
+    };
+
+    const syncTypeInputs = () => {
+      const t = typeSel?.value;
+      if (statusSel) statusSel.style.display = (t === 'DOOR') ? '' : 'none';
+      if (radsInput) radsInput.style.display = (t === 'RADIATION') ? '' : 'none';
+    };
+    syncTypeInputs();
+    typeSel?.addEventListener('change', syncTypeInputs);
+
+    toggle?.addEventListener('click', () => {
+      placing = !placing;
+      toggle.classList.toggle('wy-active', placing);
+      shipEl.classList.toggle('wy-marker-placing', placing);
+    });
+
+    shipEl.addEventListener('click', async (e) => {
+      if (!placing || !markerLayer) return;
+      // Ignore clicks that land on an existing marker (move/resize handles those)
+      if (e.target.closest('[data-marker-id]')) return;
+      const rect = markerLayer.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      if (x < 0 || x > 100 || y < 0 || y > 100) return;
+      const type = typeSel?.value || 'DAMAGE';
+      const marker = {
+        id: `sm-${Date.now()}`,
+        type,
+        status: type === 'DOOR' ? (statusSel?.value || 'LOCKED') : '',
+        label: (labelInput?.value || '').trim().toUpperCase(),
+        x: Number(x.toFixed(2)),
+        y: Number(y.toFixed(2)),
+      };
+      if (type !== 'DOOR') {
+        const d = DEF_SIZE[type] || { w: 12, h: 12 };
+        marker.w = d.w;
+        marker.h = d.h;
+      }
+      if (type === 'RADIATION') marker.rads = Number(radsInput?.value) || 0;
+      const markers = this._getSensorMarkers(this._sensorsDeckId);
+      markers.push(marker);
+      await this._setSensorMarkers(this._sensorsDeckId, markers);
+      if (labelInput) labelInput.value = '';
+      TerminalSFX.play('beep');
+      this._renderSensorMarkers(contentEl, markerLayer);
+    });
+
+    list?.addEventListener('click', async (e) => {
+      const del = e.target.closest('[data-action="del-sensor-marker"]');
+      const tog = e.target.closest('[data-action="toggle-door"]');
+      if (del) {
+        const id = del.dataset.markerId;
+        const markers = this._getSensorMarkers(this._sensorsDeckId).filter(m => m.id !== id);
+        await this._setSensorMarkers(this._sensorsDeckId, markers);
+        this._renderSensorMarkers(contentEl, markerLayer);
+      } else if (tog) {
+        const id = tog.dataset.markerId;
+        const markers = this._getSensorMarkers(this._sensorsDeckId);
+        const m = markers.find(x => x.id === id);
+        if (m && m.type === 'DOOR') {
+          m.status = m.status === 'LOCKED' ? 'UNLOCKED' : 'LOCKED';
+          await this._setSensorMarkers(this._sensorsDeckId, markers);
+          this._renderSensorMarkers(contentEl, markerLayer);
+        }
+      }
+    });
+  }
+
+  /**
+   * EXTERNAL sensors — animated proximity radar. Draws range rings, a rotating
+   * sweep with a fading trail, and blips for each NAV-marker contact that
+   * brighten as the sweep passes over them.
+   */
+  _setupExternalRadar(contentEl) {
+    const wrap = contentEl.querySelector('#wy-radar');
+    const canvas = contentEl.querySelector('#wy-radar-canvas');
+    const readoutBody = contentEl.querySelector('#wy-radar-readout-body');
+    const countEl = contentEl.querySelector('#wy-radar-count');
+    if (!wrap || !canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const st = this._sensorState || {};
+    // Live contact set (targets) — refreshed from the RADAR scene on a short interval.
+    let contacts = this._lastRadarContacts || [];
+    // Displayed blips — only updated to the latest target when the sweep passes
+    // over their bearing (old-school radar persistence). Keyed by contact id.
+    const disp = new Map();
+    let prevSweep = -1;
+    const TWO_PI = Math.PI * 2;
+    const normA = (a) => ((a % TWO_PI) + TWO_PI) % TWO_PI;
+    const crossedAngle = (prev, cur, a) => (cur >= prev ? (a > prev && a <= cur) : (a > prev || a <= cur));
+
+    const resize = () => {
+      const size = Math.max(80, Math.floor(Math.min(wrap.clientWidth, wrap.clientHeight)));
+      canvas.width = size;
+      canvas.height = size;
+      canvas.style.width = `${size}px`;
+      canvas.style.height = `${size}px`;
+    };
+    resize();
+    if (this._sensorsResizeObserver) this._sensorsResizeObserver.disconnect();
+    this._sensorsResizeObserver = new ResizeObserver(resize);
+    this._sensorsResizeObserver.observe(wrap);
+
+    // Blip radius scales with the token's on-scene size (fallback to size 1-10)
+    const blipRadius = (c, R) => {
+      if (c.sizePct != null) return Math.max(3, Math.min(R * 0.35, c.sizePct * R * 0.9));
+      return 2 + (Math.max(1, Math.min(10, c.size || 3)) - 1) * (7 / 9);
+    };
+
+    const selected = () => disp.get(this._radarSelectedId) || contacts.find(c => c.id === this._radarSelectedId) || null;
+
+    const updateReadout = () => {
+      if (!readoutBody) return;
+      const c = selected();
+      if (!c) {
+        readoutBody.innerHTML = '<div class="wy-text-dim">NO TARGET SELECTED.<br>TOUCH A CONTACT ON THE SCOPE.</div>';
+        return;
+      }
+      const d = c.data || {};
+      const row = (k, v) => ((v === '' || v == null) ? '' : `<div class="wy-radar-readout-row"><span class="wy-text-dim">${k}</span><span>${v}</span></div>`);
+      const lenTxt = (d.length === '' || d.length == null) ? '' : `${d.length} M`;
+      readoutBody.innerHTML =
+        row('DESIGNATION', c.label) +
+        row('MODEL / CLASS', d.model) +
+        row('MANUFACTURER', d.manufacturer) +
+        row('ARMAMENTS', d.armaments) +
+        row('MODULES / UPGRADES', d.modules) +
+        row('AI', d.ai) +
+        row('CREW', d.crew) +
+        row('LENGTH', lenTxt) +
+        row('HULL', d.hull) +
+        row('ARMOR', d.armor) +
+        row('DAMAGE', d.damage) +
+        row('BEARING', `${c.bearing}°`) +
+        row('RANGE', `${c.range} AU`) +
+        row('SIZE', `${c.size}/10`) +
+        (c.notes
+          ? `<div class="wy-radar-readout-notes"><span class="wy-text-dim">NOTES</span><br>${c.notes}</div>`
+          : '<div class="wy-radar-readout-notes wy-text-dim">NO TARGET DATA ON FILE.</div>');
+    };
+
+    const refreshContacts = () => {
+      if (st.offline) { contacts = []; }
+      else {
+        const rs = this._getRadarSceneContacts();
+        contacts = st.diminished ? rs.contacts.filter(c => c.radiusPct <= st.rangeRatio + 0.001) : rs.contacts;
+      }
+      this._lastRadarContacts = contacts;
+    };
+    refreshContacts();
+    updateReadout();
+
+    // Click/touch a blip to select it → populate the readout panel
+    const pickContact = (clientX, clientY) => {
+      const rect = canvas.getBoundingClientRect();
+      const w = canvas.width, h = canvas.height;
+      const cx = w / 2, cy = h / 2, R = Math.min(cx, cy) - 4;
+      const px = (clientX - rect.left) * (w / rect.width);
+      const py = (clientY - rect.top) * (h / rect.height);
+      let best = null, bestD = 18;
+      disp.forEach(c => {
+        const bx = cx + Math.cos(c.angle) * R * c.radiusPct;
+        const by = cy + Math.sin(c.angle) * R * c.radiusPct;
+        const d = Math.hypot(px - bx, py - by);
+        if (d < bestD) { bestD = d; best = c; }
+      });
+      if (best) { this._radarSelectedId = best.id; TerminalSFX.play('beep'); updateReadout(); }
+    };
+    canvas.addEventListener('click', (e) => pickContact(e.clientX, e.clientY));
+
+    const start = performance.now();
+    const SWEEP_PERIOD = 4000; // ms per full revolution
+    let lastPoll = 0;
+
+    const draw = (now) => {
+      // Live-refresh contacts from the RADAR scene (~5x/sec) for realtime tracking
+      if (now - lastPoll > 200) { lastPoll = now; refreshContacts(); updateReadout(); }
+
+      const w = canvas.width, h = canvas.height;
+      const cx = w / 2, cy = h / 2;
+      const R = Math.min(cx, cy) - 4;
+      ctx.clearRect(0, 0, w, h);
+
+      ctx.strokeStyle = 'rgba(127,255,0,0.25)';
+      ctx.lineWidth = 1;
+      for (let i = 1; i <= 4; i++) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, (R * i) / 4, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.beginPath();
+      ctx.moveTo(cx - R, cy); ctx.lineTo(cx + R, cy);
+      ctx.moveTo(cx, cy - R); ctx.lineTo(cx, cy + R);
+      ctx.stroke();
+
+      // Reduced effective-range ring when sensors are diminished
+      if (st.diminished && st.rangeRatio < 1) {
+        ctx.save();
+        ctx.setLineDash([4, 4]);
+        ctx.strokeStyle = 'rgba(255,191,0,0.55)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(cx, cy, R * st.rangeRatio, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      const sweep = (((now - start) % SWEEP_PERIOD) / SWEEP_PERIOD) * Math.PI * 2;
+      ctx.save();
+      ctx.translate(cx, cy);
+      for (let i = 0; i < 24; i++) {
+        const a = sweep - i * 0.03;
+        ctx.strokeStyle = `rgba(127,255,0,${0.22 * (1 - i / 24)})`;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(Math.cos(a) * R, Math.sin(a) * R);
+        ctx.stroke();
+      }
+      ctx.strokeStyle = 'rgba(127,255,0,0.9)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(Math.cos(sweep) * R, Math.sin(sweep) * R);
+      ctx.stroke();
+      ctx.restore();
+
+      // Paint updates: snapshot a target's position only when the sweep passes
+      // its bearing (first frame paints everything so the scope isn't empty).
+      contacts.forEach(c => {
+        if (prevSweep < 0 || crossedAngle(prevSweep, sweep, normA(c.angle))) {
+          disp.set(c.id, { ...c });
+        }
+      });
+      const liveIds = new Set(contacts.map(c => c.id));
+      for (const id of Array.from(disp.keys())) if (!liveIds.has(id)) disp.delete(id);
+      prevSweep = sweep;
+      if (countEl) countEl.textContent = String(disp.size);
+
+      let __i = 0;
+      disp.forEach((c) => {
+        const i = __i++;
+        let px = cx + Math.cos(c.angle) * R * c.radiusPct;
+        let py = cy + Math.sin(c.angle) * R * c.radiusPct;
+        if (st.diminished) {
+          const j = (st.degrade || 0) * 8;
+          px += Math.sin(now / 300 + i) * j;
+          py += Math.cos(now / 370 + i) * j;
+        }
+        const da = (((sweep - c.angle) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+        const intensity = Math.max(0.25, 1 - da / (Math.PI * 2));
+        const r = blipRadius(c, R);
+        const isSel = c.id === this._radarSelectedId;
+        ctx.fillStyle = `rgba(127,255,0,${intensity})`;
+        ctx.beginPath();
+        ctx.arc(px, py, r, 0, Math.PI * 2);
+        ctx.fill();
+        if (isSel) {
+          ctx.strokeStyle = 'rgba(0,255,255,0.9)';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(px, py, r + 4, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        if (intensity > 0.55 || isSel) {
+          ctx.fillStyle = isSel ? 'rgba(0,255,255,0.95)' : `rgba(127,255,0,${(intensity - 0.55) / 0.45})`;
+          ctx.font = '9px monospace';
+          ctx.fillText(c.label, px + r + 3, py + 3);
+        }
+      });
+
+      this._radarRAF = requestAnimationFrame(draw);
+    };
+
+    if (this._radarRAF) cancelAnimationFrame(this._radarRAF);
+    this._radarRAF = requestAnimationFrame(draw);
+  }
+
   /* ── Comms data ── */
   _getCommsData() {
     // Derive COMM STATUS from the COMMS ARRAY entry in shipSystems
@@ -1508,6 +2354,9 @@ export class WYTerminalApp extends Application {
         break;
       case 'nav':
         this._setupNavView(contentEl);
+        break;
+      case 'sensors':
+        this._setupSensorsView(contentEl);
         break;
       case 'crew':
         this._setupCrewView(contentEl);
@@ -1915,6 +2764,7 @@ export class WYTerminalApp extends Application {
       this._broadcastSocket('refreshView', { view: 'systems' });
       this._broadcastSocket('refreshView', { view: 'comms' });
       this._broadcastSocket('refreshView', { view: 'logs' });
+      this._broadcastSocket('refreshView', { view: 'sensors' });
       this._renderView('systems');
     });
 
@@ -5566,6 +6416,33 @@ export class WYTerminalApp extends Application {
       ui.notifications.info(`WY-Terminal: Crew folders updated. ${selected.length} folder(s) selected.`);
       this._broadcastSocket('refreshView', { view: 'crew' });
     });
+
+    // ── External radar: configure the RADAR scene background ──
+    contentEl.querySelector('[data-action="setup-radar-scene"]')?.addEventListener('click', () => {
+      game.wyTerminal?.setupRadarScene?.();
+    });
+
+    // ── AlienRPG content import ──
+    contentEl.querySelector('[data-action="import-spacecraft"]')?.addEventListener('click', () => {
+      game.wyTerminal?.importSpacecraft?.();
+    });
+    contentEl.querySelector('[data-action="import-all-content"]')?.addEventListener('click', () => {
+      game.wyTerminal?.importAlienContent?.();
+    });
+
+    // Save INTERNAL sensor crew label overrides
+    contentEl.querySelector('[data-action="save-crew-labels"]')?.addEventListener('click', async () => {
+      const inputs = contentEl.querySelectorAll('[data-crew-label]');
+      const overrides = {};
+      inputs.forEach(inp => {
+        const id = inp.dataset.crewLabel;
+        const val = (inp.value || '').trim();
+        if (id && val) overrides[id] = val.toUpperCase();
+      });
+      await game.settings.set('wy-terminal', 'sensorCrewLabels', overrides);
+      ui.notifications.info(`WY-Terminal: Crew labels saved (${Object.keys(overrides).length}).`);
+      this._broadcastSocket('refreshView', { view: 'sensors' });
+    });
   }
 
   async _saveSettingsFromForm(contentEl) {
@@ -5984,6 +6861,7 @@ export class WYTerminalApp extends Application {
               if (action.detail !== undefined) sys.detail = action.detail;
               await game.settings.set('wy-terminal', 'shipSystems', systems);
               this._broadcastSocket('refreshView', { view: 'systems' });
+              this._broadcastSocket('refreshView', { view: 'sensors' });
               console.log(`WY-Terminal | System "${action.systemName}" set to ${action.status}`);
             } else {
               console.warn(`WY-Terminal | Timer action: system "${action.systemName}" not found in ship systems.`);
@@ -6267,6 +7145,7 @@ export class WYTerminalApp extends Application {
       starsystems: 'STELLAR CARTOGRAPHY',
       emergency: 'EMERGENCY PROTOCOLS',
       nav: 'NAVIGATION',
+      sensors: 'SENSOR ARRAY',
       comms: 'COMMUNICATIONS',
       cargo: 'CARGO MANIFEST',
       weapons: 'WEAPONS SYSTEMS',
